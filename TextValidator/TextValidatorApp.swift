@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct TextValidatorApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+	let coordinator = DefaultContactInfoCoordinator()
+	
+	var body: some Scene {
+			WindowGroup {
+				NavigationControllerWrapper(coordinator: coordinator)
+					.edgesIgnoringSafeArea(.all)
+					.onAppear {
+						coordinator.start()
+					}
+			}
+	}
 }
