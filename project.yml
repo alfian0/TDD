@@ -1,0 +1,56 @@
+name: TextValidator
+options:
+  bundleIdPrefix: id.alfian
+  xcodeVersion: 14.2
+packages:
+  FirebaseAuth:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 11.3.0
+settings:
+  ENABLE_USER_SCRIPT_SANDBOXING: 'NO'
+  CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED: 'YES'
+  ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: 'NO'
+targets:
+  TextValidator:
+    platform: iOS
+    type: application
+    deploymentTarget: "15.0"
+    sources: [TextValidator]
+    configFiles:
+      Debug: TextValidator/Configuration/Debug.xcconfig
+      Release: TextValidator/Configuration/Release.xcconfig
+    postBuildScripts:
+      - path: Scripts/swiftformat_script.sh
+        name: SwiftFormat
+      - path: Scripts/swiftlint_script.sh
+        name: SwiftLint
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 1.0
+        SWIFT_VERSION: 5.0
+        DEVELOPMENT_TEAM: "9GE8EQEDQB"
+        ENABLE_BITCODE: false
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: 1
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_CFBundleDisplayName: "$(BUNDLE_DISPLAY_NAME)"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+    dependencies:
+      - package: FirebaseAuth
+    scheme:
+      testTargets:
+        - TextValidatorTests
+      gatherCoverageData: true
+      coverageTargets:
+        - TextValidator
+  TextValidatorTests:
+    platform: iOS
+    type: bundle.unit-test
+    sources: [TextValidatorTests]
+    settings:
+      INFOPLIST_FILE: TextValidator/Info.plist
+    dependencies:
+      - target: TextValidator

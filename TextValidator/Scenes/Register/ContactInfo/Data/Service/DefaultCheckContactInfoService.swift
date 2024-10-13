@@ -5,22 +5,22 @@
 //  Created by Alfian on 07/10/24.
 //
 
-import Foundation
 import Combine
+import FirebaseAuth
+import Foundation
 
 final class DefaultCheckContactInfoService: CheckContactInfoRepository {
-	func execute(fullname: String, phone: String) -> AnyPublisher<ContactInfoResponse, any Error> {
-		if fullname == "error" {
-			return Fail(error: NSError(domain: "", code: 404))
-				.eraseToAnyPublisher()
-		} else if phone.count == 7 {
-			return Just(ContactInfoResponse(type: "two"))
-				.setFailureType(to: Error.self)
-				.eraseToAnyPublisher()
-		} else {
-			return Just(ContactInfoResponse(type: "one"))
-				.setFailureType(to: Error.self)
-				.eraseToAnyPublisher()
-		}
-	}
+    func execute(fullname _: String, phone: String) -> AnyPublisher<String, any Error> {
+        Auth.auth().settings?.isAppVerificationDisabledForTesting = false
+        return Future<String, any Error> { promise in
+            PhoneAuthProvider.provider().verifyPhoneNumber(phone) { verificationID, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else if let verificationID = verificationID {
+                    promise(.success(verificationID))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 }

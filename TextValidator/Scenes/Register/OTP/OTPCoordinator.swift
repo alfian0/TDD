@@ -8,29 +8,51 @@
 import SwiftUI
 
 enum OTPCoordinatorPage {
-	case pin
+    case pin
+}
+
+enum OTPCoordinatorSheet {
+    case error(title: String, subtitle: String, didDismiss: () -> Void)
 }
 
 final class OTPCoordinator: Coordinator {
-	var childCoordinator: [any Coordinator] = .init()
-	var navigationController: UINavigationController
-	
-	init(navigationController: UINavigationController = UINavigationController()) {
-		self.navigationController = navigationController
-	}
-	
-	func start(type: OTPType) {
-		let vm = OTPViewModel(type: type, coordinator: self)
-		let v = OTPView(viewModel: vm)
-		let vc = UIHostingController(rootView: v)
-		navigationController.show(vc, sender: navigationController)
-	}
-	
-	func push(_ page: OTPCoordinatorPage) {
-		switch page {
-			case .pin:
-				let coordinator = PINCoordinator(navigationController: navigationController)
-				coordinator.start()
-		}
-	}
+    var childCoordinator: [any Coordinator] = .init()
+    var navigationController: UINavigationController
+
+    init(navigationController: UINavigationController = UINavigationController()) {
+        self.navigationController = navigationController
+    }
+
+    func start(type: OTPType, verificationID: String) {
+        let vm = OTPViewModel(
+            type: type,
+            verificationID: verificationID,
+            otpVerifyUsecase: DefaultOTPVerifyUsecase(service: OTPVerifyService()),
+            coordinator: self
+        )
+        let v = OTPView(viewModel: vm)
+        let vc = UIHostingController(rootView: v)
+        navigationController.show(vc, sender: navigationController)
+    }
+
+    func push(_ page: OTPCoordinatorPage) {
+        switch page {
+        case .pin:
+            let coordinator = PINCoordinator(navigationController: navigationController)
+            coordinator.start()
+        }
+    }
+
+    func present(_ sheet: OTPCoordinatorSheet) {
+        switch sheet {
+        case let .error(title, subtitle, didDismiss):
+            let coordinator = ErrorCoordinator()
+            coordinator.start(title: title, subtitle: subtitle, didDismiss: { [weak self] in
+                didDismiss()
+                self?.navigationController.dismiss(animated: true)
+            })
+            coordinator.navigationController.modalPresentationStyle = .fullScreen
+            navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
+        }
+    }
 }

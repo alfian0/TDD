@@ -8,5 +8,5 @@
 import Combine
 
 protocol CountryCodeRepository {
-	func findAll() -> AnyPublisher<[CountryCodeResponse], Error>
+    func findAll() -> AnyPublisher<[CountryCodeResponse], Error>
 }

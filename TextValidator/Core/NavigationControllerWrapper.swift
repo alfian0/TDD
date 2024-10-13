@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct NavigationControllerWrapper: UIViewControllerRepresentable {
-	let coordinator: any Coordinator
-	
-	public init(coordinator: any Coordinator) {
-		self.coordinator = coordinator
-	}
-	
-	public func makeUIViewController(context _: Context) -> UINavigationController {
-		return coordinator.navigationController
-	}
-	
-	public func updateUIViewController(_: UINavigationController, context _: Context) {
-		// Handle updates if necessary
-	}
+    let coordinator: any Coordinator
+
+    public init(coordinator: any Coordinator) {
+        self.coordinator = coordinator
+    }
+
+    public func makeUIViewController(context _: Context) -> UINavigationController {
+        return coordinator.navigationController
+    }
+
+    public func updateUIViewController(_: UINavigationController, context _: Context) {
+        // Handle updates if necessary
+    }
 }

@@ -8,12 +8,12 @@
 import SwiftUI
 
 extension Binding where Value == String {
-	func limit(_ length: Int) -> Self {
-		if wrappedValue.count > length {
-			DispatchQueue.main.async {
-				wrappedValue = String(wrappedValue.prefix(length))
-			}
-		}
-		return self
-	}
+    func limit(_ length: Int) -> Self {
+        if wrappedValue.count > length {
+            DispatchQueue.main.async {
+                wrappedValue = String(wrappedValue.prefix(length))
+            }
+        }
+        return self
+    }
 }

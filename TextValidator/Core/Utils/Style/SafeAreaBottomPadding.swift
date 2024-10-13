@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct SafeAreaBottomPadding: ViewModifier {
-	func body(content: Content) -> some View {
-		if UIApplication.shared.windows.first?.safeAreaInsets.bottom == 0 {
-			content.padding(.bottom)
-		} else {
-			content
-		}
-	}
+    func body(content: Content) -> some View {
+        if UIApplication.shared.windows.first?.safeAreaInsets.bottom == 0 {
+            content.padding(.bottom)
+        } else {
+            content
+        }
+    }
 }
 
 extension View {
-	func safeAreaBottomPadding() -> some View {
-		modifier(SafeAreaBottomPadding())
-	}
+    func safeAreaBottomPadding() -> some View {
+        modifier(SafeAreaBottomPadding())
+    }
 }
