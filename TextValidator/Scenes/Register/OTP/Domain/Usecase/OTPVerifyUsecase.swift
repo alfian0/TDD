@@ -6,7 +6,7 @@
 //
 
 import Combine
-import FirebaseAuth
+import Foundation
 
 enum OTPVerifyError: Error, LocalizedError {
     case NOT_MATCH
@@ -23,7 +23,7 @@ enum OTPVerifyError: Error, LocalizedError {
 }
 
 protocol OTPVerifyUsecase {
-    func execute(verificationID: String, verificationCode: String) -> AnyPublisher<AuthDataResult, OTPVerifyError>
+    func execute(verificationID: String, verificationCode: String) -> AnyPublisher<UserModel, OTPVerifyError>
 }
 
 final class DefaultOTPVerifyUsecase: OTPVerifyUsecase {
@@ -33,9 +33,20 @@ final class DefaultOTPVerifyUsecase: OTPVerifyUsecase {
         self.service = service
     }
 
-    func execute(verificationID: String, verificationCode: String) -> AnyPublisher<FirebaseAuth.AuthDataResult, OTPVerifyError> {
+    func execute(verificationID: String, verificationCode: String) -> AnyPublisher<UserModel, OTPVerifyError> {
         service.execute(verificationID: verificationID, verificationCode: verificationCode)
-            .catch { error -> AnyPublisher<FirebaseAuth.AuthDataResult, OTPVerifyError> in
+            .map { authDataResult in
+                let user = authDataResult.user
+                return UserModel(
+                    providerID: user.providerID,
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    email: user.email,
+                    phoneNumber: user.phoneNumber
+                )
+            }
+            .catch { error -> AnyPublisher<UserModel, OTPVerifyError> in
                 let error = error as NSError
                 if let userInfo = error.userInfo as? [String: String],
                    userInfo["FIRAuthErrorUserInfoNameKey"] == "ERROR_INVALID_VERIFICATION_CODE"

@@ -6,7 +6,9 @@
 //
 
 import Combine
+import FirebaseAuth
 
 protocol CheckContactInfoRepository {
-    func execute(fullname: String, phone: String) -> AnyPublisher<String, Error>
+    func verify(phone: String) -> AnyPublisher<String, Error>
+    func update(fullname: String) -> AnyPublisher<User?, Error>
 }

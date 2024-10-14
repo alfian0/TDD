@@ -18,6 +18,7 @@ final class OTPViewModel: ObservableObject {
     var subtitle: String
     var count = 6
 
+    private let didSuccess: () -> Void
     private let verificationID: String
     private let otpVerifyUsecase: DefaultOTPVerifyUsecase
 
@@ -30,13 +31,15 @@ final class OTPViewModel: ObservableObject {
         type: OTPType,
         verificationID: String,
         otpVerifyUsecase: DefaultOTPVerifyUsecase,
-        coordinator: OTPCoordinator
+        coordinator: OTPCoordinator,
+        didSuccess: @escaping () -> Void
     ) {
         title = type.title
         subtitle = type.subtitle
         self.coordinator = coordinator
         self.verificationID = verificationID
         self.otpVerifyUsecase = otpVerifyUsecase
+        self.didSuccess = didSuccess
 
         $otpText
             .map { [weak self] value in
@@ -71,13 +74,13 @@ final class OTPViewModel: ObservableObject {
             }
     }
 
-    func goToPIN() {
+    func next() {
         otpVerifyUsecase.execute(verificationID: verificationID, verificationCode: otpText)
             .sink { [weak self] result in
                 guard let self = self else { return }
                 switch result {
-                case let .success(authResult):
-                    coordinator.push(.pin)
+                case .success:
+                    didSuccess()
                 case let .failure(error):
                     coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
                 }

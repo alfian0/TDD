@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LoginView: View {
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Hi, Welcome Back!")
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -24,9 +24,21 @@ struct LoginView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Username")
+                    Text("Email or Phone")
                         .font(.subheadline)
-                    TextField("Username", text: .constant(""))
+                    TextField("Email or Phone", text: .constant(""))
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                    Divider()
+                    Text("")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Password")
+                        .font(.subheadline)
+                    TextField("Password", text: .constant(""))
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                     Divider()

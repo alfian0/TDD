@@ -8,8 +8,9 @@
 import SwiftUI
 
 enum ContactInfoCoordinatorPage {
-    case otp(type: OTPType, verificationID: String)
+    case otp(type: OTPType, verificationID: String, didSuccess: () -> Void)
     case email
+    case password
 }
 
 enum ContactInfoCoordinatorSheet {
@@ -23,13 +24,13 @@ enum ContactInfoCoordinatorSheet {
     )
 }
 
-protocol ContactInfoCoordinator {
+protocol ContactInfoCoordinator: Coordinator {
     func start()
     func push(_ page: ContactInfoCoordinatorPage)
     func present(_ sheet: ContactInfoCoordinatorSheet)
 }
 
-final class DefaultContactInfoCoordinator: Coordinator, ContactInfoCoordinator {
+final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
     var childCoordinator: [any Coordinator] = .init()
     var navigationController: UINavigationController
 
@@ -54,12 +55,20 @@ final class DefaultContactInfoCoordinator: Coordinator, ContactInfoCoordinator {
 
     func push(_ page: ContactInfoCoordinatorPage) {
         switch page {
-        case let .otp(type, verificationID):
+        case let .otp(type, verificationID, didSuccess):
             let coordinator = OTPCoordinator(navigationController: navigationController)
-            coordinator.start(type: type, verificationID: verificationID)
+            coordinator.start(
+                type: type,
+                verificationID: verificationID,
+                didSuccess: didSuccess
+            )
 
         case .email:
             let coordinator = EmailCoordinator(navigationController: navigationController)
+            coordinator.start()
+
+        case .password:
+            let coordinator = PasswordCoordinator(navigationController: navigationController)
             coordinator.start()
         }
     }

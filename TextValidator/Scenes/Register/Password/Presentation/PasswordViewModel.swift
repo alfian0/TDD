@@ -14,11 +14,22 @@ final class PasswordViewModel: ObservableObject {
     @Published var repeatPassword: String = ""
     @Published var repeatPasswordError: String?
     @Published var passwordStrength: PasswordStrength = .veryWeak
+    @Published var canSubmit: Bool = false
 
-    private(set) var passwordStrengthUsecase = PasswordStrengthUsecase()
+    private(set) var setPasswordUsecase: SetPasswordUsecase
+    private(set) var passwordStrengthUsecase: PasswordStrengthUsecase
     private(set) var cancellables = Set<AnyCancellable>()
+    private var coordinator: PasswordCoordinator
 
-    init() {
+    init(
+        setPasswordUsecase: SetPasswordUsecase,
+        passwordStrengthUsecase: PasswordStrengthUsecase,
+        coordinator: PasswordCoordinator
+    ) {
+        self.setPasswordUsecase = setPasswordUsecase
+        self.passwordStrengthUsecase = passwordStrengthUsecase
+        self.coordinator = coordinator
+
         $password
             .dropFirst()
             .sink { [weak self] value in
@@ -39,5 +50,27 @@ final class PasswordViewModel: ObservableObject {
         )
         .map { $0 == $1 ? nil : TextValidationError.NOT_EQUAL.localizedDescription }
         .assign(to: &$repeatPasswordError)
+
+        Publishers.CombineLatest($passwordError, $repeatPasswordError)
+            .map { [weak self] passwordError, repeatPasswordError in
+                guard let self = self else { return false }
+                return passwordError == nil && repeatPasswordError == nil && !self.password.isEmpty && !self.repeatPassword.isEmpty
+            }
+            .assign(to: \.canSubmit, on: self)
+            .store(in: &cancellables)
+    }
+
+    func didTapCountinue() {
+        setPasswordUsecase.execute(password: password)
+            .sink { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success:
+                    coordinator.push(.pin)
+                case let .failure(error):
+                    coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+                }
+            }
+            .store(in: &cancellables)
     }
 }

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct EmailView: View {
+    @StateObject var viewModel: EmailViewModel
+
     var body: some View {
         VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
@@ -25,11 +27,11 @@ struct EmailView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Email")
                     .font(.subheadline)
-                TextField("Email", text: .constant(""))
+                TextField("Email", text: $viewModel.email)
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
                 Divider()
-                Text("")
+                Text(viewModel.emailError ?? "")
                     .font(.caption)
                     .foregroundColor(.red)
             }
@@ -38,16 +40,19 @@ struct EmailView: View {
             Spacer()
 
             VStack {
-                Button {} label: {
+                Button {
+                    viewModel.didTapCountinue()
+                } label: {
                     Text("Continue")
                         .frame(minHeight: 24)
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal)
                         .padding(.vertical, 8)
-                        .background(.blue)
+                        .background(viewModel.canSubmit ? Color.blue : Color.gray)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
+                .disabled(!viewModel.canSubmit)
 
                 Button {} label: {
                     Text("Skip")
@@ -68,5 +73,10 @@ struct EmailView: View {
 }
 
 #Preview {
-    EmailView()
+    EmailView(viewModel: EmailViewModel(
+        emailValidationUsecase: EmailValidationUsecase(),
+        setEmailUsecase: SetEmailUsecase(service: EmailService()),
+        coordinator: EmailCoordinator()
+    )
+    )
 }

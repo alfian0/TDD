@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PasswordView: View {
-    @StateObject var viewModel: PasswordViewModel = .init()
+    @StateObject var viewModel: PasswordViewModel
 
     var body: some View {
         VStack {
@@ -60,17 +60,20 @@ struct PasswordView: View {
 
             Spacer()
 
-            Button {} label: {
+            Button {
+                viewModel.didTapCountinue()
+            } label: {
                 Text("Continue")
                     .frame(minHeight: 24)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal)
                     .padding(.vertical, 8)
-                    .background(.blue)
+                    .background(viewModel.canSubmit ? Color.blue : Color.gray)
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }
             .padding(.horizontal)
+            .disabled(!viewModel.canSubmit)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .safeAreaBottomPadding()
@@ -78,5 +81,9 @@ struct PasswordView: View {
 }
 
 #Preview {
-    PasswordView()
+    PasswordView(viewModel: PasswordViewModel(
+        setPasswordUsecase: SetPasswordUsecase(service: PasswordService()),
+        passwordStrengthUsecase: PasswordStrengthUsecase(),
+        coordinator: PasswordCoordinator()
+    ))
 }

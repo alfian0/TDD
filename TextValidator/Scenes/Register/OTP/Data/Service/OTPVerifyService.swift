@@ -14,7 +14,6 @@ final class OTPVerifyService: OTPVerifyRepository {
         return Future<AuthDataResult, any Error> { promise in
             Auth.auth().signIn(with: credential) { authResult, error in
                 if let error = error {
-                    print(error)
                     promise(.failure(error))
                 } else if let authResult = authResult {
                     promise(.success(authResult))

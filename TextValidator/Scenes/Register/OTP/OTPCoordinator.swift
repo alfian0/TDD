@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-enum OTPCoordinatorPage {
-    case pin
-}
-
 enum OTPCoordinatorSheet {
     case error(title: String, subtitle: String, didDismiss: () -> Void)
 }
@@ -23,24 +19,17 @@ final class OTPCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
-    func start(type: OTPType, verificationID: String) {
+    func start(type: OTPType, verificationID: String, didSuccess: @escaping () -> Void) {
         let vm = OTPViewModel(
             type: type,
             verificationID: verificationID,
             otpVerifyUsecase: DefaultOTPVerifyUsecase(service: OTPVerifyService()),
-            coordinator: self
+            coordinator: self,
+            didSuccess: didSuccess
         )
         let v = OTPView(viewModel: vm)
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)
-    }
-
-    func push(_ page: OTPCoordinatorPage) {
-        switch page {
-        case .pin:
-            let coordinator = PINCoordinator(navigationController: navigationController)
-            coordinator.start()
-        }
     }
 
     func present(_ sheet: OTPCoordinatorSheet) {

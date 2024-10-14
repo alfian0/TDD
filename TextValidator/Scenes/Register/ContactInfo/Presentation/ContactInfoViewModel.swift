@@ -89,13 +89,21 @@ final class ContactInfoViewModel: ObservableObject {
 
     func didTapCountinue() {
         isLoading = true
-        checkContactInfoUsecase.execute(fullname: fullname, phone: countryCode.dialCode + phone)
+        checkContactInfoUsecase.verify(fullname: fullname, phone: countryCode.dialCode + phone)
             .sink { [weak self] result in
                 guard let self = self else { return }
                 isLoading = false
                 switch result {
                 case let .success(verificationID):
-                    coordinator.push(.otp(type: .phone(code: countryCode, phone: phone), verificationID: verificationID))
+                    coordinator.push(.otp(
+                        type: .phone(code: countryCode, phone: phone),
+                        verificationID: verificationID,
+                        didSuccess: {
+                            self.coordinator.finish()
+                            self.updateName()
+                        }
+                    )
+                    )
                 case let .failure(error):
                     coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
                 }
@@ -118,5 +126,23 @@ final class ContactInfoViewModel: ObservableObject {
             cancellable.cancel()
         }
         cancellables.removeAll()
+    }
+
+    private func updateName() {
+        checkContactInfoUsecase.update(fullname: fullname)
+            .sink { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case let .success(user):
+                    if user.email == nil {
+                        coordinator.push(.email)
+                    } else {
+                        coordinator.push(.password)
+                    }
+                case let .failure(error):
+                    coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+                }
+            }
+            .store(in: &cancellables)
     }
 }

@@ -83,7 +83,7 @@ struct OTPView: View {
             Spacer()
 
             Button(action: {
-                viewModel.goToPIN()
+                viewModel.next()
             }) {
                 Text("Continue")
                     .frame(minHeight: 24)
@@ -122,7 +122,8 @@ struct OTPView: View {
             type: .phone(code: .dummy, phone: "87738091779"),
             verificationID: "",
             otpVerifyUsecase: DefaultOTPVerifyUsecase(service: OTPVerifyService()),
-            coordinator: OTPCoordinator()
+            coordinator: OTPCoordinator(),
+            didSuccess: {}
         )
     )
 }

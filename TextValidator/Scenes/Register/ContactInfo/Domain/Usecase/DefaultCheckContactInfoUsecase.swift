@@ -11,22 +11,7 @@ import Foundation
 enum ContactInfoError: Error, LocalizedError, Equatable {
     case ALREADY_REGISTERED
     case ERROR_INVALID_PHONE_NUMBER
-    case NETWORK_ERROR(Error)
     case UNKNOWN
-
-    static func == (lhs: ContactInfoError, rhs: ContactInfoError) -> Bool {
-        switch (lhs, rhs) {
-        case (.ALREADY_REGISTERED, .ALREADY_REGISTERED):
-            return true
-        case let (.NETWORK_ERROR(lhsError), .NETWORK_ERROR(rhsError)):
-            return (lhsError as NSError).domain == (rhsError as NSError).domain &&
-                (lhsError as NSError).code == (rhsError as NSError).code
-        case (.UNKNOWN, .UNKNOWN):
-            return true
-        default:
-            return false
-        }
-    }
 
     var errorDescription: String? {
         switch self {
@@ -34,8 +19,6 @@ enum ContactInfoError: Error, LocalizedError, Equatable {
             return "Already registered"
         case .ERROR_INVALID_PHONE_NUMBER:
             return "Invalid Phone Number"
-        case let .NETWORK_ERROR(error):
-            return error.localizedDescription
         case .UNKNOWN:
             return "Unknown"
         }
@@ -43,7 +26,8 @@ enum ContactInfoError: Error, LocalizedError, Equatable {
 }
 
 protocol CheckContactInfoUsecase {
-    func execute(fullname: String, phone: String) -> AnyPublisher<String, ContactInfoError>
+    func verify(fullname: String, phone: String) -> AnyPublisher<String, ContactInfoError>
+    func update(fullname: String) -> AnyPublisher<UserModel, ContactInfoError>
 }
 
 final class DefaultCheckContactInfoUsecase: CheckContactInfoUsecase {
@@ -53,8 +37,8 @@ final class DefaultCheckContactInfoUsecase: CheckContactInfoUsecase {
         self.service = service
     }
 
-    func execute(fullname: String, phone: String) -> AnyPublisher<String, ContactInfoError> {
-        return service.execute(fullname: fullname, phone: phone)
+    func verify(fullname _: String, phone: String) -> AnyPublisher<String, ContactInfoError> {
+        service.verify(phone: phone)
             .catch { error -> AnyPublisher<String, ContactInfoError> in
                 let error = error as NSError
                 if let userInfo = error.userInfo as? [String: String],
@@ -63,7 +47,26 @@ final class DefaultCheckContactInfoUsecase: CheckContactInfoUsecase {
                     return Fail(error: ContactInfoError.ERROR_INVALID_PHONE_NUMBER)
                         .eraseToAnyPublisher()
                 }
-                return Fail(error: ContactInfoError.NETWORK_ERROR(error))
+                return Fail(error: ContactInfoError.UNKNOWN)
+                    .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
+    }
+
+    func update(fullname: String) -> AnyPublisher<UserModel, ContactInfoError> {
+        service.update(fullname: fullname)
+            .map {
+                UserModel(
+                    providerID: $0?.providerID ?? "",
+                    uid: $0?.uid ?? "",
+                    displayName: $0?.displayName,
+                    photoURL: $0?.photoURL,
+                    email: $0?.email,
+                    phoneNumber: $0?.email
+                )
+            }
+            .catch { error -> AnyPublisher<UserModel, ContactInfoError> in
+                Fail(error: ContactInfoError.UNKNOWN)
                     .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
