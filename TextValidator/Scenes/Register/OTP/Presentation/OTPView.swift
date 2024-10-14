@@ -117,13 +117,13 @@ struct OTPView: View {
 }
 
 #Preview {
-    OTPView(
-        viewModel: OTPViewModel(
-            type: .phone(code: .dummy, phone: "87738091779"),
-            verificationID: "",
-            otpVerifyUsecase: DefaultOTPVerifyUsecase(service: OTPVerifyService()),
-            coordinator: OTPCoordinator(),
-            didSuccess: {}
-        )
-    )
+    let coordinator = OTPCoordinator()
+
+    NavigationControllerWrapper(coordinator: coordinator)
+        .edgesIgnoringSafeArea(.all)
+        .onAppear {
+            coordinator.start(type: .phone(code: .dummy, phone: ""), verificationID: "", didSuccess: {
+                
+            })
+        }
 }

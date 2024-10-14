@@ -63,6 +63,6 @@ struct PINView: View {
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)
         .onAppear {
-            coordinator.start()
+            coordinator.start(didFinish: {})
         }
 }

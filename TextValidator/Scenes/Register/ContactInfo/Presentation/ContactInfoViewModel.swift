@@ -26,19 +26,22 @@ final class ContactInfoViewModel: ObservableObject {
     private var coordinator: any ContactInfoCoordinator
 
     var cancellables = Set<AnyCancellable>()
+    let didTapLogin: () -> Void
 
     init(
         fullnameValidationUsecase: FullNameValidationUsecase,
         phoneValidationUsecase: PhoneValidationUsecase,
         countryCodeUsecase: CountryCodeUsecase,
         checkContactInfoUsecase: CheckContactInfoUsecase,
-        coordinator: any ContactInfoCoordinator
+        coordinator: any ContactInfoCoordinator,
+        didTapLogin: @escaping () -> Void
     ) {
         self.fullnameValidationUsecase = fullnameValidationUsecase
         self.phoneValidationUsecase = phoneValidationUsecase
         self.countryCodeUsecase = countryCodeUsecase
         self.checkContactInfoUsecase = checkContactInfoUsecase
         self.coordinator = coordinator
+        self.didTapLogin = didTapLogin
 
         $fullname
             .dropFirst()
@@ -99,7 +102,6 @@ final class ContactInfoViewModel: ObservableObject {
                         type: .phone(code: countryCode, phone: phone),
                         verificationID: verificationID,
                         didSuccess: {
-                            self.coordinator.finish()
                             self.updateName()
                         }
                     )
@@ -112,7 +114,7 @@ final class ContactInfoViewModel: ObservableObject {
     }
 
     func launchLogin() {
-        coordinator.present(.login)
+        didTapLogin()
     }
 
     func launchCountryCode() {

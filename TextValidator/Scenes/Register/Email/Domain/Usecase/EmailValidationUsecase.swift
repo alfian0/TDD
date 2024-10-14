@@ -9,6 +9,9 @@ import Foundation
 
 final class EmailValidationUsecase {
     func execute(input: String) -> TextValidationError? {
+        guard !input.isEmpty else {
+            return .EMPTY
+        }
         // Email validation regex pattern based on RFC 5322
         let regex = "^(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*" +
             "|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]" +

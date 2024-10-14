@@ -127,11 +127,13 @@ struct ContactInfoView: View {
 }
 
 #Preview {
-    ContactInfoView(viewModel: ContactInfoViewModel(
-        fullnameValidationUsecase: FullNameValidationUsecase(),
-        phoneValidationUsecase: PhoneValidationUsecase(),
-        countryCodeUsecase: DefaultCountryCodeUsecase(service: DefaultCountryCodeService()),
-        checkContactInfoUsecase: DefaultCheckContactInfoUsecase(service: DefaultCheckContactInfoService()),
-        coordinator: DefaultContactInfoCoordinator()
-    ))
+    let coordinator = DefaultContactInfoCoordinator()
+
+    NavigationControllerWrapper(coordinator: coordinator)
+        .edgesIgnoringSafeArea(.all)
+        .onAppear {
+            coordinator.start {
+                
+            }
+        }
 }

@@ -81,9 +81,11 @@ struct PasswordView: View {
 }
 
 #Preview {
-    PasswordView(viewModel: PasswordViewModel(
-        setPasswordUsecase: SetPasswordUsecase(service: PasswordService()),
-        passwordStrengthUsecase: PasswordStrengthUsecase(),
-        coordinator: PasswordCoordinator()
-    ))
+    let coordinator = PasswordCoordinator()
+
+    NavigationControllerWrapper(coordinator: coordinator)
+        .edgesIgnoringSafeArea(.all)
+        .onAppear {
+            coordinator.start()
+        }
 }

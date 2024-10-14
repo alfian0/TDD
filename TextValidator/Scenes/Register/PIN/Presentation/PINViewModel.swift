@@ -25,15 +25,18 @@ final class PINViewModel: ObservableObject {
 
     private var currentPasscode: String = ""
     private let verifyPINUsecase: VerifyPINUsecase
+    private let didFinish: () -> Void
 
     init(
         count: Int,
         verifyPINUsecase: VerifyPINUsecase,
-        coordinator: PINCoordinator
+        coordinator: PINCoordinator,
+        didFinish: @escaping () -> Void
     ) {
         self.count = count
         self.verifyPINUsecase = verifyPINUsecase
         self.coordinator = coordinator
+        self.didFinish = didFinish
 
         $passcode
             .filter { $0.count == count }
@@ -49,7 +52,7 @@ final class PINViewModel: ObservableObject {
         if !currentPasscode.isEmpty, currentPasscode.count == count {
             view(with: .enter)
         } else {
-            coordinator.finish()
+            didFinish()
         }
     }
 
@@ -73,7 +76,7 @@ final class PINViewModel: ObservableObject {
                 switch result {
                 case let .success(isVerify):
                     if isVerify {
-                        coordinator.goToPassword()
+                        coordinator.push(.pin)
                     } else {
                         self.view(with: .reenter)
                     }

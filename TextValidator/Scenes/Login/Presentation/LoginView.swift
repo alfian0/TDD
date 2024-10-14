@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct LoginView: View {
+    @StateObject var viewModel: LoginViewModel
+
     var body: some View {
         VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
@@ -24,27 +26,29 @@ struct LoginView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Email or Phone")
+                    Text("Email")
                         .font(.subheadline)
-                    TextField("Email or Phone", text: .constant(""))
+                    TextField("Email", text: $viewModel.username)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
                     Divider()
-                    Text("")
+                    Text(viewModel.usernameError ?? "")
                         .font(.caption)
                         .foregroundColor(.red)
                 }
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Password")
-                        .font(.subheadline)
-                    TextField("Password", text: .constant(""))
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                    Divider()
-                    Text("")
-                        .font(.caption)
-                        .foregroundColor(.red)
+                if viewModel.isEmailValid {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Password")
+                            .font(.subheadline)
+                        TextField("Password", text: .constant(""))
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
+                        Divider()
+                        Text("")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
                 }
 
                 HStack(spacing: 4) {
@@ -80,12 +84,25 @@ struct LoginView: View {
                     Image(systemName: "questionmark.circle")
                 }
             }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    viewModel.dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+            }
         }
     }
 }
 
 #Preview {
     NavigationView {
-        LoginView()
+        LoginView(viewModel: LoginViewModel(
+            emailValidationUsecase: EmailValidationUsecase(),
+            coordinator: LoginViewCoordinator(),
+            didDismiss: {}
+        )
+        )
     }
 }

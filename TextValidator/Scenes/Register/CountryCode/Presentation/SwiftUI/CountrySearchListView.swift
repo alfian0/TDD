@@ -46,7 +46,15 @@ struct CountrySearchListView: View {
 }
 
 #Preview {
-    CountrySearchListView(viewModel: CountryCodeViewModel(selected: .dummy, items: try! Data.fromJSONFile("Dial").toCodable(with: [CountryCodeResponse].self).map { CountryCodeModel(name: $0.name, flag: $0.flag, dialCode: $0.dialCode, code: $0.code) }) { _ in
+    let coordinator = CountryCodeCoordinator()
 
-    } didDismiss: {})
+    NavigationControllerWrapper(coordinator: coordinator)
+        .edgesIgnoringSafeArea(.all)
+        .onAppear {
+            coordinator.start(selected: .dummy, items: [.dummy]) { _ in
+                
+            } didDismiss: {
+                
+            }
+        }
 }

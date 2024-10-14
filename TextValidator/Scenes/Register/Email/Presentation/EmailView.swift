@@ -73,10 +73,11 @@ struct EmailView: View {
 }
 
 #Preview {
-    EmailView(viewModel: EmailViewModel(
-        emailValidationUsecase: EmailValidationUsecase(),
-        setEmailUsecase: SetEmailUsecase(service: EmailService()),
-        coordinator: EmailCoordinator()
-    )
-    )
+    let coordinator = EmailCoordinator()
+
+    NavigationControllerWrapper(coordinator: coordinator)
+        .edgesIgnoringSafeArea(.all)
+        .onAppear {
+            coordinator.start()
+        }
 }

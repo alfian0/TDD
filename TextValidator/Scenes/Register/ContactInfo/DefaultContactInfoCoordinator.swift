@@ -15,7 +15,6 @@ enum ContactInfoCoordinatorPage {
 
 enum ContactInfoCoordinatorSheet {
     case error(title: String, subtitle: String, didDismiss: () -> Void)
-    case login
     case countryCode(
         selected: CountryCodeModel,
         items: [CountryCodeModel],
@@ -25,7 +24,7 @@ enum ContactInfoCoordinatorSheet {
 }
 
 protocol ContactInfoCoordinator: Coordinator {
-    func start()
+    func start(didTapLogin: @escaping () -> Void)
     func push(_ page: ContactInfoCoordinatorPage)
     func present(_ sheet: ContactInfoCoordinatorSheet)
 }
@@ -38,14 +37,15 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
         self.navigationController = navigationController
     }
 
-    func start() {
+    func start(didTapLogin: @escaping () -> Void) {
         guard navigationController.viewControllers.isEmpty else { return }
         let vm = ContactInfoViewModel(
             fullnameValidationUsecase: FullNameValidationUsecase(),
             phoneValidationUsecase: PhoneValidationUsecase(),
             countryCodeUsecase: DefaultCountryCodeUsecase(service: DefaultCountryCodeService()),
             checkContactInfoUsecase: DefaultCheckContactInfoUsecase(service: DefaultCheckContactInfoService()),
-            coordinator: self
+            coordinator: self,
+            didTapLogin: didTapLogin
         )
         let v = ContactInfoView(viewModel: vm)
         let vc = UIHostingController(rootView: v)
@@ -60,7 +60,12 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
             coordinator.start(
                 type: type,
                 verificationID: verificationID,
-                didSuccess: didSuccess
+                didSuccess: { [weak self] in
+                    guard let self = self else { return }
+                    navigationController.dismiss(animated: true) {
+                        didSuccess()
+                    }
+                }
             )
 
         case .email:
@@ -80,13 +85,8 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
             coordinator.start(title: title, subtitle: subtitle, didDismiss: { [weak self] in
                 didDismiss()
                 self?.navigationController.dismiss(animated: true)
+                self?.childCoordinator.removeLast()
             })
-            coordinator.navigationController.modalPresentationStyle = .fullScreen
-            navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
-
-        case .login:
-            let coordinator = LoginViewCoordinator()
-            coordinator.start()
             coordinator.navigationController.modalPresentationStyle = .fullScreen
             childCoordinator.append(coordinator)
             navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
@@ -98,13 +98,15 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
                 items: items,
                 didSelect: { [weak self] item in
                     didSelect(item)
-                    self?.navigationController.dismiss(animated: true)
-                    self?.childCoordinator.removeLast()
+                    self?.navigationController.dismiss(animated: true, completion: {
+                        self?.childCoordinator.removeLast()
+                    })
                 },
                 didDismiss: { [weak self] in
                     didDismiss()
-                    self?.navigationController.dismiss(animated: true)
-                    self?.childCoordinator.removeLast()
+                    self?.navigationController.dismiss(animated: true, completion: {
+                        self?.childCoordinator.removeLast()
+                    })
                 }
             )
             coordinator.navigationController.modalPresentationStyle = .fullScreen

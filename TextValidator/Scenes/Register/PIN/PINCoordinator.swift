@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+enum PINCoordinatorPage {
+    case pin
+}
+
 final class PINCoordinator: Coordinator {
     var childCoordinator: [any Coordinator] = .init()
     var navigationController: UINavigationController
@@ -15,19 +19,21 @@ final class PINCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
-    func start() {
+    func start(didFinish: @escaping () -> Void) {
         let vm = PINViewModel(
             count: 6,
             verifyPINUsecase: VerifyPINUsecase(service: SetPINService()),
-            coordinator: self
+            coordinator: self,
+            didFinish: didFinish
         )
         let v = PINView(viewModel: vm)
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)
     }
 
-    func goToPassword() {
-        let coordinator = PasswordCoordinator(navigationController: navigationController)
-        coordinator.start()
+    func push(_ page: PINCoordinatorPage) {
+        switch page {
+        case .pin: break
+        }
     }
 }

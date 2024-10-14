@@ -15,8 +15,13 @@ final class LoginViewCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
-    func start() {
-        let v = LoginView()
+    func start(didDismiss: @escaping () -> Void) {
+        let vm = LoginViewModel(
+            emailValidationUsecase: EmailValidationUsecase(),
+            coordinator: self,
+            didDismiss: didDismiss
+        )
+        let v = LoginView(viewModel: vm)
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)
     }

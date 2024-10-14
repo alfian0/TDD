@@ -22,7 +22,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct TextValidatorApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    let coordinator = DefaultContactInfoCoordinator()
+    let coordinator = MainAppCoordinator()
 
     var body: some Scene {
         WindowGroup {

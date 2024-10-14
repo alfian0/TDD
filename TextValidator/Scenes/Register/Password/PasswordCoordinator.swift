@@ -44,7 +44,7 @@ final class PasswordCoordinator: Coordinator {
         switch page {
         case .pin:
             let coordinator = PINCoordinator(navigationController: navigationController)
-            coordinator.start()
+            coordinator.start(didFinish: {})
         }
     }
 
