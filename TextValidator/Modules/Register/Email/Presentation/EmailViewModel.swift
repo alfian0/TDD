@@ -31,6 +31,7 @@ enum EmailViewState {
     }
 }
 
+@MainActor
 final class EmailViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var emailError: String?
@@ -38,7 +39,7 @@ final class EmailViewModel: ObservableObject {
     @Published var viewState: EmailViewState
 
     private let emailValidationUsecase: EmailValidationUsecase
-    private let setEmailUsecase: SetEmailUsecase
+    private let registerEmailUsecase: RegisterEmailUsecase
     private var coordinator: EmailCoordinator
 
     private(set) var cancellables = Set<AnyCancellable>()
@@ -46,12 +47,12 @@ final class EmailViewModel: ObservableObject {
     init(
         viewState: EmailViewState,
         emailValidationUsecase: EmailValidationUsecase,
-        setEmailUsecase: SetEmailUsecase,
+        registerEmailUsecase: RegisterEmailUsecase,
         coordinator: EmailCoordinator
     ) {
         self.viewState = viewState
         self.emailValidationUsecase = emailValidationUsecase
-        self.setEmailUsecase = setEmailUsecase
+        self.registerEmailUsecase = registerEmailUsecase
         self.coordinator = coordinator
 
         $email
@@ -84,17 +85,14 @@ final class EmailViewModel: ObservableObject {
         }
     }
 
-    func didTapCountinue() {
-        setEmailUsecase.execute(email: email)
-            .sink { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success:
-                    viewState = .waitingForVerification
-                case let .failure(error):
-                    coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
-                }
-            }
-            .store(in: &cancellables)
+    func didTapCountinue() async {
+        let result = await registerEmailUsecase.execute(email: email)
+
+        switch result {
+        case .success:
+            viewState = .waitingForVerification
+        case let .failure(error):
+            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+        }
     }
 }

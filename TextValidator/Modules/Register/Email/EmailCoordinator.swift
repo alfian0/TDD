@@ -23,11 +23,15 @@ final class EmailCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
+    @MainActor
     func start(viewState: EmailViewState) {
         let vm = EmailViewModel(
             viewState: viewState,
             emailValidationUsecase: EmailValidationUsecase(),
-            setEmailUsecase: SetEmailUsecase(service: EmailService()),
+            registerEmailUsecase: RegisterEmailUsecase(
+                repository: RegisterEmailRepository(service: FirebaseRegisterService()),
+                emailValidationUsecase: EmailValidationUsecase()
+            ),
             coordinator: self
         )
         let v = EmailView(viewModel: vm)
@@ -35,6 +39,7 @@ final class EmailCoordinator: Coordinator {
         navigationController.setViewControllers([vc], animated: true)
     }
 
+    @MainActor
     func start(_ deeplink: DeeplinkType) {
         switch deeplink {
         case .verifyEmail:

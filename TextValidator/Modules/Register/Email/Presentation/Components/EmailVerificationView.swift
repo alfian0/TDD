@@ -21,7 +21,9 @@ struct EmailVerificationView: View {
             Spacer()
 
             Button {
-                viewModel.didTapCountinue()
+                Task {
+                    await viewModel.didTapCountinue()
+                }
             } label: {
                 Text("Resend")
                     .frame(minHeight: 24)
@@ -38,7 +40,10 @@ struct EmailVerificationView: View {
         viewModel: EmailViewModel(
             viewState: .formInput,
             emailValidationUsecase: EmailValidationUsecase(),
-            setEmailUsecase: SetEmailUsecase(service: EmailService()),
+            registerEmailUsecase: RegisterEmailUsecase(
+                repository: RegisterEmailRepository(service: FirebaseRegisterService()),
+                emailValidationUsecase: EmailValidationUsecase()
+            ),
             coordinator: EmailCoordinator()
         )
     )

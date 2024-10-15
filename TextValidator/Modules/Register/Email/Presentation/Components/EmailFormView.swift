@@ -28,7 +28,9 @@ struct EmailFormView: View {
 
         VStack {
             Button {
-                viewModel.didTapCountinue()
+                Task {
+                    await viewModel.didTapCountinue()
+                }
             } label: {
                 Text("Continue")
                     .frame(minHeight: 24)
@@ -54,7 +56,10 @@ struct EmailFormView: View {
     EmailFormView(viewModel: EmailViewModel(
         viewState: .formInput,
         emailValidationUsecase: EmailValidationUsecase(),
-        setEmailUsecase: SetEmailUsecase(service: EmailService()),
+        registerEmailUsecase: RegisterEmailUsecase(
+            repository: RegisterEmailRepository(service: FirebaseRegisterService()),
+            emailValidationUsecase: EmailValidationUsecase()
+        ),
         coordinator: EmailCoordinator()
     ))
 }
