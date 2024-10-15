@@ -24,7 +24,9 @@ final class OTPCoordinator: Coordinator {
         let vm = OTPViewModel(
             type: type,
             verificationID: verificationID,
-            otpVerifyUsecase: DefaultOTPVerifyUsecase(service: OTPVerifyService()),
+            verifyOTPUsecase: VerifyOTPUsecase(
+                repository: VerifyOTPRepository(service: FirebaseRegisterService())
+            ),
             coordinator: self,
             didSuccess: didSuccess
         )

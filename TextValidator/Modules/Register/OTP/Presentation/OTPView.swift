@@ -83,7 +83,9 @@ struct OTPView: View {
             Spacer()
 
             Button(action: {
-                viewModel.next()
+                Task {
+                    await viewModel.next()
+                }
             }) {
                 Text("Continue")
                     .frame(minHeight: 24)

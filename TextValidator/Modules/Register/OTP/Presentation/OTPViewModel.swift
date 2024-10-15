@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 
+@MainActor
 final class OTPViewModel: ObservableObject {
     @Published var otpText: String = ""
     @Published private(set) var isEnableOtherAction: Bool = false
@@ -20,7 +21,7 @@ final class OTPViewModel: ObservableObject {
 
     private let didSuccess: () -> Void
     private let verificationID: String
-    private let otpVerifyUsecase: DefaultOTPVerifyUsecase
+    private let verifyOTPUsecase: VerifyOTPUsecase
 
     private var timeRemaining = 10
     private var timerCancellable: AnyCancellable?
@@ -30,7 +31,7 @@ final class OTPViewModel: ObservableObject {
     init(
         type: OTPType,
         verificationID: String,
-        otpVerifyUsecase: DefaultOTPVerifyUsecase,
+        verifyOTPUsecase: VerifyOTPUsecase,
         coordinator: OTPCoordinator,
         didSuccess: @escaping () -> Void
     ) {
@@ -38,7 +39,7 @@ final class OTPViewModel: ObservableObject {
         subtitle = type.subtitle
         self.coordinator = coordinator
         self.verificationID = verificationID
-        self.otpVerifyUsecase = otpVerifyUsecase
+        self.verifyOTPUsecase = verifyOTPUsecase
         self.didSuccess = didSuccess
 
         $otpText
@@ -74,17 +75,13 @@ final class OTPViewModel: ObservableObject {
             }
     }
 
-    func next() {
-        otpVerifyUsecase.execute(verificationID: verificationID, verificationCode: otpText)
-            .sink { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success:
-                    didSuccess()
-                case let .failure(error):
-                    coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
-                }
-            }
-            .store(in: &cancellables)
+    func next() async {
+        let result = await verifyOTPUsecase.execute(verificationID: verificationID, verificationCode: otpText)
+        switch result {
+        case let .success(user):
+            didSuccess()
+        case let .failure(error):
+            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+        }
     }
 }
