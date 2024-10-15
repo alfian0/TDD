@@ -8,6 +8,7 @@
 import Foundation
 
 // MARK: Usecase just single bussiness logic, validate, or conver data or error to new mapper
+
 enum LoginUsecaseError: Error, LocalizedError {
     case INVALID_EMAIL(TextValidationError)
     case ERROR_INVALID_CREDENTIAL

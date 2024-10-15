@@ -24,8 +24,8 @@ enum ContactInfoCoordinatorSheet {
 }
 
 protocol ContactInfoCoordinator: Coordinator {
-    func start(didTapLogin: @escaping () -> Void)
-    func push(_ page: ContactInfoCoordinatorPage)
+    func start(didTapLogin: @escaping () -> Void) async
+    func push(_ page: ContactInfoCoordinatorPage) async
     func present(_ sheet: ContactInfoCoordinatorSheet)
 }
 
@@ -37,13 +37,20 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
         self.navigationController = navigationController
     }
 
+    @MainActor
     func start(didTapLogin: @escaping () -> Void) {
         let vm = ContactInfoViewModel(
             fullnameValidationUsecase: NameValidationUsecase(),
             phoneValidationUsecase: PhoneValidationUsecase(),
             countryCodeUsecase: DefaultCountryCodeUsecase(service: DefaultCountryCodeService()),
-            verifyPhoneUsecase: VerifyPhoneUsecase(service: DefaultCheckContactInfoService()),
-            updateNameUsecase: UpdateNameUsecase(service: DefaultCheckContactInfoService()),
+            registerPhoneUsecase: RegisterPhoneUsecase(
+                repository: RegisterPhoneRepository(service: FirebaseRegisterService()),
+                phoneValidationUsecase: PhoneValidationUsecase()
+            ),
+            saveNameUsecase: SaveNameUsecase(
+                repository: RegisterPhoneRepository(service: FirebaseRegisterService()),
+                nameValidationUsecase: NameValidationUsecase()
+            ),
             coordinator: self,
             didTapLogin: didTapLogin
         )
@@ -53,12 +60,14 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
         navigationController.show(vc, sender: navigationController)
     }
 
+    @MainActor
     func start(_ deeplink: DeeplinkType, didTapLogin: @escaping () -> Void) {
         start(didTapLogin: didTapLogin)
         let coordinator = EmailCoordinator(navigationController: navigationController)
         coordinator.start(deeplink)
     }
 
+    @MainActor
     func push(_ page: ContactInfoCoordinatorPage) {
         switch page {
         case let .otp(type, verificationID, didSuccess):

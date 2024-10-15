@@ -19,6 +19,7 @@ final class OTPCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
+    @MainActor
     func start(type: OTPType, verificationID: String, didSuccess: @escaping () -> Void) {
         let vm = OTPViewModel(
             type: type,

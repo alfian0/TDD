@@ -8,6 +8,7 @@
 import FirebaseAuth
 
 // MARK: Service related to Third-party in this case FirebaseAuth
+
 final class FirebaseLoginService {
     func signInWithEmail(email: String, password: String) async throws -> User {
         try await Auth.auth().signIn(withEmail: email, password: password).user

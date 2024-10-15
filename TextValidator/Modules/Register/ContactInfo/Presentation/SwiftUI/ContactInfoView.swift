@@ -100,7 +100,9 @@ struct ContactInfoView: View {
                 .toggleStyle(iOSCheckboxToggleStyle())
 
                 Button(action: {
-                    viewModel.didTapCountinue()
+                    Task {
+                        await viewModel.didTapCountinue()
+                    }
                 }) {
                     Text("Continue")
                         .frame(minHeight: 24)

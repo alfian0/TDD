@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 
+@MainActor
 final class ContactInfoViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var fullname: String = ""
@@ -22,8 +23,8 @@ final class ContactInfoViewModel: ObservableObject {
     private let fullnameValidationUsecase: NameValidationUsecase
     private let phoneValidationUsecase: PhoneValidationUsecase
     private let countryCodeUsecase: CountryCodeUsecase
-    private let verifyPhoneUsecase: VerifyPhoneUsecase
-    private let updateNameUsecase: UpdateNameUsecase
+    private let registerPhoneUsecase: RegisterPhoneUsecase
+    private let saveNameUsecase: SaveNameUsecase
     private var coordinator: any ContactInfoCoordinator
 
     var cancellables = Set<AnyCancellable>()
@@ -33,16 +34,16 @@ final class ContactInfoViewModel: ObservableObject {
         fullnameValidationUsecase: NameValidationUsecase,
         phoneValidationUsecase: PhoneValidationUsecase,
         countryCodeUsecase: CountryCodeUsecase,
-        verifyPhoneUsecase: VerifyPhoneUsecase,
-        updateNameUsecase: UpdateNameUsecase,
+        registerPhoneUsecase: RegisterPhoneUsecase,
+        saveNameUsecase: SaveNameUsecase,
         coordinator: any ContactInfoCoordinator,
         didTapLogin: @escaping () -> Void
     ) {
         self.fullnameValidationUsecase = fullnameValidationUsecase
         self.phoneValidationUsecase = phoneValidationUsecase
         self.countryCodeUsecase = countryCodeUsecase
-        self.verifyPhoneUsecase = verifyPhoneUsecase
-        self.updateNameUsecase = updateNameUsecase
+        self.registerPhoneUsecase = registerPhoneUsecase
+        self.saveNameUsecase = saveNameUsecase
         self.coordinator = coordinator
         self.didTapLogin = didTapLogin
 
@@ -93,27 +94,25 @@ final class ContactInfoViewModel: ObservableObject {
         }
     }
 
-    func didTapCountinue() {
+    func didTapCountinue() async {
         isLoading = true
-        verifyPhoneUsecase.exec(phone: countryCode.dialCode + phone)
-            .sink { [weak self] result in
-                guard let self = self else { return }
-                isLoading = false
-                switch result {
-                case let .success(verificationID):
-                    coordinator.push(.otp(
-                        type: .phone(code: countryCode, phone: phone),
-                        verificationID: verificationID,
-                        didSuccess: {
-                            self.updateName()
-                        }
-                    )
-                    )
-                case let .failure(error):
-                    coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+
+        defer {
+            isLoading = false
+        }
+
+        let result = await registerPhoneUsecase.execute(phone: countryCode.dialCode + phone)
+
+        switch result {
+        case let .success(verificationID):
+            await coordinator.push(.otp(type: .phone(code: countryCode, phone: phone), verificationID: verificationID, didSuccess: { [weak self] in
+                Task {
+                    await self?.updateName()
                 }
-            }
-            .store(in: &cancellables)
+            }))
+        case let .failure(error):
+            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+        }
     }
 
     func launchLogin() {
@@ -133,21 +132,24 @@ final class ContactInfoViewModel: ObservableObject {
         cancellables.removeAll()
     }
 
-    private func updateName() {
-        updateNameUsecase.exec(fullname: fullname)
-            .sink { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case let .success(user):
-                    if user.email == nil {
-                        coordinator.push(.email)
-                    } else {
-                        coordinator.push(.password)
-                    }
-                case let .failure(error):
-                    coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
-                }
+    private func updateName() async {
+        isLoading = true
+
+        defer {
+            isLoading = false
+        }
+
+        let result = await saveNameUsecase.execute(name: fullname)
+
+        switch result {
+        case let .success(isEmailVerified):
+            if isEmailVerified {
+                await coordinator.push(.password)
+            } else {
+                await coordinator.push(.email)
             }
-            .store(in: &cancellables)
+        case let .failure(error):
+            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+        }
     }
 }

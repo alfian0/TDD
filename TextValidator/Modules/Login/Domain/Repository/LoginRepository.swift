@@ -8,12 +8,15 @@
 import Foundation
 
 // MARK: Repository use service but not importing Third-patry and Handling multiple source
+
 // MARK: For this case use FirebaseLoginService and UserDefault to temporary save email
+
 protocol LoginRepository {
     func signInWithEmail(email: String, password: String) async throws -> UserModel
 }
 
 // MARK: TO DO remove this to Constant
+
 let emailLogin = "email_login"
 
 final class LoginRepositoryImpl: LoginRepository {
@@ -44,7 +47,7 @@ final class LoginRepositoryImpl: LoginRepository {
         guard authDataResult.user.emailVerified() else {
             throw NSError(domain: "login.repository", code: 0)
         }
-        
+
         UserDefaults.standard.removeObject(forKey: emailLogin)
 
         return UserMapper.map(user: authDataResult.user)

@@ -30,7 +30,7 @@ class ContactInfoViewController: UIViewController {
     }
 
     deinit {
-        viewModel.cancel()
+//        viewModel.cancel()
     }
 
     override func viewDidLoad() {
@@ -123,8 +123,8 @@ class ContactInfoViewController: UIViewController {
         viewModel.didTapCountryCode()
     }
 
-    @objc private func didTapContinue() {
-        viewModel.didTapCountinue()
+    @objc private func didTapContinue() async {
+        await viewModel.didTapCountinue()
     }
 
     @objc private func didToggleTermsSwitch(_ sender: UIButton) {
