@@ -23,6 +23,7 @@ final class PasswordCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
+    @MainActor
     func start() {
         guard navigationController.viewControllers
             .filter({ $0 is UIHostingController<PasswordView> }).count == 0
@@ -31,7 +32,9 @@ final class PasswordCoordinator: Coordinator {
         }
 
         let vm = PasswordViewModel(
-            setPasswordUsecase: SetPasswordUsecase(service: PasswordService()),
+            setPasswordUsecase: SetPasswordUsecase(
+                repository: SetPasswordRepository(service: FirebaseRegisterService())
+            ),
             passwordStrengthUsecase: PasswordStrengthUsecase(),
             coordinator: self
         )

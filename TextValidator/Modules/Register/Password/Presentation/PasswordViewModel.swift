@@ -8,6 +8,7 @@
 import Combine
 import SwiftUI
 
+@MainActor
 final class PasswordViewModel: ObservableObject {
     @Published var password: String = ""
     @Published var passwordError: String?
@@ -60,17 +61,14 @@ final class PasswordViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    func didTapCountinue() {
-        setPasswordUsecase.execute(password: password)
-            .sink { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success:
-                    coordinator.push(.pin)
-                case let .failure(error):
-                    coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
-                }
-            }
-            .store(in: &cancellables)
+    func didTapCountinue() async {
+        let result = await setPasswordUsecase.execute(password: password)
+
+        switch result {
+        case .success:
+            coordinator.push(.pin)
+        case let .failure(error):
+            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+        }
     }
 }

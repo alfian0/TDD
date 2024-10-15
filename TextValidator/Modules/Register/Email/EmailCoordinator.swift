@@ -47,6 +47,7 @@ final class EmailCoordinator: Coordinator {
         }
     }
 
+    @MainActor
     func push(_ page: EmailCoordinatorPage) {
         switch page {
         case .password:

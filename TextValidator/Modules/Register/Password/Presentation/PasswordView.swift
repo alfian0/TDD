@@ -61,7 +61,9 @@ struct PasswordView: View {
             Spacer()
 
             Button {
-                viewModel.didTapCountinue()
+                Task {
+                    await viewModel.didTapCountinue()
+                }
             } label: {
                 Text("Continue")
                     .frame(minHeight: 24)

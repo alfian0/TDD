@@ -8,24 +8,23 @@
 import Combine
 import Foundation
 
-enum SetPassword: Error, LocalizedError {
+enum SetPasswordUsecaseError: Error, LocalizedError {
     case UNKNOWN
 }
 
 final class SetPasswordUsecase {
-    private let service: PasswordRepository
+    private let repository: SetPasswordRepository
 
-    init(service: PasswordRepository) {
-        self.service = service
+    init(repository: SetPasswordRepository) {
+        self.repository = repository
     }
 
-    func execute(password: String) -> AnyPublisher<UserModel, SetPassword> {
-        service.update(password: password)
-            .compactMap { $0 }
-            .map { UserMapper.map(user: $0) }
-            .catch { _ in
-                Fail(error: SetPassword.UNKNOWN)
-            }
-            .eraseToAnyPublisher()
+    func execute(password: String) async -> Result<Void, SetPasswordUsecaseError> {
+        do {
+            try await repository.updatePassword(password: password)
+            return .success(())
+        } catch {
+            return .failure(.UNKNOWN)
+        }
     }
 }
