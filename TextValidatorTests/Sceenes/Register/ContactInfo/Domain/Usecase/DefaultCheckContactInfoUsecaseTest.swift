@@ -16,7 +16,7 @@ final class DefaultCheckContactInfoUsecaseTest: XCTestCase {
         let expectation = expectation(description: "Should return level one")
         let service = MockCheckContactInfoService()
         service.result = ContactInfoResponse(type: "one")
-        let sut = DefaultCheckContactInfoUsecase(service: service)
+        let sut = VerifyPhoneUsecase(service: service)
         sut.execute(fullname: "", phone: "")
             .sink { result in
                 switch result {
@@ -35,7 +35,7 @@ final class DefaultCheckContactInfoUsecaseTest: XCTestCase {
         let expectation = expectation(description: "Should return error")
         let service = MockCheckContactInfoService()
         service.error = NSError(domain: "", code: 404)
-        let sut = DefaultCheckContactInfoUsecase(service: service)
+        let sut = VerifyPhoneUsecase(service: service)
         sut.execute(fullname: "", phone: "")
             .sink { result in
                 switch result {
@@ -54,7 +54,7 @@ final class DefaultCheckContactInfoUsecaseTest: XCTestCase {
         let expectation = expectation(description: "Should return registered")
         let service = MockCheckContactInfoService()
         service.error = NSError(domain: "", code: 403)
-        let sut = DefaultCheckContactInfoUsecase(service: service)
+        let sut = VerifyPhoneUsecase(service: service)
         sut.execute(fullname: "", phone: "")
             .sink { result in
                 switch result {

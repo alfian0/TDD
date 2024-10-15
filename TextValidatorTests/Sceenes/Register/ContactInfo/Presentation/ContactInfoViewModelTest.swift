@@ -24,7 +24,7 @@ final class ContactInfoViewModelTest: XCTestCase {
         cancellables = []
 
         sut = ContactInfoViewModel(
-            fullnameValidationUsecase: FullNameValidationUsecase(),
+            fullnameValidationUsecase: NameValidationUsecase(),
             phoneValidationUsecase: PhoneValidationUsecase(),
             countryCodeUsecase: countryCodeRepo,
             checkContactInfoUsecase: checkContactInfoRepo,

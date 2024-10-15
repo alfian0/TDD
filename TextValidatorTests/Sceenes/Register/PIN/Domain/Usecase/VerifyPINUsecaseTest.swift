@@ -15,7 +15,7 @@ final class VerifyPINUsecaseTest: XCTestCase {
     func test_VerifyPINUsecase_withEmptyText_shoudReturnEmpty() {
         let expectation = expectation(description: "Should return empty")
         let service = MockSetPINService()
-        let sut = VerifyPINUsecase(service: service)
+        let sut = PINValidationUsecase(service: service)
         sut.execute(pin: "", repin: "")
             .sink { result in
                 switch result {
@@ -39,7 +39,7 @@ final class VerifyPINUsecaseTest: XCTestCase {
     func test_VerifyPINUsecase_withUnder4Characther_shoudReturnTooShort() {
         let expectation = expectation(description: "Should return TOO_SHORT")
         let service = MockSetPINService()
-        let sut = VerifyPINUsecase(service: service)
+        let sut = PINValidationUsecase(service: service)
         sut.execute(pin: "123", repin: "")
             .sink { result in
                 switch result {
@@ -63,7 +63,7 @@ final class VerifyPINUsecaseTest: XCTestCase {
     func test_VerifyPINUsecase_withOver12Characther_shoudReturnTooLong() {
         let expectation = expectation(description: "Should return TOO_LONG")
         let service = MockSetPINService()
-        let sut = VerifyPINUsecase(service: service)
+        let sut = PINValidationUsecase(service: service)
         sut.execute(pin: "1234567890123", repin: "")
             .sink { result in
                 switch result {
@@ -87,7 +87,7 @@ final class VerifyPINUsecaseTest: XCTestCase {
     func test_VerifyPINUsecase_withIdenticalConsecutive_shoudReturnIDENTICAL_CONSECUTIVE() {
         let expectation = expectation(description: "Should return IDENTICAL_CONSECUTIVE")
         let service = MockSetPINService()
-        let sut = VerifyPINUsecase(service: service)
+        let sut = PINValidationUsecase(service: service)
         sut.execute(pin: "1111", repin: "")
             .sink { result in
                 switch result {
@@ -111,7 +111,7 @@ final class VerifyPINUsecaseTest: XCTestCase {
     func test_VerifyPINUsecase_withSquential_shoudReturnIDENTICAL_CANNOT_SQUENTIAL() {
         let expectation = expectation(description: "Should return CANNOT_SQUENTIAL")
         let service = MockSetPINService()
-        let sut = VerifyPINUsecase(service: service)
+        let sut = PINValidationUsecase(service: service)
         sut.execute(pin: "123456", repin: "")
             .sink { result in
                 switch result {
@@ -135,7 +135,7 @@ final class VerifyPINUsecaseTest: XCTestCase {
     func test_VerifyPINUsecase_withValidPin_shoudReturnisVerifyFALSE() {
         let expectation = expectation(description: "Should return isVerify FALSE")
         let service = MockSetPINService()
-        let sut = VerifyPINUsecase(service: service)
+        let sut = PINValidationUsecase(service: service)
         sut.execute(pin: "123458", repin: "")
             .sink { result in
                 switch result {
@@ -159,7 +159,7 @@ final class VerifyPINUsecaseTest: XCTestCase {
     func test_VerifyPINUsecase_withValidPinAndRepin_shoudReturnisVerifyTRUE() {
         let expectation = expectation(description: "Should return isVerify TRUE")
         let service = MockSetPINService()
-        let sut = VerifyPINUsecase(service: service)
+        let sut = PINValidationUsecase(service: service)
         sut.execute(pin: "123458", repin: "123458")
             .sink { result in
                 switch result {
@@ -183,7 +183,7 @@ final class VerifyPINUsecaseTest: XCTestCase {
     func test_VerifyPINUsecase_withValidPinAndNotValidRepin_shoudReturnNOT_EQUAL() {
         let expectation = expectation(description: "Should return NOT_EQUAL")
         let service = MockSetPINService()
-        let sut = VerifyPINUsecase(service: service)
+        let sut = PINValidationUsecase(service: service)
         sut.execute(pin: "123458", repin: "123454")
             .sink { result in
                 switch result {
@@ -208,7 +208,7 @@ final class VerifyPINUsecaseTest: XCTestCase {
         let expectation = expectation(description: "Should return Network Error")
         let service = MockSetPINService()
         service.error = NSError(domain: "", code: 404)
-        let sut = VerifyPINUsecase(service: service)
+        let sut = PINValidationUsecase(service: service)
         sut.execute(pin: "123457", repin: "123457")
             .sink { result in
                 switch result {

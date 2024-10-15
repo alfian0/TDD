@@ -30,6 +30,7 @@ final class MainAppCoordinator: Coordinator {
         navigationController.show(vc, sender: navigationController)
     }
 
+    @MainActor
     func start(_ deeplink: DeeplinkType) {
         switch deeplink {
         case .verifyEmail:
@@ -50,6 +51,7 @@ final class MainAppCoordinator: Coordinator {
         }
     }
 
+    @MainActor
     func present(_ sheet: MainAppCoordinatorSheet) {
         switch sheet {
         case .login:
