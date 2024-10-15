@@ -70,11 +70,8 @@ struct LoginView: View {
                 Text("Continue")
                     .frame(minHeight: 24)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
             }
+            .buttonStyle(.borderedProminent)
             .padding(.horizontal)
         }
         .safeAreaBottomPadding()

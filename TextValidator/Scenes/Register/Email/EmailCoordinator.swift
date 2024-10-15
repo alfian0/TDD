@@ -23,15 +23,24 @@ final class EmailCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
-    func start() {
+    func start(email: String, viewState: EmailViewState) {
         let vm = EmailViewModel(
+            email: email,
+            viewState: viewState,
             emailValidationUsecase: EmailValidationUsecase(),
             setEmailUsecase: SetEmailUsecase(service: EmailService()),
             coordinator: self
         )
         let v = EmailView(viewModel: vm)
         let vc = UIHostingController(rootView: v)
-        navigationController.show(vc, sender: navigationController)
+        navigationController.viewControllers = [vc]
+    }
+
+    func start(_ deeplink: DeeplinkType) {
+        switch deeplink {
+        case let .verifyEmail(link):
+            start(email: "alfian.official.mail@gmail.com", viewState: .waitingForVerification(verificationLink: link))
+        }
     }
 
     func push(_ page: EmailCoordinatorPage) {

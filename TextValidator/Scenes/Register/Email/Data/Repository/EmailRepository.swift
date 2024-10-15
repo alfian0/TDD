@@ -6,7 +6,8 @@
 //
 
 import Combine
+import FirebaseAuth
 
 protocol EmailRepository {
-    func execute(email: String) -> AnyPublisher<Void, Error>
+    func sendEmailVerification(email: String) -> AnyPublisher<Void, Error>
 }

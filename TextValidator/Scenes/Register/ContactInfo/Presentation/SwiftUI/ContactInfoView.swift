@@ -131,9 +131,7 @@ struct ContactInfoView: View {
 
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)
-        .onAppear {
-            coordinator.start {
-                
-            }
+        .onViewDidLoad {
+            coordinator.start {}
         }
 }

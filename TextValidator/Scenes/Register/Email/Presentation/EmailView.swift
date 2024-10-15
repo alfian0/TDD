@@ -13,53 +13,23 @@ struct EmailView: View {
     var body: some View {
         VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Add your email")
+                Text(viewModel.viewState.title)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .font(.title)
 
-                Text("Please input your personal email address to receive any notification")
+                Text(viewModel.viewState.subtitle)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .font(.body)
                     .foregroundColor(.secondary)
             }
             .padding(.horizontal)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Email")
-                    .font(.subheadline)
-                TextField("Email", text: $viewModel.email)
-                    .keyboardType(.emailAddress)
-                    .autocapitalization(.none)
-                Divider()
-                Text(viewModel.emailError ?? "")
-                    .font(.caption)
-                    .foregroundColor(.red)
+            switch viewModel.viewState {
+            case .formInput:
+                EmailFormView(viewModel: viewModel)
+            case .waitingForVerification:
+                EmailVerificationView(viewModel: viewModel)
             }
-            .padding(.horizontal)
-
-            Spacer()
-
-            VStack {
-                Button {
-                    viewModel.didTapCountinue()
-                } label: {
-                    Text("Continue")
-                        .frame(minHeight: 24)
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
-                        .background(viewModel.canSubmit ? Color.blue : Color.gray)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                .disabled(!viewModel.canSubmit)
-
-                Button {} label: {
-                    Text("Skip")
-                }
-            }
-            .padding(.horizontal)
-            .safeAreaBottomPadding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .toolbar {
@@ -77,7 +47,7 @@ struct EmailView: View {
 
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)
-        .onAppear {
-            coordinator.start()
+        .onViewDidLoad {
+            coordinator.start(email: "", viewState: .formInput)
         }
 }

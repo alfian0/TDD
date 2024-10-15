@@ -50,11 +50,9 @@ struct CountrySearchListView: View {
 
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)
-        .onAppear {
+        .onViewDidLoad {
             coordinator.start(selected: .dummy, items: [.dummy]) { _ in
-                
-            } didDismiss: {
-                
-            }
+
+            } didDismiss: {}
         }
 }

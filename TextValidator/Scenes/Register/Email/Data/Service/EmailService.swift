@@ -9,15 +9,22 @@ import Combine
 import FirebaseAuth
 
 final class EmailService: EmailRepository {
-    func execute(email: String) -> AnyPublisher<Void, Error> {
+    func sendEmailVerification(email: String) -> AnyPublisher<Void, Error> {
         return Future<Void, any Error> { promise in
-            Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email, completion: { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
+            let actionCodeSettings = ActionCodeSettings()
+            actionCodeSettings.handleCodeInApp = true
+            actionCodeSettings.url = URL(string: "https://textvalidator-fddd6.firebaseapp.com")
+            Auth.auth().currentUser?.sendEmailVerification(
+                beforeUpdatingEmail: email,
+                actionCodeSettings: actionCodeSettings,
+                completion: { error in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(()))
+                    }
                 }
-            })
+            )
         }
         .eraseToAnyPublisher()
     }

@@ -8,7 +8,7 @@
 import FirebaseCore
 import SwiftUI
 
-class AppDelegate: NSObject, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication,
                      didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool
     {
@@ -28,8 +28,22 @@ struct TextValidatorApp: App {
         WindowGroup {
             NavigationControllerWrapper(coordinator: coordinator)
                 .edgesIgnoringSafeArea(.all)
-                .onAppear {
+                .onViewDidLoad {
                     coordinator.start()
+                }
+                .onOpenURL { url in
+                    guard let path = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+                        return
+                    }
+                    guard let queryItems = path.queryItems else {
+                        return
+                    }
+                    guard let link = queryItems.filter({ $0.name == "link" }).first?.value else {
+                        return
+                    }
+                    if let host = path.host, host == "textvalidator.page.link" {
+                        coordinator.start(.verifyEmail(link: link))
+                    }
                 }
         }
     }

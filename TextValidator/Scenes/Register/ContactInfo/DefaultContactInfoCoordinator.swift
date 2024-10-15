@@ -38,7 +38,6 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
     }
 
     func start(didTapLogin: @escaping () -> Void) {
-        guard navigationController.viewControllers.isEmpty else { return }
         let vm = ContactInfoViewModel(
             fullnameValidationUsecase: FullNameValidationUsecase(),
             phoneValidationUsecase: PhoneValidationUsecase(),
@@ -53,6 +52,12 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
         navigationController.show(vc, sender: navigationController)
     }
 
+    func start(_ deeplink: DeeplinkType, didTapLogin: @escaping () -> Void) {
+        start(didTapLogin: didTapLogin)
+        let coordinator = EmailCoordinator(navigationController: navigationController)
+        coordinator.start(deeplink)
+    }
+
     func push(_ page: ContactInfoCoordinatorPage) {
         switch page {
         case let .otp(type, verificationID, didSuccess):
@@ -60,17 +65,14 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
             coordinator.start(
                 type: type,
                 verificationID: verificationID,
-                didSuccess: { [weak self] in
-                    guard let self = self else { return }
-                    navigationController.dismiss(animated: true) {
-                        didSuccess()
-                    }
+                didSuccess: {
+                    didSuccess()
                 }
             )
 
         case .email:
             let coordinator = EmailCoordinator(navigationController: navigationController)
-            coordinator.start()
+            coordinator.start(email: "", viewState: .formInput)
 
         case .password:
             let coordinator = PasswordCoordinator(navigationController: navigationController)
