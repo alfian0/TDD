@@ -11,24 +11,6 @@ import SwiftUI
 enum EmailViewState {
     case formInput
     case waitingForVerification
-
-    var title: String {
-        switch self {
-        case .formInput:
-            return "Add your email"
-        case .waitingForVerification:
-            return "Verify your email address"
-        }
-    }
-
-    var subtitle: String {
-        switch self {
-        case .formInput:
-            return "Please input your personal email address to receive any notificatio"
-        case .waitingForVerification:
-            return "We have just send email verification link on your email. Please check email and click on that link to verify your email address."
-        }
-    }
 }
 
 @MainActor
@@ -40,6 +22,7 @@ final class EmailViewModel: ObservableObject {
 
     private let emailValidationUsecase: EmailValidationUsecase
     private let registerEmailUsecase: RegisterEmailUsecase
+    private let reloadUserUsecase: ReloadUserUsecase
     private var coordinator: EmailCoordinatorImpl
 
     private(set) var cancellables = Set<AnyCancellable>()
@@ -48,11 +31,13 @@ final class EmailViewModel: ObservableObject {
         viewState: EmailViewState,
         emailValidationUsecase: EmailValidationUsecase,
         registerEmailUsecase: RegisterEmailUsecase,
+        reloadUserUsecase: ReloadUserUsecase,
         coordinator: EmailCoordinatorImpl
     ) {
         self.viewState = viewState
         self.emailValidationUsecase = emailValidationUsecase
         self.registerEmailUsecase = registerEmailUsecase
+        self.reloadUserUsecase = reloadUserUsecase
         self.coordinator = coordinator
 
         $email
@@ -68,21 +53,6 @@ final class EmailViewModel: ObservableObject {
                 return emailError == nil && !self.email.isEmpty
             }
             .assign(to: &$canSubmit)
-
-        switch viewState {
-        case .waitingForVerification: break
-//            setEmailUsecase.reload()
-//                .sink { result in
-//                    switch result {
-//                    case let .success(user):
-//                        print(user)
-//                    case let .failure(error):
-//                        coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
-//                    }
-//                }
-//                .store(in: &cancellables)
-        default: break
-        }
     }
 
     func didTapCountinue() async {
@@ -91,6 +61,18 @@ final class EmailViewModel: ObservableObject {
         switch result {
         case .success:
             viewState = .waitingForVerification
+        case let .failure(error):
+            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+        }
+    }
+
+    func reload() async {
+        let result = await reloadUserUsecase.execute()
+
+        switch result {
+        case let .success(isEmailVerified):
+            guard isEmailVerified else { return }
+            coordinator.push(.password)
         case let .failure(error):
             coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
         }

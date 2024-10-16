@@ -19,9 +19,10 @@ final class LoginViewCoordinator: Coordinator {
     func start(didDismiss: @escaping () -> Void) {
         let vm = LoginViewModel(
             loginUsecase: LoginUsecase(
-                repository: LoginRepositoryImpl(service: FirebaseLoginService()),
+                repository: LoginRepositoryImpl(service: FirebaseAuthService()),
                 emailValidationUsecase: EmailValidationUsecase()
             ),
+            loginBiometricUsecase: LoginBiometricUsecase(service: BiometricService()),
             emailValidationUsecase: EmailValidationUsecase(),
             coordinator: self,
             didDismiss: didDismiss

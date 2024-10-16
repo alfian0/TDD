@@ -44,11 +44,11 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
             phoneValidationUsecase: PhoneValidationUsecase(),
             countryCodeUsecase: CountryCodeUsecase(service: DefaultCountryCodeService()),
             registerPhoneUsecase: RegisterPhoneUsecase(
-                repository: RegisterPhoneRepository(service: FirebaseRegisterService()),
+                repository: RegisterPhoneRepository(service: FirebaseAuthService()),
                 phoneValidationUsecase: PhoneValidationUsecase()
             ),
             saveNameUsecase: SaveNameUsecase(
-                repository: RegisterPhoneRepository(service: FirebaseRegisterService()),
+                repository: RegisterPhoneRepository(service: FirebaseAuthService()),
                 nameValidationUsecase: NameValidationUsecase()
             ),
             coordinator: self,

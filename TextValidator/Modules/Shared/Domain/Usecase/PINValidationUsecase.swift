@@ -5,7 +5,6 @@
 //  Created by Alfian on 10/10/24.
 //
 
-import Combine
 import Foundation
 
 enum VerifyError: Error {
@@ -14,13 +13,13 @@ enum VerifyError: Error {
 }
 
 final class PINValidationUsecase {
-    private let service: PINRepository
+    private let service: SetPINService
 
-    init(service: PINRepository) {
+    init(service: SetPINService) {
         self.service = service
     }
 
-    func execute(pin: String, repin: String) -> AnyPublisher<Bool, VerifyError> {
+    func execute(pin: String, repin: String) -> Result<Bool, VerifyError> {
         if pin.isEmpty {
             return failWithError(.EMPTY)
         }
@@ -46,9 +45,7 @@ final class PINValidationUsecase {
         }
 
         if repin.isEmpty {
-            return Just(false)
-                .setFailureType(to: VerifyError.self)
-                .eraseToAnyPublisher()
+            return .success(false)
         }
 
         if pin != repin {
@@ -57,11 +54,7 @@ final class PINValidationUsecase {
 
         return service.verifyPIN(pin: pin)
             .map { true }
-            .catch { error in
-                Fail(error: VerifyError.NETWORK_ERROR(error))
-                    .eraseToAnyPublisher()
-            }
-            .eraseToAnyPublisher()
+            .mapError { VerifyError.NETWORK_ERROR($0) }
     }
 
     // Helper methods
@@ -80,8 +73,7 @@ final class PINValidationUsecase {
         return inputArray == sequential || inputArray == reverseSequential
     }
 
-    private func failWithError(_ errorType: TextValidationError) -> AnyPublisher<Bool, VerifyError> {
-        return Fail(error: VerifyError.TEXT_ERROR(errorType))
-            .eraseToAnyPublisher()
+    private func failWithError(_ errorType: TextValidationError) -> Result<Bool, VerifyError> {
+        return .failure(.TEXT_ERROR(errorType))
     }
 }

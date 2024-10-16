@@ -40,6 +40,7 @@ final class PINViewModel: ObservableObject {
         self.didFinish = didFinish
 
         $passcode
+            .receive(on: RunLoop.main)
             .filter { $0.count == count }
             .sink { [weak self] _ in
                 guard let self = self else { return }
@@ -70,24 +71,20 @@ final class PINViewModel: ObservableObject {
     }
 
     private func verifyPIN() {
-        verifyPINUsecase.execute(pin: passcode, repin: currentPasscode)
-            .sink { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case let .success(isVerify):
-                    if isVerify {
-                        coordinator.push(.pin)
-                    } else {
-                        self.view(with: .reenter)
-                    }
-                case let .failure(error):
-                    switch error {
-                    case let .TEXT_ERROR(error):
-                        self.passcodeError = error.localizedDescription
-                    case .NETWORK_ERROR: break
-                    }
-                }
+        let result = verifyPINUsecase.execute(pin: passcode, repin: currentPasscode)
+        switch result {
+        case let .success(isVerify):
+            if isVerify {
+                coordinator.push(.pin)
+            } else {
+                view(with: .reenter)
             }
-            .store(in: &cancellables)
+        case let .failure(error):
+            switch error {
+            case let .TEXT_ERROR(error):
+                passcodeError = error.localizedDescription
+            default: break
+            }
+        }
     }
 }

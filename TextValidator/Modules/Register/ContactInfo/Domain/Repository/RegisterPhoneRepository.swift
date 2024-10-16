@@ -6,9 +6,9 @@
 //
 
 final class RegisterPhoneRepository {
-    private let service: FirebaseRegisterService
+    private let service: FirebaseAuthService
 
-    init(service: FirebaseRegisterService) {
+    init(service: FirebaseAuthService) {
         self.service = service
     }
 

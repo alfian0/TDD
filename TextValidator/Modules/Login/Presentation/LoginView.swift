@@ -62,13 +62,13 @@ struct LoginView: View {
     NavigationView {
         LoginView(viewModel: LoginViewModel(
             loginUsecase: LoginUsecase(
-                repository: LoginRepositoryImpl(service: FirebaseLoginService()),
+                repository: LoginRepositoryImpl(service: FirebaseAuthService()),
                 emailValidationUsecase: EmailValidationUsecase()
             ),
+            loginBiometricUsecase: LoginBiometricUsecase(service: BiometricService()),
             emailValidationUsecase: EmailValidationUsecase(),
             coordinator: LoginViewCoordinator(),
             didDismiss: {}
-        )
-        )
+        ))
     }
 }

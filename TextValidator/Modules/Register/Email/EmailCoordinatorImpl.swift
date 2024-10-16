@@ -35,8 +35,11 @@ final class EmailCoordinatorImpl: EmailCoordinator {
             viewState: viewState,
             emailValidationUsecase: EmailValidationUsecase(),
             registerEmailUsecase: RegisterEmailUsecase(
-                repository: RegisterEmailRepository(service: FirebaseRegisterService()),
+                repository: RegisterEmailRepository(service: FirebaseAuthService()),
                 emailValidationUsecase: EmailValidationUsecase()
+            ),
+            reloadUserUsecase: ReloadUserUsecase(
+                repository: RegisterEmailRepository(service: FirebaseAuthService())
             ),
             coordinator: self
         )

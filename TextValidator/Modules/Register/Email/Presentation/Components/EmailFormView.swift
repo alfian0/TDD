@@ -11,44 +11,58 @@ struct EmailFormView: View {
     @StateObject var viewModel: EmailViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Email")
-                .font(.subheadline)
-            TextField("Email", text: $viewModel.email)
-                .keyboardType(.emailAddress)
-                .autocapitalization(.none)
-            Divider()
-            Text(viewModel.emailError ?? "")
-                .font(.caption)
-                .foregroundColor(.red)
-        }
-        .padding(.horizontal)
+        VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Add your email")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.title)
 
-        Spacer()
+                Text("Please input your personal email address to receive any notificatio")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal)
 
-        VStack {
-            Button {
-                Task {
-                    await viewModel.didTapCountinue()
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Email")
+                    .font(.subheadline)
+                TextField("Email", text: $viewModel.email)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                Divider()
+                Text(viewModel.emailError ?? "")
+                    .font(.caption)
+                    .foregroundColor(.red)
+            }
+            .padding(.horizontal)
+
+            Spacer()
+
+            VStack {
+                Button {
+                    Task {
+                        await viewModel.didTapCountinue()
+                    }
+                } label: {
+                    Text("Continue")
+                        .frame(minHeight: 24)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(viewModel.canSubmit ? Color.blue : Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
-            } label: {
-                Text("Continue")
-                    .frame(minHeight: 24)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(viewModel.canSubmit ? Color.blue : Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-            }
-            .disabled(!viewModel.canSubmit)
+                .disabled(!viewModel.canSubmit)
 
-            Button {} label: {
-                Text("Skip")
+                Button {} label: {
+                    Text("Skip")
+                }
             }
+            .padding(.horizontal)
+            .safeAreaBottomPadding()
         }
-        .padding(.horizontal)
-        .safeAreaBottomPadding()
     }
 }
 
@@ -57,8 +71,11 @@ struct EmailFormView: View {
         viewState: .formInput,
         emailValidationUsecase: EmailValidationUsecase(),
         registerEmailUsecase: RegisterEmailUsecase(
-            repository: RegisterEmailRepository(service: FirebaseRegisterService()),
+            repository: RegisterEmailRepository(service: FirebaseAuthService()),
             emailValidationUsecase: EmailValidationUsecase()
+        ),
+        reloadUserUsecase: ReloadUserUsecase(
+            repository: RegisterEmailRepository(service: FirebaseAuthService())
         ),
         coordinator: EmailCoordinatorImpl()
     ))

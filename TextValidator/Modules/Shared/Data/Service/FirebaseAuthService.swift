@@ -1,5 +1,5 @@
 //
-//  FirebaseRegisterService.swift
+//  FirebaseAuthService.swift
 //  TextValidator
 //
 //  Created by Alfian on 15/10/24.
@@ -7,7 +7,22 @@
 
 import FirebaseAuth
 
-final class FirebaseRegisterService {
+final class FirebaseAuthService {
+    func signInWithEmail(email: String, password: String) async throws -> User {
+        try await Auth.auth().signIn(withEmail: email, password: password).user
+    }
+
+    func sendSignInLink(email: String) async throws {
+        let actionCodeSettings = ActionCodeSettings()
+        actionCodeSettings.handleCodeInApp = true
+        actionCodeSettings.url = URL(string: "")
+        try await Auth.auth().sendSignInLink(toEmail: email, actionCodeSettings: actionCodeSettings)
+    }
+
+    func signInWithEmail(email: String, link: String) async throws -> AuthDataResult {
+        try await Auth.auth().signIn(withEmail: email, link: link)
+    }
+
     func verifyPhoneNumber(phone: String) async throws -> String {
         Auth.auth().settings?.isAppVerificationDisabledForTesting = false
         return try await PhoneAuthProvider.provider().verifyPhoneNumber(phone)
@@ -24,8 +39,9 @@ final class FirebaseRegisterService {
         try await Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email)
     }
 
-    func reload() async throws {
+    func reload() async throws -> User? {
         try await Auth.auth().currentUser?.reload()
+        return Auth.auth().currentUser
     }
 
     func verifyCode(verificationID: String, verificationCode: String) async throws -> AuthDataResult {

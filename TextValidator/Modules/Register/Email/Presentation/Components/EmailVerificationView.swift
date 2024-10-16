@@ -11,27 +11,48 @@ struct EmailVerificationView: View {
     @StateObject var viewModel: EmailViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "envelope")
-                Text(viewModel.email)
-                    .font(.body.bold())
+        VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Verify your email address")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.title)
+
+                Text("We have just send email verification link on your email. Please check email and click on that link to verify your email address.")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.body)
+                    .foregroundColor(.secondary)
             }
+            .padding(.horizontal)
 
-            Spacer()
-
-            Button {
-                Task {
-                    await viewModel.didTapCountinue()
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Image(systemName: "envelope")
+                    Text(viewModel.email)
+                        .font(.body.bold())
+                    Button {
+                        Task {
+                            await viewModel.reload()
+                        }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                    }
                 }
-            } label: {
-                Text("Resend")
-                    .frame(minHeight: 24)
-                    .frame(maxWidth: .infinity)
+
+                Spacer()
+
+                Button {
+                    Task {
+                        await viewModel.didTapCountinue()
+                    }
+                } label: {
+                    Text("Reload")
+                        .frame(minHeight: 24)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
 }
 
@@ -41,8 +62,11 @@ struct EmailVerificationView: View {
             viewState: .formInput,
             emailValidationUsecase: EmailValidationUsecase(),
             registerEmailUsecase: RegisterEmailUsecase(
-                repository: RegisterEmailRepository(service: FirebaseRegisterService()),
+                repository: RegisterEmailRepository(service: FirebaseAuthService()),
                 emailValidationUsecase: EmailValidationUsecase()
+            ),
+            reloadUserUsecase: ReloadUserUsecase(
+                repository: RegisterEmailRepository(service: FirebaseAuthService())
             ),
             coordinator: EmailCoordinatorImpl()
         )

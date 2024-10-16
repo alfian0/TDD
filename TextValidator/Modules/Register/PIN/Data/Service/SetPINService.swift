@@ -5,18 +5,14 @@
 //  Created by Alfian on 10/10/24.
 //
 
-import Combine
 import Foundation
 
-final class SetPINService: PINRepository {
-    func verifyPIN(pin: String) -> AnyPublisher<Void, any Error> {
+final class SetPINService {
+    func verifyPIN(pin: String) -> Result<Void, any Error> {
         if pin == "261092" {
-            return Fail(error: NSError(domain: "", code: 404))
-                .eraseToAnyPublisher()
+            return .failure(NSError(domain: "pin.data.service", code: 0))
         } else {
-            return Just(())
-                .setFailureType(to: Error.self)
-                .eraseToAnyPublisher()
+            return .success(())
         }
     }
 }

@@ -6,13 +6,17 @@
 //
 
 final class RegisterEmailRepository {
-    private let service: FirebaseRegisterService
+    private let service: FirebaseAuthService
 
-    init(service: FirebaseRegisterService) {
+    init(service: FirebaseAuthService) {
         self.service = service
     }
 
     func sendEmailVerification(email: String) async throws {
         try await service.sendEmailVerification(email: email)
+    }
+
+    func reload() async throws -> Bool {
+        return try await service.reload()?.isEmailVerified ?? false
     }
 }

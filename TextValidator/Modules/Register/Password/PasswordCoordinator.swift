@@ -33,7 +33,7 @@ final class PasswordCoordinator: Coordinator {
 
         let vm = PasswordViewModel(
             setPasswordUsecase: SetPasswordUsecase(
-                repository: SetPasswordRepository(service: FirebaseRegisterService())
+                repository: SetPasswordRepository(service: FirebaseAuthService())
             ),
             passwordStrengthUsecase: PasswordStrengthUsecase(),
             coordinator: self

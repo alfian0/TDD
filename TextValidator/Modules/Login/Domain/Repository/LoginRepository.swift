@@ -20,9 +20,9 @@ protocol LoginRepository {
 let emailLogin = "email_login"
 
 final class LoginRepositoryImpl: LoginRepository {
-    private let service: FirebaseLoginService
+    private let service: FirebaseAuthService
 
-    init(service: FirebaseLoginService) {
+    init(service: FirebaseAuthService) {
         self.service = service
     }
 

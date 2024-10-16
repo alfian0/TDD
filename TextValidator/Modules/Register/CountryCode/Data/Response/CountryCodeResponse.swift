@@ -11,14 +11,3 @@ struct CountryCodeResponse: Codable {
     let dialCode: String
     let code: String
 }
-
-enum CountryCodeResponseMapper {
-    static func map(country: CountryCodeResponse) -> CountryCodeModel {
-        return CountryCodeModel(
-            name: country.name,
-            flag: country.flag,
-            dialCode: country.dialCode,
-            code: country.code
-        )
-    }
-}

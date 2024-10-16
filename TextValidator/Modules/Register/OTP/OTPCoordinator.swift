@@ -25,7 +25,7 @@ final class OTPCoordinator: Coordinator {
             type: type,
             verificationID: verificationID,
             verifyOTPUsecase: VerifyOTPUsecase(
-                repository: VerifyOTPRepository(service: FirebaseRegisterService())
+                repository: VerifyOTPRepository(service: FirebaseAuthService())
             ),
             coordinator: self,
             didSuccess: didSuccess

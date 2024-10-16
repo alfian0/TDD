@@ -11,19 +11,7 @@ struct EmailView: View {
     @StateObject var viewModel: EmailViewModel
 
     var body: some View {
-        VStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.viewState.title)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.title)
-
-                Text(viewModel.viewState.subtitle)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal)
-
+        Group {
             switch viewModel.viewState {
             case .formInput:
                 EmailFormView(viewModel: viewModel)

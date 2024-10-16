@@ -18,24 +18,30 @@ struct EmailSignInView: View {
                 TextField("Email", text: $viewModel.username)
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
+                    .disabled(viewModel.isLoading)
                 Divider()
+                    .frame(minHeight: (viewModel.usernameError != nil) ? 1 : 0.1)
+                    .background((viewModel.usernameError != nil) ? .red : .secondary)
+                    .animation(.default, value: viewModel.usernameError)
                 Text(viewModel.usernameError ?? "")
                     .font(.caption)
                     .foregroundColor(.red)
+                    .animation(.default, value: viewModel.usernameError)
             }
 
-            if viewModel.isEmailValid {
+            if viewModel.canSubmit {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Password")
                         .font(.subheadline)
                     SecureField("Password", text: $viewModel.password)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
+                        .disabled(viewModel.isLoading)
                     Divider()
-                    Text("")
-                        .font(.caption)
-                        .foregroundColor(.red)
+                        .frame(minHeight: 0.1)
+                        .background(.secondary)
                 }
+                .animation(.default, value: viewModel.canSubmit)
             }
 
             HStack(spacing: 4) {
@@ -53,16 +59,41 @@ struct EmailSignInView: View {
 
         Spacer()
 
-        Button {
-            Task {
-                await viewModel.login()
+        HStack(spacing: 8) {
+            Button {
+                Task {
+                    await viewModel.login()
+                }
+            } label: {
+                Text("Continue")
+                    .frame(maxWidth: .infinity)
             }
-        } label: {
-            Text("Continue")
-                .frame(minHeight: 24)
-                .frame(maxWidth: .infinity)
+            .buttonStyle(LoadingButtonStyle(isLoading: viewModel.isLoading))
+            .disabled(!viewModel.canSubmit)
+
+            Button {
+                Task {
+                    await viewModel.loginWithBiometric()
+                }
+            } label: {
+                Image(systemName: "faceid")
+                    .frame(minHeight: 24)
+            }
+            .buttonStyle(LoadingButtonStyle(isLoading: viewModel.isLoading))
         }
-        .buttonStyle(.borderedProminent)
         .padding(.horizontal)
     }
+}
+
+#Preview {
+    EmailSignInView(viewModel: LoginViewModel(
+        loginUsecase: LoginUsecase(
+            repository: LoginRepositoryImpl(service: FirebaseAuthService()),
+            emailValidationUsecase: EmailValidationUsecase()
+        ),
+        loginBiometricUsecase: LoginBiometricUsecase(service: BiometricService()),
+        emailValidationUsecase: EmailValidationUsecase(),
+        coordinator: LoginViewCoordinator(),
+        didDismiss: {}
+    ))
 }
