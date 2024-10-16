@@ -49,7 +49,9 @@ struct ContactInfoView: View {
                         .font(.subheadline)
                     HStack {
                         Button {
-                            viewModel.didTapCountryCode()
+                            Task {
+                                await viewModel.didTapCountryCode()
+                            }
                         } label: {
                             Group {
                                 if viewModel.isLoading {

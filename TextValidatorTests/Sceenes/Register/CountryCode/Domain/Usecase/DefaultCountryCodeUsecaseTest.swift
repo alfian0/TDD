@@ -16,7 +16,7 @@ final class DefaultCountryCodeUsecaseTest: XCTestCase {
         let expectation = expectation(description: "Should return success")
         let service = MockCountryCodeService()
         service.result = try! Data.fromJSONFile("Dial").toCodable(with: [CountryCodeResponse].self)
-        let sut = DefaultCountryCodeUsecase(service: service)
+        let sut = CountryCodeUsecase(service: service)
         sut.execute()
             .sink { result in
                 switch result {
@@ -36,7 +36,7 @@ final class DefaultCountryCodeUsecaseTest: XCTestCase {
         let expectation = expectation(description: "Should return error")
         let service = MockCountryCodeService()
         service.error = NSError(domain: "", code: 404)
-        let sut = DefaultCountryCodeUsecase(service: service)
+        let sut = CountryCodeUsecase(service: service)
         sut.execute()
             .sink { result in
                 switch result {

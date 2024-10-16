@@ -42,7 +42,7 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
         let vm = ContactInfoViewModel(
             fullnameValidationUsecase: NameValidationUsecase(),
             phoneValidationUsecase: PhoneValidationUsecase(),
-            countryCodeUsecase: DefaultCountryCodeUsecase(service: DefaultCountryCodeService()),
+            countryCodeUsecase: CountryCodeUsecase(service: DefaultCountryCodeService()),
             registerPhoneUsecase: RegisterPhoneUsecase(
                 repository: RegisterPhoneRepository(service: FirebaseRegisterService()),
                 phoneValidationUsecase: PhoneValidationUsecase()

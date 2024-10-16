@@ -73,24 +73,20 @@ final class ContactInfoViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    func didTapCountryCode() {
+    func didTapCountryCode() async {
         if !countryCodes.isEmpty {
             launchCountryCode()
         } else {
             isLoading = true
-            countryCodeUsecase.execute()
-                .sink { [weak self] result in
-                    guard let self = self else { return }
-                    isLoading = false
-                    switch result {
-                    case let .success(result):
-                        countryCodes = result
-                        launchCountryCode()
-                    case let .failure(error):
-                        coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
-                    }
-                }
-                .store(in: &cancellables)
+            let result = await countryCodeUsecase.execute()
+            isLoading = false
+            switch result {
+            case let .success(countries):
+                countryCodes = countries
+                launchCountryCode()
+            case let .failure(error):
+                coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+            }
         }
     }
 

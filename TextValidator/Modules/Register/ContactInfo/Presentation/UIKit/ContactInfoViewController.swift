@@ -119,8 +119,8 @@ class ContactInfoViewController: UIViewController {
         }
     }
 
-    @objc private func didTapCountryCode() {
-        viewModel.didTapCountryCode()
+    @objc private func didTapCountryCode() async {
+        await viewModel.didTapCountryCode()
     }
 
     @objc private func didTapContinue() async {
