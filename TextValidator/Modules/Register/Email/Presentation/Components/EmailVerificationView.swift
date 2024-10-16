@@ -46,10 +46,9 @@ struct EmailVerificationView: View {
                     }
                 } label: {
                     Text("Reload")
-                        .frame(minHeight: 24)
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(LoadingButtonStyle(isLoading: false))
             }
             .padding(.horizontal)
         }

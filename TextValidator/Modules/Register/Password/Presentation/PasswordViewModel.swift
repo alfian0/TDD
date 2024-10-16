@@ -40,6 +40,7 @@ final class PasswordViewModel: ObservableObject {
                     passwordStrength = result
                     passwordError = nil
                 case let .failure(error):
+                    passwordStrength = .veryWeak
                     passwordError = error.localizedDescription
                 }
             }

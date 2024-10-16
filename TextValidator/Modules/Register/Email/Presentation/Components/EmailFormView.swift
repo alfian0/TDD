@@ -24,18 +24,11 @@ struct EmailFormView: View {
             }
             .padding(.horizontal)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Email")
-                    .font(.subheadline)
-                TextField("Email", text: $viewModel.email)
-                    .keyboardType(.emailAddress)
-                    .autocapitalization(.none)
-                Divider()
-                Text(viewModel.emailError ?? "")
-                    .font(.caption)
-                    .foregroundColor(.red)
-            }
-            .padding(.horizontal)
+            TextField("Email", text: $viewModel.email)
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+                .modifier(TextFieldModifier(label: "Email", errorMessage: viewModel.emailError))
+                .padding(.horizontal)
 
             Spacer()
 
@@ -46,15 +39,10 @@ struct EmailFormView: View {
                     }
                 } label: {
                     Text("Continue")
-                        .frame(minHeight: 24)
                         .frame(maxWidth: .infinity)
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
-                        .background(viewModel.canSubmit ? Color.blue : Color.gray)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
                 }
                 .disabled(!viewModel.canSubmit)
+                .buttonStyle(LoadingButtonStyle(isLoading: false))
 
                 Button {} label: {
                     Text("Skip")

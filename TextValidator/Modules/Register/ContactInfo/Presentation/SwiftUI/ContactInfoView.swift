@@ -32,21 +32,12 @@ struct ContactInfoView: View {
             .padding(.horizontal)
 
             VStack(alignment: .leading, spacing: 8) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Fullname")
-                        .font(.subheadline)
-                    TextField("Fullname", text: $viewModel.fullname)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                    Divider()
-                    Text(viewModel.fullnameError ?? "")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                }
+                TextField("Fullname", text: $viewModel.fullname)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                    .modifier(TextFieldModifier(label: "Fullname", errorMessage: viewModel.fullnameError))
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Phone Number")
-                        .font(.subheadline)
                     HStack {
                         Button {
                             Task {
@@ -69,11 +60,8 @@ struct ContactInfoView: View {
                         TextField("Phone", text: $viewModel.phone)
                             .disabled(viewModel.isLoading)
                     }
-                    Divider()
-                    Text(viewModel.phoneError ?? "")
-                        .font(.caption)
-                        .foregroundColor(.red)
                 }
+                .modifier(TextFieldModifier(label: "Password", errorMessage: viewModel.phoneError))
 
                 HStack(spacing: 4) {
                     Text("Already have an account ?")
@@ -107,14 +95,9 @@ struct ContactInfoView: View {
                     }
                 }) {
                     Text("Continue")
-                        .frame(minHeight: 24)
                         .frame(maxWidth: .infinity)
-                        .padding(.horizontal)
-                        .padding(.vertical, 8)
-                        .background(viewModel.canSubmit ? Color.blue : Color.gray)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
                 }
+                .buttonStyle(LoadingButtonStyle(isLoading: viewModel.isLoading))
                 .disabled(!viewModel.canSubmit)
             }
             .padding(.horizontal)

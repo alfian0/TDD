@@ -88,16 +88,11 @@ struct OTPView: View {
                 }
             }) {
                 Text("Continue")
-                    .frame(minHeight: 24)
                     .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(viewModel.canSubmit ? Color.blue : Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
             }
             .padding(.horizontal)
             .disabled(!viewModel.canSubmit)
+            .buttonStyle(LoadingButtonStyle(isLoading: false))
         }
         .safeAreaBottomPadding()
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

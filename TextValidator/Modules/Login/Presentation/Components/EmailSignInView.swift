@@ -12,36 +12,18 @@ struct EmailSignInView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Email")
-                    .font(.subheadline)
-                TextField("Email", text: $viewModel.username)
+            TextField("Email", text: $viewModel.username)
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+                .disabled(viewModel.isLoading)
+                .modifier(TextFieldModifier(label: "Email", errorMessage: viewModel.usernameError))
+
+            if viewModel.canSubmit {
+                SecureField("Password", text: $viewModel.password)
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
                     .disabled(viewModel.isLoading)
-                Divider()
-                    .frame(minHeight: (viewModel.usernameError != nil) ? 1 : 0.1)
-                    .background((viewModel.usernameError != nil) ? .red : .secondary)
-                    .animation(.default, value: viewModel.usernameError)
-                Text(viewModel.usernameError ?? "")
-                    .font(.caption)
-                    .foregroundColor(.red)
-                    .animation(.default, value: viewModel.usernameError)
-            }
-
-            if viewModel.canSubmit {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Password")
-                        .font(.subheadline)
-                    SecureField("Password", text: $viewModel.password)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                        .disabled(viewModel.isLoading)
-                    Divider()
-                        .frame(minHeight: 0.1)
-                        .background(.secondary)
-                }
-                .animation(.default, value: viewModel.canSubmit)
+                    .modifier(TextFieldModifier(label: "Password", errorMessage: nil))
             }
 
             HStack(spacing: 4) {
@@ -77,7 +59,6 @@ struct EmailSignInView: View {
                 }
             } label: {
                 Image(systemName: "faceid")
-                    .frame(minHeight: 24)
             }
             .buttonStyle(LoadingButtonStyle(isLoading: viewModel.isLoading))
         }

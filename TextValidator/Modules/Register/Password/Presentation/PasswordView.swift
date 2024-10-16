@@ -25,25 +25,13 @@ struct PasswordView: View {
             .padding(.horizontal)
 
             VStack(spacing: 16) {
-                VStack(alignment: .leading) {
-                    SecureField("Password", text: $viewModel.password)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                    Divider()
-                    Text(viewModel.passwordError ?? "")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                }
+                SecureField("Password", text: $viewModel.password)
+                    .autocapitalization(.none)
+                    .modifier(TextFieldModifier(label: "Password", errorMessage: viewModel.passwordError))
 
-                VStack(alignment: .leading) {
-                    SecureField("Repeat Password", text: $viewModel.repeatPassword)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                    Divider()
-                    Text(viewModel.repeatPasswordError ?? "")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                }
+                SecureField("Repeat Password", text: $viewModel.repeatPassword)
+                    .autocapitalization(.none)
+                    .modifier(TextFieldModifier(label: "Repeat Password", errorMessage: viewModel.repeatPasswordError))
 
                 HStack(spacing: 4) {
                     ForEach(PasswordStrength.allCases, id: \.self) { value in
@@ -66,16 +54,11 @@ struct PasswordView: View {
                 }
             } label: {
                 Text("Continue")
-                    .frame(minHeight: 24)
                     .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(viewModel.canSubmit ? Color.blue : Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
             }
             .padding(.horizontal)
             .disabled(!viewModel.canSubmit)
+            .buttonStyle(LoadingButtonStyle(isLoading: false))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .safeAreaBottomPadding()
