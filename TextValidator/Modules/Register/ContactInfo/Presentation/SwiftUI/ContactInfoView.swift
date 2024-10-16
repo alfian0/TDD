@@ -129,7 +129,7 @@ struct ContactInfoView: View {
 }
 
 #Preview {
-    let coordinator = DefaultContactInfoCoordinator()
+    let coordinator = ContactInfoCoordinatorImpl()
 
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)

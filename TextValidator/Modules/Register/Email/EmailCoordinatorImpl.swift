@@ -1,5 +1,5 @@
 //
-//  EmailCoordinator.swift
+//  EmailCoordinatorImpl.swift
 //  TextValidator
 //
 //  Created by Alfian on 09/10/24.
@@ -15,7 +15,13 @@ enum EmailCoordinatorSheet {
     case error(title: String, subtitle: String, didDismiss: () -> Void)
 }
 
-final class EmailCoordinator: Coordinator {
+protocol EmailCoordinator: Coordinator {
+    func start(viewState: EmailViewState) async
+    func push(_ page: EmailCoordinatorPage) async
+    func present(_ sheet: EmailCoordinatorSheet)
+}
+
+final class EmailCoordinatorImpl: EmailCoordinator {
     var childCoordinator: [any Coordinator] = .init()
     var navigationController: UINavigationController
 
@@ -37,14 +43,6 @@ final class EmailCoordinator: Coordinator {
         let v = EmailView(viewModel: vm)
         let vc = UIHostingController(rootView: v)
         navigationController.setViewControllers([vc], animated: true)
-    }
-
-    @MainActor
-    func start(_ deeplink: DeeplinkType) {
-        switch deeplink {
-        case .verifyEmail:
-            start(viewState: .waitingForVerification)
-        }
     }
 
     @MainActor

@@ -40,7 +40,7 @@ final class EmailViewModel: ObservableObject {
 
     private let emailValidationUsecase: EmailValidationUsecase
     private let registerEmailUsecase: RegisterEmailUsecase
-    private var coordinator: EmailCoordinator
+    private var coordinator: EmailCoordinatorImpl
 
     private(set) var cancellables = Set<AnyCancellable>()
 
@@ -48,7 +48,7 @@ final class EmailViewModel: ObservableObject {
         viewState: EmailViewState,
         emailValidationUsecase: EmailValidationUsecase,
         registerEmailUsecase: RegisterEmailUsecase,
-        coordinator: EmailCoordinator
+        coordinator: EmailCoordinatorImpl
     ) {
         self.viewState = viewState
         self.emailValidationUsecase = emailValidationUsecase

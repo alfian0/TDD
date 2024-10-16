@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 @main
 struct TextValidatorApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    let coordinator = MainAppCoordinator()
+    let coordinator = MainAppCoordinatorDeeplink(wrapped: MainAppCoordinatorImpl())
 
     var body: some Scene {
         WindowGroup {

@@ -13,6 +13,7 @@ enum PINViewState {
     case reenter
 }
 
+@MainActor
 final class PINViewModel: ObservableObject {
     @Published var title: String = "Set PIN"
     @Published var subtitle: String = "Enter a 6-digit PIN for account security and authentication"
@@ -40,7 +41,6 @@ final class PINViewModel: ObservableObject {
 
         $passcode
             .filter { $0.count == count }
-            .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 verifyPIN()

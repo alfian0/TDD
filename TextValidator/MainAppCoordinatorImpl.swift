@@ -1,5 +1,5 @@
 //
-//  MainAppCoordinator.swift
+//  MainAppCoordinatorImpl.swift
 //  TextValidator
 //
 //  Created by Alfian on 15/10/24.
@@ -12,11 +12,12 @@ enum MainAppCoordinatorSheet {
     case register
 }
 
-enum DeeplinkType {
-    case verifyEmail(link: String)
+protocol MainAppCoordinator: Coordinator {
+    func start()
+    func present(_ sheet: MainAppCoordinatorSheet) async
 }
 
-final class MainAppCoordinator: Coordinator {
+final class MainAppCoordinatorImpl: MainAppCoordinator {
     var childCoordinator: [any Coordinator] = .init()
     var navigationController: UINavigationController
 
@@ -28,27 +29,6 @@ final class MainAppCoordinator: Coordinator {
         let v = MainAppView(coordinator: self)
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)
-    }
-
-    @MainActor
-    func start(_ deeplink: DeeplinkType) {
-        switch deeplink {
-        case .verifyEmail:
-            navigationController.dismiss(animated: true) { [weak self] in
-                guard let self = self else { return }
-                let coordinator = DefaultContactInfoCoordinator()
-                coordinator.start(deeplink, didTapLogin: { [weak self] in
-                    guard let self = self else { return }
-                    navigationController.dismiss(animated: true) {
-                        self.present(.login)
-                        self.childCoordinator.removeLast()
-                    }
-                })
-                coordinator.navigationController.modalPresentationStyle = .fullScreen
-                childCoordinator.append(coordinator)
-                navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
-            }
-        }
     }
 
     @MainActor
@@ -67,7 +47,7 @@ final class MainAppCoordinator: Coordinator {
             navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
 
         case .register:
-            let coordinator = DefaultContactInfoCoordinator()
+            let coordinator = ContactInfoCoordinatorImpl()
             coordinator.start(didTapLogin: { [weak self] in
                 guard let self = self else { return }
                 navigationController.dismiss(animated: true) {

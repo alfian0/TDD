@@ -1,5 +1,5 @@
 //
-//  DefaultContactInfoCoordinator.swift
+//  ContactInfoCoordinatorImpl.swift
 //  TextValidator
 //
 //  Created by Alfian on 09/10/24.
@@ -29,7 +29,7 @@ protocol ContactInfoCoordinator: Coordinator {
     func present(_ sheet: ContactInfoCoordinatorSheet)
 }
 
-final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
+final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
     var childCoordinator: [any Coordinator] = .init()
     var navigationController: UINavigationController
 
@@ -61,13 +61,6 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
     }
 
     @MainActor
-    func start(_ deeplink: DeeplinkType, didTapLogin: @escaping () -> Void) {
-        start(didTapLogin: didTapLogin)
-        let coordinator = EmailCoordinator(navigationController: navigationController)
-        coordinator.start(deeplink)
-    }
-
-    @MainActor
     func push(_ page: ContactInfoCoordinatorPage) {
         switch page {
         case let .otp(type, verificationID, didSuccess):
@@ -81,7 +74,7 @@ final class DefaultContactInfoCoordinator: ContactInfoCoordinator {
             )
 
         case .email:
-            let coordinator = EmailCoordinator(navigationController: navigationController)
+            let coordinator = EmailCoordinatorImpl(navigationController: navigationController)
             coordinator.start(viewState: .formInput)
 
         case .password:

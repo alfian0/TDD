@@ -43,7 +43,7 @@ struct EmailView: View {
 }
 
 #Preview {
-    let coordinator = EmailCoordinator()
+    let coordinator = EmailCoordinatorImpl()
 
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)

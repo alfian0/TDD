@@ -44,7 +44,7 @@ struct EmailVerificationView: View {
                 repository: RegisterEmailRepository(service: FirebaseRegisterService()),
                 emailValidationUsecase: EmailValidationUsecase()
             ),
-            coordinator: EmailCoordinator()
+            coordinator: EmailCoordinatorImpl()
         )
     )
 }

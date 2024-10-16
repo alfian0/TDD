@@ -19,6 +19,7 @@ final class PINCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
+    @MainActor
     func start(didFinish: @escaping () -> Void) {
         let vm = PINViewModel(
             count: 6,

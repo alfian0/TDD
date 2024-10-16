@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainAppView: View {
-    var coordinator: MainAppCoordinator
+    var coordinator: MainAppCoordinatorImpl
 
     var body: some View {
         VStack {
@@ -30,7 +30,7 @@ struct MainAppView: View {
 }
 
 #Preview {
-    let coordinator = MainAppCoordinator()
+    let coordinator = MainAppCoordinatorImpl()
 
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)

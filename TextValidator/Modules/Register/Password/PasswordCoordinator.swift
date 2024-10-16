@@ -43,6 +43,7 @@ final class PasswordCoordinator: Coordinator {
         navigationController.setViewControllers([vc], animated: true)
     }
 
+    @MainActor
     func push(_ page: PasswordCoordinatorPage) {
         switch page {
         case .pin:
