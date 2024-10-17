@@ -16,6 +16,7 @@ final class EmailViewFactory {
             emailValidationUsecase: emailValidationUsecase,
             registerEmailUsecase: createRegisterEmailUsecase(),
             reloadUserUsecase: createReloadUserUsecase(),
+            verificationEmailUsecase: createVerificationEmailUsecase(),
             coordinator: coordinator
         )
     }
@@ -33,5 +34,9 @@ final class EmailViewFactory {
 
     private func createAuthRepository() -> AuthRepository {
         return AuthRepositoryImpl(service: firebaseAuthService)
+    }
+
+    private func createVerificationEmailUsecase() -> VerificationEmailUsecase {
+        return VerificationEmailUsecase(repository: createAuthRepository())
     }
 }

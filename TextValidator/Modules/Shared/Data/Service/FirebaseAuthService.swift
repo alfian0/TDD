@@ -15,7 +15,8 @@ final class FirebaseAuthService {
     func sendSignInLink(email: String) async throws {
         let actionCodeSettings = ActionCodeSettings()
         actionCodeSettings.handleCodeInApp = true
-        actionCodeSettings.url = URL(string: "")
+        actionCodeSettings.url = URL(string: String(format: "https://textvalidator-fddd6.firebaseapp.com/?email=%@", email))
+        actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier ?? "")
         try await Auth.auth().sendSignInLink(toEmail: email, actionCodeSettings: actionCodeSettings)
     }
 
@@ -36,7 +37,11 @@ final class FirebaseAuthService {
     }
 
     func sendEmailVerification(email: String) async throws {
-        try await Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email)
+        let actionCodeSettings = ActionCodeSettings()
+        actionCodeSettings.handleCodeInApp = true
+        actionCodeSettings.url = URL(string: String(format: "https://textvalidator-fddd6.firebaseapp.com/?email=%@", email))
+        actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier ?? "")
+        try await Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email, actionCodeSettings: actionCodeSettings)
     }
 
     func reload() async throws -> User? {

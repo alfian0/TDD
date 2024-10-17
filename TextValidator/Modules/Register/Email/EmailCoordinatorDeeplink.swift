@@ -27,8 +27,8 @@ final class EmailCoordinatorDeeplink: EmailCoordinator {
     @MainActor
     func start(_ deeplink: DeeplinkType) async {
         switch deeplink {
-        case .verifyEmail:
-            await start(viewState: .waitingForVerification)
+        case let .verifyEmail(link):
+            await start(viewState: .waitingForVerification(link: link))
         }
     }
 

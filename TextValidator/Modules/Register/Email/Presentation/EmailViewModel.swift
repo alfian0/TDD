@@ -10,7 +10,7 @@ import SwiftUI
 
 enum EmailViewState {
     case formInput
-    case waitingForVerification
+    case waitingForVerification(link: String)
 }
 
 @MainActor
@@ -23,6 +23,7 @@ final class EmailViewModel: ObservableObject {
     private let emailValidationUsecase: EmailValidationUsecase
     private let registerEmailUsecase: RegisterEmailUsecase
     private let reloadUserUsecase: ReloadUserUsecase
+    private let verificationEmailUsecase: VerificationEmailUsecase
     private var coordinator: EmailCoordinator
 
     private(set) var cancellables = Set<AnyCancellable>()
@@ -32,12 +33,14 @@ final class EmailViewModel: ObservableObject {
         emailValidationUsecase: EmailValidationUsecase,
         registerEmailUsecase: RegisterEmailUsecase,
         reloadUserUsecase: ReloadUserUsecase,
+        verificationEmailUsecase: VerificationEmailUsecase,
         coordinator: EmailCoordinator
     ) {
         self.viewState = viewState
         self.emailValidationUsecase = emailValidationUsecase
         self.registerEmailUsecase = registerEmailUsecase
         self.reloadUserUsecase = reloadUserUsecase
+        self.verificationEmailUsecase = verificationEmailUsecase
         self.coordinator = coordinator
 
         $email
@@ -55,12 +58,26 @@ final class EmailViewModel: ObservableObject {
             .assign(to: &$canSubmit)
     }
 
+    func verification() async {
+        switch viewState {
+        case let .waitingForVerification(link):
+            let result = await verificationEmailUsecase.execute(link: link)
+            switch result {
+            case let .success(user):
+                print(user)
+            case let .failure(error):
+                coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+            }
+        default: break
+        }
+    }
+
     func didTapCountinue() async {
         let result = await registerEmailUsecase.execute(email: email)
 
         switch result {
         case .success:
-            viewState = .waitingForVerification
+            viewState = .waitingForVerification(link: "")
         case let .failure(error):
             coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
         }

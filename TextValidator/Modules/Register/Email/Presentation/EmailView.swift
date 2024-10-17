@@ -27,6 +27,11 @@ struct EmailView: View {
                 }
             }
         }
+        .onAppear {
+            Task {
+                await viewModel.verification()
+            }
+        }
     }
 }
 
