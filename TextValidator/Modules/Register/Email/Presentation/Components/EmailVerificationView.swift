@@ -57,16 +57,8 @@ struct EmailVerificationView: View {
 
 #Preview {
     EmailVerificationView(
-        viewModel: EmailViewModel(
+        viewModel: EmailViewFactory().createEmailViewModel(
             viewState: .formInput,
-            emailValidationUsecase: EmailValidationUsecase(),
-            registerEmailUsecase: RegisterEmailUsecase(
-                repository: RegisterEmailRepository(service: FirebaseAuthService()),
-                emailValidationUsecase: EmailValidationUsecase()
-            ),
-            reloadUserUsecase: ReloadUserUsecase(
-                repository: RegisterEmailRepository(service: FirebaseAuthService())
-            ),
             coordinator: EmailCoordinatorImpl()
         )
     )

@@ -23,7 +23,7 @@ final class EmailViewModel: ObservableObject {
     private let emailValidationUsecase: EmailValidationUsecase
     private let registerEmailUsecase: RegisterEmailUsecase
     private let reloadUserUsecase: ReloadUserUsecase
-    private var coordinator: EmailCoordinatorImpl
+    private var coordinator: EmailCoordinator
 
     private(set) var cancellables = Set<AnyCancellable>()
 
@@ -32,7 +32,7 @@ final class EmailViewModel: ObservableObject {
         emailValidationUsecase: EmailValidationUsecase,
         registerEmailUsecase: RegisterEmailUsecase,
         reloadUserUsecase: ReloadUserUsecase,
-        coordinator: EmailCoordinatorImpl
+        coordinator: EmailCoordinator
     ) {
         self.viewState = viewState
         self.emailValidationUsecase = emailValidationUsecase
@@ -72,7 +72,7 @@ final class EmailViewModel: ObservableObject {
         switch result {
         case let .success(isEmailVerified):
             guard isEmailVerified else { return }
-            coordinator.push(.password)
+            await coordinator.push(.password)
         case let .failure(error):
             coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
         }

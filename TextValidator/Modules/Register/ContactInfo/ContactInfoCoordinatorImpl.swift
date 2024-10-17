@@ -39,21 +39,7 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
 
     @MainActor
     func start(didTapLogin: @escaping () -> Void) {
-        let vm = ContactInfoViewModel(
-            fullnameValidationUsecase: NameValidationUsecase(),
-            phoneValidationUsecase: PhoneValidationUsecase(),
-            countryCodeUsecase: CountryCodeUsecase(service: DefaultCountryCodeService()),
-            registerPhoneUsecase: RegisterPhoneUsecase(
-                repository: RegisterPhoneRepository(service: FirebaseAuthService()),
-                phoneValidationUsecase: PhoneValidationUsecase()
-            ),
-            saveNameUsecase: SaveNameUsecase(
-                repository: RegisterPhoneRepository(service: FirebaseAuthService()),
-                nameValidationUsecase: NameValidationUsecase()
-            ),
-            coordinator: self,
-            didTapLogin: didTapLogin
-        )
+        let vm = ContactInfoFactory().createContactInfoViewModel(didTapLogin: didTapLogin, coordinator: self)
         let v = ContactInfoView(viewModel: vm)
         let vc = UIHostingController(rootView: v)
 

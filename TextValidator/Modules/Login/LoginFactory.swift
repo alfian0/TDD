@@ -11,13 +11,16 @@ final class LoginFactory {
     private let keychainService = KeychainService()
     private let userdefaultsService = UserdefaultsService()
     private let emailValidationUsecase = EmailValidationUsecase()
-    
+
     @MainActor
-    func createLoginViewModel(didDismiss: @escaping () -> Void, coordinator: LoginViewCoordinator) -> LoginViewModel {
+    func createLoginViewModel(
+        didDismiss: @escaping () -> Void,
+        coordinator: LoginViewCoordinator
+    ) -> LoginViewModel {
         let repository = createLoginRepository()
         let loginUsecase = createLoginUsecase(repository: repository)
         let loginBiometricUsecase = createLoginBiometricUsecase(repository: repository, loginUsecase: loginUsecase)
-        
+
         return LoginViewModel(
             loginUsecase: loginUsecase,
             loginBiometricUsecase: loginBiometricUsecase,
@@ -26,7 +29,7 @@ final class LoginFactory {
             didDismiss: didDismiss
         )
     }
-    
+
     private func createLoginRepository() -> LoginRepository {
         return LoginRepositoryImpl(
             authService: firebaseAuthService,
@@ -35,14 +38,14 @@ final class LoginFactory {
             userdefaultsService: userdefaultsService
         )
     }
-    
+
     private func createLoginUsecase(repository: LoginRepository) -> LoginUsecase {
         return LoginUsecase(
             repository: repository,
             emailValidationUsecase: emailValidationUsecase
         )
     }
-    
+
     private func createLoginBiometricUsecase(repository: LoginRepository, loginUsecase: LoginUsecase) -> LoginBiometricUsecase {
         return LoginBiometricUsecase(
             repository: repository,

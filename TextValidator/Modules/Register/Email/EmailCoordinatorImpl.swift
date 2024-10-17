@@ -31,18 +31,7 @@ final class EmailCoordinatorImpl: EmailCoordinator {
 
     @MainActor
     func start(viewState: EmailViewState) {
-        let vm = EmailViewModel(
-            viewState: viewState,
-            emailValidationUsecase: EmailValidationUsecase(),
-            registerEmailUsecase: RegisterEmailUsecase(
-                repository: RegisterEmailRepository(service: FirebaseAuthService()),
-                emailValidationUsecase: EmailValidationUsecase()
-            ),
-            reloadUserUsecase: ReloadUserUsecase(
-                repository: RegisterEmailRepository(service: FirebaseAuthService())
-            ),
-            coordinator: self
-        )
+        let vm = EmailViewFactory().createEmailViewModel(viewState: viewState, coordinator: self)
         let v = EmailView(viewModel: vm)
         let vc = UIHostingController(rootView: v)
         navigationController.setViewControllers([vc], animated: true)

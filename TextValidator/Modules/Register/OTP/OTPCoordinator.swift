@@ -21,12 +21,9 @@ final class OTPCoordinator: Coordinator {
 
     @MainActor
     func start(type: OTPType, verificationID: String, didSuccess: @escaping () -> Void) {
-        let vm = OTPViewModel(
+        let vm = OTPViewFactory().createOTPViewModel(
             type: type,
             verificationID: verificationID,
-            verifyOTPUsecase: VerifyOTPUsecase(
-                repository: VerifyOTPRepository(service: FirebaseAuthService())
-            ),
             coordinator: self,
             didSuccess: didSuccess
         )
