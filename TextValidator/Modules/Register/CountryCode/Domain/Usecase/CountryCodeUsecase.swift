@@ -13,17 +13,16 @@ enum CountryCodeError: Error {
 }
 
 final class CountryCodeUsecase {
-    let service: DefaultCountryCodeService
+    let repository: LocalDataRepository
 
-    init(service: DefaultCountryCodeService) {
-        self.service = service
+    init(repository: LocalDataRepository) {
+        self.repository = repository
     }
 
     func execute() async -> Result<[CountryCodeModel], CountryCodeError> {
         do {
-            let countries = try await service.findAll()
-            let mappedCountries = countries.map { CountryCodeResponseMapper.map(country: $0) }
-            return .success(mappedCountries)
+            let countries = try await repository.getCountryCodes()
+            return .success(countries)
         } catch {
             return .failure(.ERROR_PARSE_JSON)
         }

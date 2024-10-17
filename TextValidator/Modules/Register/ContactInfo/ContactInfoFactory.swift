@@ -8,7 +8,7 @@
 final class ContactInfoFactory {
     private let nameValidationUsecase = NameValidationUsecase()
     private let phoneValidationUsecase = PhoneValidationUsecase()
-    private let defaultCountryCodeService = DefaultCountryCodeService()
+    private let localDataService = LocalDataService()
     private let firebaseAuthService = FirebaseAuthService()
 
     @MainActor
@@ -46,6 +46,10 @@ final class ContactInfoFactory {
     }
 
     private func createCountryCodeUsecase() -> CountryCodeUsecase {
-        return CountryCodeUsecase(service: defaultCountryCodeService)
+        return CountryCodeUsecase(repository: createLocalDataRepository())
+    }
+
+    private func createLocalDataRepository() -> LocalDataRepository {
+        return LocalDataRepositoryImpl(service: localDataService)
     }
 }
