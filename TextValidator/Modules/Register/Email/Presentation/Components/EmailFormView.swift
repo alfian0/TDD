@@ -17,7 +17,7 @@ struct EmailFormView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .font(.title)
 
-                Text("Please input your personal email address to receive any notificatio")
+                Text("Please input your personal email address to receive any notification")
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .font(.body)
                     .foregroundColor(.secondary)

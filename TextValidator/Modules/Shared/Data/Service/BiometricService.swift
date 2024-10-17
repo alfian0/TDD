@@ -21,6 +21,11 @@ class BiometricService {
         }
     }
 
+    func biometricType() -> LABiometryType {
+        let context = LAContext()
+        return context.biometryType
+    }
+
     func authenticateWithBiometrics() async throws -> Bool {
         let context = LAContext()
         return try await withCheckedThrowingContinuation { continuation in

@@ -12,7 +12,7 @@ struct OTPView: View {
     @FocusState var isKeyboardShowing: Bool
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(viewModel.title)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -31,7 +31,6 @@ struct OTPView: View {
                     isKeyboardShowing: _isKeyboardShowing,
                     count: viewModel.count
                 )
-                .padding()
                 .background {
                     TextField("", text: $viewModel.otpText.limit(viewModel.count))
                         .keyboardType(.numberPad)

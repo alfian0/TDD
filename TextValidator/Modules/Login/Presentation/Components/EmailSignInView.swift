@@ -67,14 +67,10 @@ struct EmailSignInView: View {
 }
 
 #Preview {
-    EmailSignInView(viewModel: LoginViewModel(
-        loginUsecase: LoginUsecase(
-            repository: LoginRepositoryImpl(service: FirebaseAuthService()),
-            emailValidationUsecase: EmailValidationUsecase()
-        ),
-        loginBiometricUsecase: LoginBiometricUsecase(service: BiometricService()),
-        emailValidationUsecase: EmailValidationUsecase(),
-        coordinator: LoginViewCoordinator(),
-        didDismiss: {}
-    ))
+    EmailSignInView(
+        viewModel: LoginFactory().createLoginViewModel(
+            didDismiss: {},
+            coordinator: LoginViewCoordinator()
+        )
+    )
 }

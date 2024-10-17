@@ -59,9 +59,10 @@ struct ContactInfoView: View {
 
                         TextField("Phone", text: $viewModel.phone)
                             .disabled(viewModel.isLoading)
+                            .keyboardType(.phonePad)
                     }
                 }
-                .modifier(TextFieldModifier(label: "Password", errorMessage: viewModel.phoneError))
+                .modifier(TextFieldModifier(label: "Phone", errorMessage: viewModel.phoneError))
 
                 HStack(spacing: 4) {
                     Text("Already have an account ?")

@@ -17,16 +17,7 @@ final class LoginViewCoordinator: Coordinator {
 
     @MainActor
     func start(didDismiss: @escaping () -> Void) {
-        let vm = LoginViewModel(
-            loginUsecase: LoginUsecase(
-                repository: LoginRepositoryImpl(service: FirebaseAuthService()),
-                emailValidationUsecase: EmailValidationUsecase()
-            ),
-            loginBiometricUsecase: LoginBiometricUsecase(service: BiometricService()),
-            emailValidationUsecase: EmailValidationUsecase(),
-            coordinator: self,
-            didDismiss: didDismiss
-        )
+        let vm = LoginFactory().createLoginViewModel(didDismiss: didDismiss, coordinator: self)
         let v = LoginView(viewModel: vm)
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)

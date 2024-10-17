@@ -5,22 +5,24 @@
 //  Created by Alfian on 16/10/24.
 //
 
-import Security
+import KeychainSwift
+
+enum KeychainConstants {
+    static let authToken = "authToken"
+}
 
 final class KeychainService {
-    private let biometricKey = "com.app.biometricEnabled"
+    private let keychain = KeychainSwift()
 
-    func saveBiometricEnabled(enabled: Bool) {
-        let status = KeychainHelper.save(data: enabled ? "1" : "0", forKey: biometricKey)
-        if status != errSecSuccess {
-            print("Failed to save biometric preference")
-        }
+    func saveToken(_ token: String) {
+        keychain.set(token, forKey: KeychainConstants.authToken)
     }
 
-    func isBiometricEnabled() -> Bool {
-        guard let biometricStatus = KeychainHelper.retrieveData(forKey: biometricKey) else {
-            return false
-        }
-        return biometricStatus == "1"
+    func getToken() -> String? {
+        return keychain.get(KeychainConstants.authToken)
+    }
+
+    func deleteToken() {
+        keychain.delete(KeychainConstants.authToken)
     }
 }

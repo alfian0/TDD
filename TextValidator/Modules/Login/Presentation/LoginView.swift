@@ -13,9 +13,13 @@ struct LoginView: View {
     var body: some View {
         VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Hi, Welcome Back!")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(.title)
+                HStack {
+                    Text("Hi, Welcome Back!")
+                        .font(.title)
+                    Image(systemName: "flame.circle.fill")
+                        .font(.title)
+                        .foregroundStyle(.orange)
+                }
 
                 Text("It's good to see you again")
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -33,7 +37,7 @@ struct LoginView: View {
 
             switch viewModel.signInMethod {
             case 1:
-                PhoneSignInView()
+                PhoneSignInView(viewModel: viewModel)
             default:
                 EmailSignInView(viewModel: viewModel)
             }
@@ -60,15 +64,11 @@ struct LoginView: View {
 
 #Preview {
     NavigationView {
-        LoginView(viewModel: LoginViewModel(
-            loginUsecase: LoginUsecase(
-                repository: LoginRepositoryImpl(service: FirebaseAuthService()),
-                emailValidationUsecase: EmailValidationUsecase()
-            ),
-            loginBiometricUsecase: LoginBiometricUsecase(service: BiometricService()),
-            emailValidationUsecase: EmailValidationUsecase(),
-            coordinator: LoginViewCoordinator(),
-            didDismiss: {}
-        ))
+        EmailSignInView(
+            viewModel: LoginFactory().createLoginViewModel(
+                didDismiss: {},
+                coordinator: LoginViewCoordinator()
+            )
+        )
     }
 }

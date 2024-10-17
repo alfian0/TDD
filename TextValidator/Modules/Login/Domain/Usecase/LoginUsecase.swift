@@ -19,7 +19,10 @@ final class LoginUsecase {
     private let repository: LoginRepository
     private let emailValidationUsecase: EmailValidationUsecase
 
-    init(repository: LoginRepository, emailValidationUsecase: EmailValidationUsecase) {
+    init(
+        repository: LoginRepository,
+        emailValidationUsecase: EmailValidationUsecase
+    ) {
         self.repository = repository
         self.emailValidationUsecase = emailValidationUsecase
     }
