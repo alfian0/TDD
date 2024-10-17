@@ -22,16 +22,16 @@ final class EmailViewFactory {
 
     private func createRegisterEmailUsecase() -> RegisterEmailUsecase {
         return RegisterEmailUsecase(
-            repository: createRegisterEmailRepository(),
+            repository: createAuthRepository(),
             emailValidationUsecase: emailValidationUsecase
         )
     }
 
     private func createReloadUserUsecase() -> ReloadUserUsecase {
-        return ReloadUserUsecase(repository: createRegisterEmailRepository())
+        return ReloadUserUsecase(repository: createAuthRepository())
     }
 
-    private func createRegisterEmailRepository() -> RegisterEmailRepository {
-        return RegisterEmailRepository(service: firebaseAuthService)
+    private func createAuthRepository() -> AuthRepository {
+        return AuthRepositoryImpl(service: firebaseAuthService)
     }
 }

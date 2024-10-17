@@ -12,9 +12,9 @@ enum VerifyOTPUsecaseError: Error, LocalizedError {
 }
 
 final class VerifyOTPUsecase {
-    private let repository: VerifyOTPRepository
+    private let repository: AuthRepository
 
-    init(repository: VerifyOTPRepository) {
+    init(repository: AuthRepository) {
         self.repository = repository
     }
 

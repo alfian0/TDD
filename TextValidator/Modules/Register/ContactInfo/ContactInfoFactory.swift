@@ -27,20 +27,20 @@ final class ContactInfoFactory {
         )
     }
 
-    private func createRegisterPhoneRepository() -> RegisterPhoneRepository {
-        return RegisterPhoneRepository(service: firebaseAuthService)
+    private func createAuthRepository() -> AuthRepository {
+        return AuthRepositoryImpl(service: firebaseAuthService)
     }
 
     private func createSaveNameUsecase() -> SaveNameUsecase {
         return SaveNameUsecase(
-            repository: createRegisterPhoneRepository(),
+            repository: createAuthRepository(),
             nameValidationUsecase: nameValidationUsecase
         )
     }
 
     private func createRegisterPhoneUsecase() -> RegisterPhoneUsecase {
         return RegisterPhoneUsecase(
-            repository: createRegisterPhoneRepository(),
+            repository: createAuthRepository(),
             phoneValidationUsecase: phoneValidationUsecase
         )
     }

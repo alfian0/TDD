@@ -13,9 +13,9 @@ enum SetPasswordUsecaseError: Error, LocalizedError {
 }
 
 final class SetPasswordUsecase {
-    private let repository: SetPasswordRepository
+    private let repository: AuthRepository
 
-    init(repository: SetPasswordRepository) {
+    init(repository: AuthRepository) {
         self.repository = repository
     }
 

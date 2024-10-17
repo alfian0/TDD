@@ -13,11 +13,11 @@ enum SaveNameUsecaseError: Error, LocalizedError {
 }
 
 final class SaveNameUsecase {
-    private let repository: RegisterPhoneRepository
+    private let repository: AuthRepository
     private let nameValidationUsecase: NameValidationUsecase
 
     init(
-        repository: RegisterPhoneRepository,
+        repository: AuthRepository,
         nameValidationUsecase: NameValidationUsecase
     ) {
         self.repository = repository

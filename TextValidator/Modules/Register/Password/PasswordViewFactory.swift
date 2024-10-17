@@ -19,10 +19,10 @@ final class PasswordViewFactory {
     }
 
     private func createSetPasswordUsecase() -> SetPasswordUsecase {
-        return SetPasswordUsecase(repository: createSetPasswordRepository())
+        return SetPasswordUsecase(repository: createAuthRepository())
     }
 
-    private func createSetPasswordRepository() -> SetPasswordRepository {
-        return SetPasswordRepository(service: firebaseAuthService)
+    private func createAuthRepository() -> AuthRepository {
+        return AuthRepositoryImpl(service: firebaseAuthService)
     }
 }

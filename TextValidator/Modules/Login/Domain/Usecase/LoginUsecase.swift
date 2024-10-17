@@ -16,11 +16,11 @@ enum LoginUsecaseError: Error, LocalizedError {
 }
 
 final class LoginUsecase {
-    private let repository: LoginRepository
+    private let repository: AuthRepository
     private let emailValidationUsecase: EmailValidationUsecase
 
     init(
-        repository: LoginRepository,
+        repository: AuthRepository,
         emailValidationUsecase: EmailValidationUsecase
     ) {
         self.repository = repository

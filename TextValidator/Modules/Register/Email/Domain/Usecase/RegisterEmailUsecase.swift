@@ -15,11 +15,11 @@ enum RegisterEmailUsecaseError: Error, LocalizedError {
 }
 
 final class RegisterEmailUsecase {
-    private let repository: RegisterEmailRepository
+    private let repository: AuthRepository
     private let emailValidationUsecase: EmailValidationUsecase
 
     init(
-        repository: RegisterEmailRepository,
+        repository: AuthRepository,
         emailValidationUsecase: EmailValidationUsecase
     ) {
         self.repository = repository

@@ -25,10 +25,10 @@ final class OTPViewFactory {
     }
 
     private func createVerifyOTPUsecase() -> VerifyOTPUsecase {
-        return VerifyOTPUsecase(repository: createVerifyOTPRepository())
+        return VerifyOTPUsecase(repository: createAuthRepository())
     }
 
-    private func createVerifyOTPRepository() -> VerifyOTPRepository {
-        return VerifyOTPRepository(service: firebaseAuthService)
+    private func createAuthRepository() -> AuthRepository {
+        return AuthRepositoryImpl(service: firebaseAuthService)
     }
 }

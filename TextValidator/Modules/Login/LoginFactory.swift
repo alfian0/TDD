@@ -17,9 +17,14 @@ final class LoginFactory {
         didDismiss: @escaping () -> Void,
         coordinator: LoginViewCoordinator
     ) -> LoginViewModel {
-        let repository = createLoginRepository()
-        let loginUsecase = createLoginUsecase(repository: repository)
-        let loginBiometricUsecase = createLoginBiometricUsecase(repository: repository, loginUsecase: loginUsecase)
+        let loginRepository = createAuthRepository()
+        let biometricRepository = createBiometricRepository()
+        let loginUsecase = createLoginUsecase(repository: loginRepository)
+        let loginBiometricUsecase = createLoginBiometricUsecase(
+            loginRepository: loginRepository,
+            biometricRepository: biometricRepository,
+            loginUsecase: loginUsecase
+        )
 
         return LoginViewModel(
             loginUsecase: loginUsecase,
@@ -30,25 +35,29 @@ final class LoginFactory {
         )
     }
 
-    private func createLoginRepository() -> LoginRepository {
-        return LoginRepositoryImpl(
-            authService: firebaseAuthService,
-            biometricService: biometricService,
-            keychainService: keychainService,
-            userdefaultsService: userdefaultsService
-        )
+    private func createAuthRepository() -> AuthRepository {
+        return AuthRepositoryImpl(service: firebaseAuthService)
     }
 
-    private func createLoginUsecase(repository: LoginRepository) -> LoginUsecase {
+    private func createBiometricRepository() -> BiometricRepository {
+        return BiometricRepositoryImpl(service: biometricService)
+    }
+
+    private func createLoginUsecase(repository: AuthRepository) -> LoginUsecase {
         return LoginUsecase(
             repository: repository,
             emailValidationUsecase: emailValidationUsecase
         )
     }
 
-    private func createLoginBiometricUsecase(repository: LoginRepository, loginUsecase: LoginUsecase) -> LoginBiometricUsecase {
+    private func createLoginBiometricUsecase(
+        loginRepository: AuthRepository,
+        biometricRepository: BiometricRepository,
+        loginUsecase: LoginUsecase
+    ) -> LoginBiometricUsecase {
         return LoginBiometricUsecase(
-            repository: repository,
+            loginRepository: loginRepository,
+            biometricRepository: biometricRepository,
             loginUsecase: loginUsecase
         )
     }

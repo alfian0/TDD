@@ -12,8 +12,6 @@ enum UserdefaultsConstants {
 }
 
 final class UserdefaultsService {
-    private let userdefaults = UserDefaults.standard
-
     func saveEmail(_ email: String) {
         UserDefaults.standard.set(email, forKey: UserdefaultsConstants.email)
     }

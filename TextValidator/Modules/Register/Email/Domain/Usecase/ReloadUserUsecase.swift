@@ -13,9 +13,9 @@ enum ReloadUserUsecaseError: Error, LocalizedError {
 }
 
 final class ReloadUserUsecase {
-    private let repository: RegisterEmailRepository
+    private let repository: AuthRepository
 
-    init(repository: RegisterEmailRepository) {
+    init(repository: AuthRepository) {
         self.repository = repository
     }
 

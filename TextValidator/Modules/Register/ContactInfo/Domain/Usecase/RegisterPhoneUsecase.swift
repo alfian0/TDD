@@ -13,11 +13,11 @@ enum RegisterPhoneUsecaseError: Error, LocalizedError {
 }
 
 final class RegisterPhoneUsecase {
-    private let repository: RegisterPhoneRepository
+    private let repository: AuthRepository
     private let phoneValidationUsecase: PhoneValidationUsecase
 
     init(
-        repository: RegisterPhoneRepository,
+        repository: AuthRepository,
         phoneValidationUsecase: PhoneValidationUsecase
     ) {
         self.repository = repository
