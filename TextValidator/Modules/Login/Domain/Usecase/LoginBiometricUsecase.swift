@@ -19,28 +19,25 @@ enum LoginBiometricUsecaseError: Error, LocalizedError {
 
 final class LoginBiometricUsecase {
     private let loginRepository: AuthRepository
-    private let biometricRepository: BiometricRepository
     private let loginUsecase: LoginUsecase
 
     init(
         loginRepository: AuthRepository,
-        biometricRepository: BiometricRepository,
         loginUsecase: LoginUsecase
     ) {
         self.loginRepository = loginRepository
-        self.biometricRepository = biometricRepository
         self.loginUsecase = loginUsecase
     }
 
     func exec() async -> Result<Bool, LoginBiometricUsecaseError> {
         do {
-            let isBiometricAvailable = try await biometricRepository.isBiometricAvailable()
+            let isBiometricAvailable = try await loginRepository.isBiometricAvailable()
 
             guard isBiometricAvailable else {
                 return .failure(.NOT_AVAILABLE)
             }
 
-            let authencticated = try await biometricRepository.authenticateWithBiometrics()
+            let authencticated = try await loginRepository.authenticateWithBiometrics()
 
             // To Do: Get email or password to login
             // To Do: Use login usecase to login with saved email and password
@@ -52,7 +49,7 @@ final class LoginBiometricUsecase {
             case -6:
                 return .failure(.ACCESS_DENIED)
             case -7:
-                switch biometricRepository.biometricType() {
+                switch loginRepository.biometricType() {
                 case .none:
                     return .failure(.NOT_AVAILABLE)
                 case .face:

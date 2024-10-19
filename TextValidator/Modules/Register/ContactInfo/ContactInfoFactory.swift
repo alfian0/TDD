@@ -8,8 +8,9 @@
 final class ContactInfoFactory {
     private let nameValidationUsecase = NameValidationUsecase()
     private let phoneValidationUsecase = PhoneValidationUsecase()
-    private let localDataService = LocalDataService()
+    private let countryCodeRepository = CountryCodeRepositoryImpl()
     private let firebaseAuthService = FirebaseAuthService()
+    private let biometricService = BiometricService()
 
     @MainActor
     func createContactInfoViewModel(
@@ -28,7 +29,10 @@ final class ContactInfoFactory {
     }
 
     private func createAuthRepository() -> AuthRepository {
-        return AuthRepositoryImpl(service: firebaseAuthService)
+        return AuthRepositoryImpl(
+            firebaseAuthService: firebaseAuthService,
+            biometricService: biometricService
+        )
     }
 
     private func createSaveNameUsecase() -> SaveNameUsecase {
@@ -46,10 +50,6 @@ final class ContactInfoFactory {
     }
 
     private func createCountryCodeUsecase() -> CountryCodeUsecase {
-        return CountryCodeUsecase(repository: createLocalDataRepository())
-    }
-
-    private func createLocalDataRepository() -> LocalDataRepository {
-        return LocalDataRepositoryImpl(service: localDataService)
+        return CountryCodeUsecase(repository: countryCodeRepository)
     }
 }

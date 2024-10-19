@@ -18,11 +18,9 @@ final class LoginFactory {
         coordinator: LoginViewCoordinator
     ) -> LoginViewModel {
         let loginRepository = createAuthRepository()
-        let biometricRepository = createBiometricRepository()
         let loginUsecase = createLoginUsecase(repository: loginRepository)
         let loginBiometricUsecase = createLoginBiometricUsecase(
             loginRepository: loginRepository,
-            biometricRepository: biometricRepository,
             loginUsecase: loginUsecase
         )
 
@@ -36,11 +34,7 @@ final class LoginFactory {
     }
 
     private func createAuthRepository() -> AuthRepository {
-        return AuthRepositoryImpl(service: firebaseAuthService)
-    }
-
-    private func createBiometricRepository() -> BiometricRepository {
-        return BiometricRepositoryImpl(service: biometricService)
+        return AuthRepositoryImpl(firebaseAuthService: firebaseAuthService, biometricService: biometricService)
     }
 
     private func createLoginUsecase(repository: AuthRepository) -> LoginUsecase {
@@ -52,12 +46,10 @@ final class LoginFactory {
 
     private func createLoginBiometricUsecase(
         loginRepository: AuthRepository,
-        biometricRepository: BiometricRepository,
         loginUsecase: LoginUsecase
     ) -> LoginBiometricUsecase {
         return LoginBiometricUsecase(
             loginRepository: loginRepository,
-            biometricRepository: biometricRepository,
             loginUsecase: loginUsecase
         )
     }

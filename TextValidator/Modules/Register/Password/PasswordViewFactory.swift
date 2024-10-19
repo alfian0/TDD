@@ -8,6 +8,7 @@
 final class PasswordViewFactory {
     private let passwordStrengthUsecase = PasswordStrengthUsecase()
     private let firebaseAuthService = FirebaseAuthService()
+    private let biometricService = BiometricService()
 
     @MainActor
     func createPasswordViewModel(coordinator: PasswordCoordinator) -> PasswordViewModel {
@@ -23,6 +24,9 @@ final class PasswordViewFactory {
     }
 
     private func createAuthRepository() -> AuthRepository {
-        return AuthRepositoryImpl(service: firebaseAuthService)
+        return AuthRepositoryImpl(
+            firebaseAuthService: firebaseAuthService,
+            biometricService: biometricService
+        )
     }
 }

@@ -8,24 +8,29 @@
 import Foundation
 
 final class AuthRepositoryImpl: AuthRepository {
-    private let service: FirebaseAuthService
+    private let firebaseAuthService: FirebaseAuthService
+    private let biometricService: BiometricService
 
-    init(service: FirebaseAuthService) {
-        self.service = service
+    init(
+        firebaseAuthService: FirebaseAuthService,
+        biometricService: BiometricService
+    ) {
+        self.firebaseAuthService = firebaseAuthService
+        self.biometricService = biometricService
     }
 
     func signInWithEmail(email: String, password: String) async throws -> UserModel {
-        let user = try await service.signInWithEmail(email: email, password: password)
+        let user = try await firebaseAuthService.signInWithEmail(email: email, password: password)
 
         return UserMapper.map(user: user)
     }
 
     func sendSignInLink(email: String) async throws {
-        try await service.sendSignInLink(email: email)
+        try await firebaseAuthService.sendSignInLink(email: email)
     }
 
     func signInWithEmail(email: String, link: String) async throws -> UserModel {
-        let authDataResult = try await service.signInWithEmail(email: email, link: link)
+        let authDataResult = try await firebaseAuthService.signInWithEmail(email: email, link: link)
 
         guard authDataResult.user.emailVerified() else {
             throw NSError(domain: "login.repository", code: 0)
@@ -35,23 +40,23 @@ final class AuthRepositoryImpl: AuthRepository {
     }
 
     func verifyPhoneNumber(phone: String) async throws -> String {
-        try await service.verifyPhoneNumber(phone: phone)
+        try await firebaseAuthService.verifyPhoneNumber(phone: phone)
     }
 
     func saveFullname(name: String) async throws -> Bool {
-        try await service.saveFullname(name: name)
+        try await firebaseAuthService.saveFullname(name: name)
     }
 
     func sendEmailVerification(email: String) async throws {
-        try await service.sendEmailVerification(email: email)
+        try await firebaseAuthService.sendEmailVerification(email: email)
     }
 
     func reload() async throws -> Bool {
-        return try await service.reload()?.isEmailVerified ?? false
+        return try await firebaseAuthService.reload()?.isEmailVerified ?? false
     }
 
     func verifyCode(verificationID: String, verificationCode: String) async throws -> UserModel {
-        let result = try await service.verifyCode(
+        let result = try await firebaseAuthService.verifyCode(
             verificationID: verificationID,
             verificationCode: verificationCode
         )
@@ -59,6 +64,29 @@ final class AuthRepositoryImpl: AuthRepository {
     }
 
     func updatePassword(password: String) async throws {
-        try await service.updatePassword(password: password)
+        try await firebaseAuthService.updatePassword(password: password)
+    }
+
+    func isBiometricAvailable() async throws -> Bool {
+        try biometricService.isBiometricAvailable()
+    }
+
+    func biometricType() -> BiometricType {
+        switch biometricService.biometricType() {
+        case .none:
+            return .none
+        case .faceID:
+            return .face
+        case .touchID:
+            return .touch
+        case .opticID:
+            return .optic
+        @unknown default:
+            return .none
+        }
+    }
+
+    func authenticateWithBiometrics() async throws -> Bool {
+        try await biometricService.authenticateWithBiometrics()
     }
 }

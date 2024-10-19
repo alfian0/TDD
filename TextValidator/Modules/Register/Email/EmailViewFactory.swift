@@ -7,6 +7,7 @@
 
 final class EmailViewFactory {
     private let firebaseAuthService = FirebaseAuthService()
+    private let biometricService = BiometricService()
     private let emailValidationUsecase = EmailValidationUsecase()
 
     @MainActor
@@ -33,7 +34,7 @@ final class EmailViewFactory {
     }
 
     private func createAuthRepository() -> AuthRepository {
-        return AuthRepositoryImpl(service: firebaseAuthService)
+        return AuthRepositoryImpl(firebaseAuthService: firebaseAuthService, biometricService: biometricService)
     }
 
     private func createVerificationEmailUsecase() -> VerificationEmailUsecase {

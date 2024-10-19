@@ -17,4 +17,8 @@ protocol AuthRepository {
     func reload() async throws -> Bool
     func verifyCode(verificationID: String, verificationCode: String) async throws -> UserModel
     func updatePassword(password: String) async throws
+
+    func isBiometricAvailable() async throws -> Bool
+    func biometricType() -> BiometricType
+    func authenticateWithBiometrics() async throws -> Bool
 }

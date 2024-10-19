@@ -7,6 +7,7 @@
 
 final class OTPViewFactory {
     private let firebaseAuthService = FirebaseAuthService()
+    private let biometricService = BiometricService()
 
     @MainActor
     func createOTPViewModel(
@@ -29,6 +30,9 @@ final class OTPViewFactory {
     }
 
     private func createAuthRepository() -> AuthRepository {
-        return AuthRepositoryImpl(service: firebaseAuthService)
+        return AuthRepositoryImpl(
+            firebaseAuthService: firebaseAuthService,
+            biometricService: biometricService
+        )
     }
 }

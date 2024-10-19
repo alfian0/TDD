@@ -13,9 +13,9 @@ enum CountryCodeError: Error {
 }
 
 final class CountryCodeUsecase {
-    let repository: LocalDataRepository
+    let repository: CountryCodeRepository
 
-    init(repository: LocalDataRepository) {
+    init(repository: CountryCodeRepository) {
         self.repository = repository
     }
 
