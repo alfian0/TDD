@@ -32,11 +32,11 @@ final class VerificationEmailUsecase {
             return .failure(.UNKNOWN)
         }
 
-        do {
-            let user = try await repository.signInWithEmail(email: email, link: link)
-            return .success(user)
-        } catch {
-            return .failure(.UNKNOWN)
-        }
+//        do {
+//            let user = try await repository.signInWithEmail(email: email, link: link)
+//            return .success(user)
+//        } catch {
+        return .failure(.UNKNOWN)
+//        }
     }
 }

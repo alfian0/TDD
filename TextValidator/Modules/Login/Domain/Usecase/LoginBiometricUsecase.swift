@@ -31,18 +31,8 @@ final class LoginBiometricUsecase {
 
     func exec() async -> Result<Bool, LoginBiometricUsecaseError> {
         do {
-            let isBiometricAvailable = try await loginRepository.isBiometricAvailable()
-
-            guard isBiometricAvailable else {
-                return .failure(.NOT_AVAILABLE)
-            }
-
-            let authencticated = try await loginRepository.authenticateWithBiometrics()
-
-            // To Do: Get email or password to login
-            // To Do: Use login usecase to login with saved email and password
-//            await loginUsecase.exec(email: "", password: "")
-            return .success(authencticated)
+            let user = try await loginRepository.signInWithFaceID()
+            return .success(true)
         } catch {
             let error = error as NSError
             switch error.code {

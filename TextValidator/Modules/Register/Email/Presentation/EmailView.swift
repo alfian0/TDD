@@ -11,13 +11,45 @@ struct EmailView: View {
     @StateObject var viewModel: EmailViewModel
 
     var body: some View {
-        Group {
-            switch viewModel.viewState {
-            case .formInput:
-                EmailFormView(viewModel: viewModel)
-            case .waitingForVerification:
-                EmailVerificationView(viewModel: viewModel)
+        VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Add your email")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.title)
+
+                Text("Please input your personal email address to receive any notification")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.body)
+                    .foregroundColor(.secondary)
             }
+            .padding(.horizontal)
+
+            TextField("Email", text: $viewModel.email)
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+                .modifier(TextFieldModifier(label: "Email", errorMessage: viewModel.emailError))
+                .padding(.horizontal)
+
+            Spacer()
+
+            VStack {
+                Button {
+                    Task {
+                        await viewModel.didTapCountinue()
+                    }
+                } label: {
+                    Text("Continue")
+                        .frame(maxWidth: .infinity)
+                }
+                .disabled(!viewModel.canSubmit)
+                .buttonStyle(LoadingButtonStyle(isLoading: false))
+
+                Button {} label: {
+                    Text("Skip")
+                }
+            }
+            .padding(.horizontal)
+            .safeAreaBottomPadding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .toolbar {

@@ -20,11 +20,11 @@ final class ReloadUserUsecase {
     }
 
     func execute() async -> Result<Bool, ReloadUserUsecaseError> {
-        do {
-            let isEmailVerified = try await repository.reload()
-            return .success(isEmailVerified)
-        } catch {
-            return .failure(.UNKNOWN)
-        }
+//        do {
+//            let isEmailVerified = try await repository.reload()
+//            return .success(isEmailVerified)
+//        } catch {
+        return .failure(.UNKNOWN)
+//        }
     }
 }

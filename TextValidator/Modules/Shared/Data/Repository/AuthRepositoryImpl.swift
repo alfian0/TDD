@@ -7,6 +7,11 @@
 
 import Foundation
 
+enum AuthRepositoryError: Error, LocalizedError {
+    case BIOMETRIC_NOT_AVAILABLE
+    case CANNOT_AUTHENTICATE
+}
+
 final class AuthRepositoryImpl: AuthRepository {
     private let firebaseAuthService: FirebaseAuthService
     private let biometricService: BiometricService
@@ -25,19 +30,35 @@ final class AuthRepositoryImpl: AuthRepository {
         return UserMapper.map(user: user)
     }
 
-    func sendSignInLink(email: String) async throws {
-        try await firebaseAuthService.sendSignInLink(email: email)
-    }
-
-    func signInWithEmail(email: String, link: String) async throws -> UserModel {
-        let authDataResult = try await firebaseAuthService.signInWithEmail(email: email, link: link)
-
-        guard authDataResult.user.emailVerified() else {
-            throw NSError(domain: "login.repository", code: 0)
+    func signInWithFaceID() async throws -> UserModel {
+        let isBiometricAvailable = try biometricService.isBiometricAvailable()
+        guard isBiometricAvailable else {
+            throw AuthRepositoryError.BIOMETRIC_NOT_AVAILABLE
         }
-
-        return UserMapper.map(user: authDataResult.user)
+        let isAuthenticated = try await biometricService.authenticateWithBiometrics()
+        guard isAuthenticated else {
+            throw AuthRepositoryError.CANNOT_AUTHENTICATE
+        }
+        // To Do: Get email and password from keychain
+        let email = ""
+        let password = ""
+        let user = try await firebaseAuthService.signInWithEmail(email: email, password: password)
+        return UserMapper.map(user: user)
     }
+
+//    func sendSignInLink(email: String) async throws {
+//        try await firebaseAuthService.sendSignInLink(email: email)
+//    }
+//
+//    func signInWithEmail(email: String, link: String) async throws -> UserModel {
+//        let authDataResult = try await firebaseAuthService.signInWithEmail(email: email, link: link)
+//
+//        guard authDataResult.user.emailVerified() else {
+//            throw NSError(domain: "login.repository", code: 0)
+//        }
+//
+//        return UserMapper.map(user: authDataResult.user)
+//    }
 
     func verifyPhoneNumber(phone: String) async throws -> String {
         try await firebaseAuthService.verifyPhoneNumber(phone: phone)
@@ -51,9 +72,9 @@ final class AuthRepositoryImpl: AuthRepository {
         try await firebaseAuthService.sendEmailVerification(email: email)
     }
 
-    func reload() async throws -> Bool {
-        return try await firebaseAuthService.reload()?.isEmailVerified ?? false
-    }
+//    func reload() async throws -> Bool {
+//        return try await firebaseAuthService.reload()?.isEmailVerified ?? false
+//    }
 
     func verifyCode(verificationID: String, verificationCode: String) async throws -> UserModel {
         let result = try await firebaseAuthService.verifyCode(
@@ -67,9 +88,9 @@ final class AuthRepositoryImpl: AuthRepository {
         try await firebaseAuthService.updatePassword(password: password)
     }
 
-    func isBiometricAvailable() async throws -> Bool {
-        try biometricService.isBiometricAvailable()
-    }
+//    func isBiometricAvailable() async throws -> Bool {
+//        try biometricService.isBiometricAvailable()
+//    }
 
     func biometricType() -> BiometricType {
         switch biometricService.biometricType() {
@@ -86,7 +107,7 @@ final class AuthRepositoryImpl: AuthRepository {
         }
     }
 
-    func authenticateWithBiometrics() async throws -> Bool {
-        try await biometricService.authenticateWithBiometrics()
-    }
+//    func authenticateWithBiometrics() async throws -> Bool {
+//        try await biometricService.authenticateWithBiometrics()
+//    }
 }

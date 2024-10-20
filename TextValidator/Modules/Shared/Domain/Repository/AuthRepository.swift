@@ -9,16 +9,17 @@ import Foundation
 
 protocol AuthRepository {
     func signInWithEmail(email: String, password: String) async throws -> UserModel
-    func sendSignInLink(email: String) async throws
-    func signInWithEmail(email: String, link: String) async throws -> UserModel
+//    func sendSignInLink(email: String) async throws
+//    func signInWithEmail(email: String, link: String) async throws -> UserModel
     func verifyPhoneNumber(phone: String) async throws -> String
     func saveFullname(name: String) async throws -> Bool
     func sendEmailVerification(email: String) async throws
-    func reload() async throws -> Bool
+//    func reload() async throws -> Bool
     func verifyCode(verificationID: String, verificationCode: String) async throws -> UserModel
     func updatePassword(password: String) async throws
 
-    func isBiometricAvailable() async throws -> Bool
+    func signInWithFaceID() async throws -> UserModel
+//    func isBiometricAvailable() async throws -> Bool
     func biometricType() -> BiometricType
-    func authenticateWithBiometrics() async throws -> Bool
+//    func authenticateWithBiometrics() async throws -> Bool
 }
