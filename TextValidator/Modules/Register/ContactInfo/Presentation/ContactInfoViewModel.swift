@@ -25,7 +25,10 @@ final class ContactInfoViewModel: ObservableObject {
     private let countryCodeUsecase: CountryCodeUsecase
     private let registerPhoneUsecase: RegisterPhoneUsecase
     private let saveNameUsecase: SaveNameUsecase
+    private let verifyOTPUsecase: VerifyOTPUsecase
     private var coordinator: any ContactInfoCoordinator
+
+    private var verificationID: String = ""
 
     var cancellables = Set<AnyCancellable>()
     let didTapLogin: () -> Void
@@ -36,6 +39,7 @@ final class ContactInfoViewModel: ObservableObject {
         countryCodeUsecase: CountryCodeUsecase,
         registerPhoneUsecase: RegisterPhoneUsecase,
         saveNameUsecase: SaveNameUsecase,
+        verifyOTPUsecase: VerifyOTPUsecase,
         coordinator: any ContactInfoCoordinator,
         didTapLogin: @escaping () -> Void
     ) {
@@ -44,6 +48,7 @@ final class ContactInfoViewModel: ObservableObject {
         self.countryCodeUsecase = countryCodeUsecase
         self.registerPhoneUsecase = registerPhoneUsecase
         self.saveNameUsecase = saveNameUsecase
+        self.verifyOTPUsecase = verifyOTPUsecase
         self.coordinator = coordinator
         self.didTapLogin = didTapLogin
 
@@ -78,8 +83,12 @@ final class ContactInfoViewModel: ObservableObject {
             launchCountryCode()
         } else {
             isLoading = true
+
+            defer {
+                isLoading = false
+            }
+
             let result = await countryCodeUsecase.execute()
-            isLoading = false
             switch result {
             case let .success(countries):
                 countryCodes = countries
@@ -98,17 +107,25 @@ final class ContactInfoViewModel: ObservableObject {
         }
 
         let result = await registerPhoneUsecase.execute(phone: countryCode.dialCode + phone)
-
-        switch result {
-        case let .success(verificationID):
-            await coordinator.push(.otp(type: .phone(code: countryCode, phone: phone), verificationID: verificationID, didSuccess: { [weak self] in
-                Task {
-                    await self?.updateName()
-                }
-            }))
-        case let .failure(error):
-            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+        guard case let .success(verificationID) = result else {
+            if case let .failure(error) = result {
+                coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+            }
+            return
         }
+
+        self.verificationID = verificationID
+        await coordinator.push(.otp(
+            title: "Verify your phone number",
+            subtitle: "Enter the 5-digit OTP code sent to \(countryCode.dialCode)\(phone)",
+            didResend: {},
+            didChange: {},
+            didSuccess: { [weak self] otp in
+                Task {
+                    await self?.validate(with: otp)
+                }
+            }
+        ))
     }
 
     func launchLogin() {
@@ -128,24 +145,33 @@ final class ContactInfoViewModel: ObservableObject {
         cancellables.removeAll()
     }
 
-    private func updateName() async {
+    private func validate(with otp: String) async {
         isLoading = true
 
         defer {
             isLoading = false
         }
 
-        let result = await saveNameUsecase.execute(name: fullname)
-
-        switch result {
-        case let .success(isEmailVerified):
-            if isEmailVerified {
-                await coordinator.push(.password)
-            } else {
-                await coordinator.push(.email)
+        let result2 = await verifyOTPUsecase.execute(verificationID: verificationID, verificationCode: otp)
+        guard case let .success(user) = result2 else {
+            if case let .failure(error) = result2 {
+                coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
             }
-        case let .failure(error):
-            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+            return
+        }
+
+        let result3 = await saveNameUsecase.execute(name: fullname)
+        guard case let .success(isEmailVerified) = result3 else {
+            if case let .failure(error) = result3 {
+                coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+            }
+            return
+        }
+
+        if isEmailVerified {
+            await coordinator.push(.password)
+        } else {
+            await coordinator.push(.email)
         }
     }
 }

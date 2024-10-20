@@ -11,16 +11,19 @@ final class OTPViewFactory {
 
     @MainActor
     func createOTPViewModel(
-        type: OTPType,
-        verificationID: String,
+        title: String,
+        subtitle: String,
         coordinator: OTPCoordinator,
-        didSuccess: @escaping () -> Void
+        didResend: @escaping () -> Void,
+        didChange: @escaping () -> Void,
+        didSuccess: @escaping (String) -> Void
     ) -> OTPViewModel {
         return OTPViewModel(
-            type: type,
-            verificationID: verificationID,
-            verifyOTPUsecase: createVerifyOTPUsecase(),
+            title: title,
+            subtitle: subtitle,
             coordinator: coordinator,
+            didResend: didResend,
+            didChange: didChange,
             didSuccess: didSuccess
         )
     }

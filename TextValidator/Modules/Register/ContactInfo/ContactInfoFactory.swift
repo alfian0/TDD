@@ -23,6 +23,7 @@ final class ContactInfoFactory {
             countryCodeUsecase: createCountryCodeUsecase(),
             registerPhoneUsecase: createRegisterPhoneUsecase(),
             saveNameUsecase: createSaveNameUsecase(),
+            verifyOTPUsecase: createVerifyOTPUsecase(),
             coordinator: coordinator,
             didTapLogin: didTapLogin
         )
@@ -51,5 +52,9 @@ final class ContactInfoFactory {
 
     private func createCountryCodeUsecase() -> CountryCodeUsecase {
         return CountryCodeUsecase(repository: countryCodeRepository)
+    }
+
+    private func createVerifyOTPUsecase() -> VerifyOTPUsecase {
+        return VerifyOTPUsecase(repository: createAuthRepository())
     }
 }

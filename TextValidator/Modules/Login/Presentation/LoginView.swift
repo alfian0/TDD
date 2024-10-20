@@ -64,7 +64,7 @@ struct LoginView: View {
 
 #Preview {
     NavigationView {
-        EmailSignInView(
+        LoginView(
             viewModel: LoginFactory().createLoginViewModel(
                 didDismiss: {},
                 coordinator: LoginViewCoordinator()

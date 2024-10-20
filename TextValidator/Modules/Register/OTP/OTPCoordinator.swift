@@ -20,11 +20,19 @@ final class OTPCoordinator: Coordinator {
     }
 
     @MainActor
-    func start(type: OTPType, verificationID: String, didSuccess: @escaping () -> Void) {
+    func start(
+        title: String,
+        subtitle: String,
+        didResend: @escaping () -> Void,
+        didChange: @escaping () -> Void,
+        didSuccess: @escaping (String) -> Void
+    ) {
         let vm = OTPViewFactory().createOTPViewModel(
-            type: type,
-            verificationID: verificationID,
+            title: title,
+            subtitle: subtitle,
             coordinator: self,
+            didResend: didResend,
+            didChange: didChange,
             didSuccess: didSuccess
         )
         let v = OTPView(viewModel: vm)
