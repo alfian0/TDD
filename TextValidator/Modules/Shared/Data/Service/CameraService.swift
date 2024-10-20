@@ -10,9 +10,11 @@ import UIKit
 
 class CameraService: NSObject {
     private(set) var captureSession: AVCaptureSession?
+    private(set) var queue = DispatchQueue(label: "video.capture")
     private var photoOutput = AVCapturePhotoOutput()
-    private var completion: ((Result<UIImage, Error>) -> Void)?
+    private var videoOutput = AVCaptureVideoDataOutput()
     private var imageContinuation: CheckedContinuation<UIImage, Error>?
+    private var videoContinuation: CheckedContinuation<CMSampleBuffer, Error>?
 
     func isCameraAuthorized() async throws -> Bool {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -29,16 +31,18 @@ class CameraService: NSObject {
         }
     }
 
-    func configureCamera() {
+    func adInput() {
         captureSession = AVCaptureSession()
 
         guard let captureSession = captureSession else {
             return
         }
 
-        let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
+        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+            return
+        }
 
-        guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice!) else {
+        guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) else {
             return
         }
 
@@ -49,19 +53,29 @@ class CameraService: NSObject {
         }
 
         captureSession.addInput(videoDeviceInput)
+    }
 
-        guard captureSession.canAddOutput(photoOutput) else {
+    func addPhotoOutput(session: AVCaptureSession) {
+        guard session.canAddOutput(photoOutput) else {
             return
         }
 
-        captureSession.addOutput(photoOutput)
-
-        captureSession.commitConfiguration()
+        session.addOutput(photoOutput)
+        session.commitConfiguration()
     }
 
-    func captureImage(completion _: @escaping (Result<UIImage, Error>) -> Void) {
-        let settings = AVCapturePhotoSettings()
-        photoOutput.capturePhoto(with: settings, delegate: self)
+    func addVideoOutput(session: AVCaptureSession) {
+        guard session.canAddOutput(videoOutput) else {
+            return
+        }
+
+        videoOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as NSString: NSNumber(value: kCVPixelFormatType_32BGRA)] as [String: Any]
+        videoOutput.setSampleBufferDelegate(self, queue: queue)
+        let videoOrientation = videoOutput.connection(with: .video)
+        videoOrientation?.videoOrientation = .portrait
+
+        session.addOutput(videoOutput)
+        session.commitConfiguration()
     }
 
     func startCapture() async throws -> UIImage {
@@ -71,6 +85,12 @@ class CameraService: NSObject {
             photoOutput.capturePhoto(with: settings, delegate: self)
         }
     }
+
+    func startCapture() async throws -> CMSampleBuffer {
+        return try await withCheckedThrowingContinuation { continuation in
+            videoContinuation = continuation
+        }
+    }
 }
 
 // MARK: - AVCapturePhotoCaptureDelegate
@@ -78,7 +98,6 @@ class CameraService: NSObject {
 extension CameraService: AVCapturePhotoCaptureDelegate {
     func photoOutput(_: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
-            completion?(.failure(error))
             imageContinuation?.resume(throwing: error)
             return
         }
@@ -86,13 +105,19 @@ extension CameraService: AVCapturePhotoCaptureDelegate {
         guard let imageData = photo.fileDataRepresentation(),
               let image = UIImage(data: imageData)
         else {
-            completion?(.failure(CameraError.captureFailed))
             imageContinuation?.resume(throwing: CameraError.captureFailed)
             return
         }
 
-        completion?(.success(image))
         imageContinuation?.resume(returning: image)
+    }
+}
+
+// MARK: AVCaptureVideoDataOutputSampleBufferDelegate
+
+extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
+    func captureOutput(_: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from _: AVCaptureConnection) {
+        videoContinuation?.resume(returning: sampleBuffer)
     }
 }
 
