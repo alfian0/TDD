@@ -28,19 +28,58 @@ struct LoginView: View {
             }
             .padding(.horizontal)
 
-            Picker("", selection: $viewModel.signInMethod) {
-                Text("Email").tag(0)
-                Text("Phone").tag(1)
+            VStack(alignment: .leading, spacing: 8) {
+                TextField("Email", text: $viewModel.username)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                    .disabled(viewModel.isLoading)
+                    .modifier(TextFieldModifier(label: "Email", errorMessage: viewModel.usernameError))
+
+                if viewModel.canSubmit {
+                    SecureField("Password", text: $viewModel.password)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                        .disabled(viewModel.isLoading)
+                        .modifier(TextFieldModifier(label: "Password", errorMessage: nil))
+                }
+
+                HStack(spacing: 4) {
+                    Text("Forgot you password?")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+
+                    Button {} label: {
+                        Text("Click here")
+                            .font(.subheadline)
+                    }
+                }
             }
-            .pickerStyle(.segmented)
             .padding(.horizontal)
 
-            switch viewModel.signInMethod {
-            case 1:
-                PhoneSignInView(viewModel: viewModel)
-            default:
-                EmailSignInView(viewModel: viewModel)
+            Spacer()
+
+            HStack(spacing: 8) {
+                Button {
+                    Task {
+                        await viewModel.login()
+                    }
+                } label: {
+                    Text("Continue")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(LoadingButtonStyle(isLoading: viewModel.isLoading))
+                .disabled(!viewModel.canSubmit)
+
+                Button {
+                    Task {
+                        await viewModel.loginWithBiometric()
+                    }
+                } label: {
+                    Image(systemName: "faceid")
+                }
+                .buttonStyle(LoadingButtonStyle(isLoading: viewModel.isLoading))
             }
+            .padding(.horizontal)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .safeAreaBottomPadding()

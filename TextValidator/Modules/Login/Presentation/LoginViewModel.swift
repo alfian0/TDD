@@ -10,7 +10,6 @@ import SwiftUI
 
 @MainActor
 final class LoginViewModel: ObservableObject {
-    @Published var signInMethod: Int = 0
     @Published var username: String = ""
     @Published var usernameError: String?
     @Published var password: String = ""
