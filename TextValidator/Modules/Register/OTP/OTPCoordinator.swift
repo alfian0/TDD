@@ -23,6 +23,8 @@ final class OTPCoordinator: Coordinator {
     func start(
         title: String,
         subtitle: String,
+        count: Int,
+        duration: Int,
         didResend: @escaping () -> Void,
         didChange: @escaping () -> Void,
         didSuccess: @escaping (String) -> Void
@@ -30,6 +32,8 @@ final class OTPCoordinator: Coordinator {
         let vm = OTPViewFactory().createOTPViewModel(
             title: title,
             subtitle: subtitle,
+            count: count,
+            duration: duration,
             coordinator: self,
             didResend: didResend,
             didChange: didChange,

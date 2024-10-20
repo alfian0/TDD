@@ -120,7 +120,7 @@ struct OTPView: View {
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)
         .onViewDidLoad {
-            coordinator.start(title: "", subtitle: "") {} didChange: {} didSuccess: { _ in
+            coordinator.start(title: "", subtitle: "", count: 6, duration: 10) {} didChange: {} didSuccess: { _ in
             }
         }
 }

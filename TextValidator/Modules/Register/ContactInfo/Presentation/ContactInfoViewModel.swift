@@ -118,6 +118,8 @@ final class ContactInfoViewModel: ObservableObject {
         await coordinator.push(.otp(
             title: "Verify your phone number",
             subtitle: "Enter the 5-digit OTP code sent to \(countryCode.dialCode)\(phone)",
+            count: 6,
+            duration: 10,
             didResend: { [weak self] in
                 Task {
                     guard let self = self else { return }

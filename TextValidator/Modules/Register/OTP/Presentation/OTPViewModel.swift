@@ -17,13 +17,13 @@ final class OTPViewModel: ObservableObject {
 
     var title: String
     var subtitle: String
-    var count = 6
+    var count: Int
 
     private let didResend: () -> Void
     private let didChange: () -> Void
     private let didSuccess: (String) -> Void
 
-    private var duration = 10
+    private var duration: Int
     private var timerCancellable: AnyCancellable?
     private var coordinator: OTPCoordinator
     private var cancellables = Set<AnyCancellable>()
@@ -31,8 +31,8 @@ final class OTPViewModel: ObservableObject {
     init(
         title: String,
         subtitle: String,
-        count: Int = 6,
-        duration: Int = 10,
+        count: Int,
+        duration: Int,
         coordinator: OTPCoordinator,
         didResend: @escaping () -> Void,
         didChange: @escaping () -> Void,

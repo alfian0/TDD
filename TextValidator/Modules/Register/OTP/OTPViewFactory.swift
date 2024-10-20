@@ -13,6 +13,8 @@ final class OTPViewFactory {
     func createOTPViewModel(
         title: String,
         subtitle: String,
+        count: Int,
+        duration: Int,
         coordinator: OTPCoordinator,
         didResend: @escaping () -> Void,
         didChange: @escaping () -> Void,
@@ -21,6 +23,8 @@ final class OTPViewFactory {
         return OTPViewModel(
             title: title,
             subtitle: subtitle,
+            count: count,
+            duration: duration,
             coordinator: coordinator,
             didResend: didResend,
             didChange: didChange,

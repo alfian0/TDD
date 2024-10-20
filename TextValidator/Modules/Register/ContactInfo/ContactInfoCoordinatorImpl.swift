@@ -8,7 +8,15 @@
 import SwiftUI
 
 enum ContactInfoCoordinatorPage {
-    case otp(title: String, subtitle: String, didResend: () -> Void, didChange: () -> Void, didSuccess: (String) -> Void)
+    case otp(
+        title: String,
+        subtitle: String,
+        count: Int,
+        duration: Int,
+        didResend: () -> Void,
+        didChange: () -> Void,
+        didSuccess: (String) -> Void
+    )
     case email
     case password
 }
@@ -49,11 +57,13 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
     @MainActor
     func push(_ page: ContactInfoCoordinatorPage) {
         switch page {
-        case let .otp(title, subtitle, didResend, didChange, didSuccess):
+        case let .otp(title, subtitle, count, duration, didResend, didChange, didSuccess):
             let coordinator = OTPCoordinator(navigationController: navigationController)
             coordinator.start(
                 title: title,
                 subtitle: subtitle,
+                count: count,
+                duration: duration,
                 didResend: didResend,
                 didChange: { [weak self] in
                     didChange()
