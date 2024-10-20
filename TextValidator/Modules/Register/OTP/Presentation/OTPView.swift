@@ -56,7 +56,7 @@ struct OTPView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 guard viewModel.isEnableOtherAction else { return }
-                                viewModel.start()
+                                viewModel.resend()
                             }
 
                         Text("or")
@@ -69,6 +69,7 @@ struct OTPView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 guard viewModel.isEnableOtherAction else { return }
+                                viewModel.change()
                             }
 
                         Text("\(viewModel.timer)")
@@ -82,9 +83,7 @@ struct OTPView: View {
             Spacer()
 
             Button(action: {
-                Task {
-                    await viewModel.next()
-                }
+                viewModel.next()
             }) {
                 Text("Continue")
                     .frame(maxWidth: .infinity)
@@ -108,6 +107,9 @@ struct OTPView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
+        }
+        .onAppear {
+            viewModel.start()
         }
     }
 }

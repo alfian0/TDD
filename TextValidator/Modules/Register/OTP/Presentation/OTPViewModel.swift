@@ -52,11 +52,12 @@ final class OTPViewModel: ObservableObject {
                 value.count == count
             }
             .assign(to: &$canSubmit)
-
-        start()
     }
 
     func start() {
+        guard timerCancellable == nil else {
+            return
+        }
         duration = 10
         timerCancellable = Timer.TimerPublisher(interval: 1.0, runLoop: .main, mode: .default)
             .autoconnect()
@@ -79,7 +80,15 @@ final class OTPViewModel: ObservableObject {
             }
     }
 
-    func next() async {
+    func next() {
         didSuccess(otpText)
+    }
+
+    func resend() {
+        didResend()
+    }
+
+    func change() {
+        didChange()
     }
 }

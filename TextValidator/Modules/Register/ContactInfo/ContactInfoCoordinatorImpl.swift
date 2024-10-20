@@ -51,7 +51,16 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
         switch page {
         case let .otp(title, subtitle, didResend, didChange, didSuccess):
             let coordinator = OTPCoordinator(navigationController: navigationController)
-            coordinator.start(title: title, subtitle: subtitle, didResend: didResend, didChange: didChange, didSuccess: didSuccess)
+            coordinator.start(
+                title: title,
+                subtitle: subtitle,
+                didResend: didResend,
+                didChange: { [weak self] in
+                    didChange()
+                    self?.navigationController.popViewController(animated: true)
+                },
+                didSuccess: didSuccess
+            )
 
         case .email:
             let coordinator = EmailCoordinatorImpl(navigationController: navigationController)

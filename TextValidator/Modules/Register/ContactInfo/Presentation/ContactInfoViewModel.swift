@@ -118,8 +118,22 @@ final class ContactInfoViewModel: ObservableObject {
         await coordinator.push(.otp(
             title: "Verify your phone number",
             subtitle: "Enter the 5-digit OTP code sent to \(countryCode.dialCode)\(phone)",
-            didResend: {},
-            didChange: {},
+            didResend: { [weak self] in
+                Task {
+                    guard let self = self else { return }
+                    let result = await self.registerPhoneUsecase.execute(phone: self.countryCode.dialCode + self.phone)
+                    guard case let .success(verificationID) = result else {
+                        if case let .failure(error) = result {
+                            self.coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+                        }
+                        return
+                    }
+                    self.verificationID = verificationID
+                }
+            },
+            didChange: {
+                print("didchange")
+            },
             didSuccess: { [weak self] otp in
                 Task {
                     await self?.validate(with: otp)
