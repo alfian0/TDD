@@ -117,7 +117,7 @@ final class ContactInfoViewModel: ObservableObject {
 
     func didTapCountryCode() async {
         if !countryCodes.isEmpty {
-            launchCountryCode()
+            await launchCountryCode()
         } else {
             isLoading = true
 
@@ -129,9 +129,9 @@ final class ContactInfoViewModel: ObservableObject {
             switch result {
             case let .success(countries):
                 countryCodes = countries
-                launchCountryCode()
+                await launchCountryCode()
             case let .failure(error):
-                coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+                await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
             }
         }
     }
@@ -146,7 +146,7 @@ final class ContactInfoViewModel: ObservableObject {
         let result = await registerPhoneUsecase.execute(phone: countryCode.dialCode + phone)
         guard case let .success(verificationID) = result else {
             if case let .failure(error) = result {
-                coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+                await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
             }
             return
         }
@@ -163,7 +163,7 @@ final class ContactInfoViewModel: ObservableObject {
                     let result = await self.registerPhoneUsecase.execute(phone: self.countryCode.dialCode + self.phone)
                     guard case let .success(verificationID) = result else {
                         if case let .failure(error) = result {
-                            self.coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+                            await self.coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
                         }
                         return
                     }
@@ -185,8 +185,8 @@ final class ContactInfoViewModel: ObservableObject {
         didTapLogin()
     }
 
-    func launchCountryCode() {
-        coordinator.present(.countryCode(selected: countryCode, items: countryCodes, didSelect: { [weak self] item in
+    func launchCountryCode() async {
+        await coordinator.present(.countryCode(selected: countryCode, items: countryCodes, didSelect: { [weak self] item in
             self?.countryCode = item
         }, didDismiss: {}))
     }
@@ -208,7 +208,7 @@ final class ContactInfoViewModel: ObservableObject {
         let result2 = await verifyOTPUsecase.execute(verificationID: verificationID, verificationCode: otp)
         guard case let .success(user) = result2 else {
             if case let .failure(error) = result2 {
-                coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+                await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
             }
             return
         }
@@ -216,7 +216,7 @@ final class ContactInfoViewModel: ObservableObject {
         let result3 = await saveNameUsecase.execute(name: fullname)
         guard case let .success(isEmailVerified) = result3 else {
             if case let .failure(error) = result3 {
-                coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+                await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
             }
             return
         }

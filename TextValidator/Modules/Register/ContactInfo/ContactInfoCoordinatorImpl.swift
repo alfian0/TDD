@@ -43,7 +43,7 @@ enum ContactInfoCoordinatorSheet {
 protocol ContactInfoCoordinator: Coordinator {
     func start(didTapLogin: @escaping () -> Void) async
     func push(_ page: ContactInfoCoordinatorPage) async
-    func present(_ sheet: ContactInfoCoordinatorSheet)
+    func present(_ sheet: ContactInfoCoordinatorSheet) async
 }
 
 final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
@@ -91,6 +91,7 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
         }
     }
 
+    @MainActor
     func present(_ sheet: ContactInfoCoordinatorSheet) {
         switch sheet {
         case let .error(title, subtitle, didDismiss):
@@ -105,7 +106,9 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
             navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
 
         case let .countryCode(selected, items, didSelect, didDismiss):
-            let coordinator = CountryCodeCoordinator()
+            guard let coordinator = AppAssembler.shared.resolver.resolve(CountryCodeCoordinator.self, argument: UINavigationController()) else {
+                return
+            }
             coordinator.start(
                 selected: selected,
                 items: items,

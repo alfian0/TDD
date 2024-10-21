@@ -55,7 +55,7 @@ final class ContactInfoCoordinatorDeeplink: ContactInfoCoordinator {
         await wrapped.push(page)
     }
 
-    func present(_ sheet: ContactInfoCoordinatorSheet) {
-        wrapped.present(sheet)
+    func present(_ sheet: ContactInfoCoordinatorSheet) async {
+        await wrapped.present(sheet)
     }
 }

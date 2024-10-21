@@ -51,6 +51,10 @@ final class AppAssembler {
         ContactInfoViewModelAssembly(),
         ContactInfoViewAssembly(),
         CountryCodeUsecaseAssembly(),
+        FilterCountryCodesUsecaseAssembly(),
+        CountryCodeViewModelAssembly(),
+        CountrySearchListViewAssembly(),
+        CountryCodeCoordinatorAssembly(),
     ])
 }
 

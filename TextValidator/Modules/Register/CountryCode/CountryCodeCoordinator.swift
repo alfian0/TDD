@@ -6,6 +6,15 @@
 //
 
 import SwiftUI
+import Swinject
+
+class CountryCodeCoordinatorAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(CountryCodeCoordinator.self) { _, n in
+            CountryCodeCoordinator(navigationController: n)
+        }
+    }
+}
 
 final class CountryCodeCoordinator: Coordinator {
     var childCoordinator: [any Coordinator] = .init()
@@ -15,14 +24,16 @@ final class CountryCodeCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
+    @MainActor
     func start(
         selected: CountryCodeModel,
         items: [CountryCodeModel],
         didSelect: @escaping (CountryCodeModel) -> Void,
         didDismiss: @escaping () -> Void
     ) {
-        let vm = CountryCodeViewModel(selected: selected, items: items, didSelect: didSelect, didDismiss: didDismiss)
-        let v = CountrySearchListView(viewModel: vm)
+        guard let v = AppAssembler.shared.resolver.resolve(CountrySearchListView.self, arguments: selected, items, didSelect, didDismiss) else {
+            return
+        }
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)
     }

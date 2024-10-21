@@ -7,6 +7,15 @@
 
 import Combine
 import Foundation
+import Swinject
+
+class CountryCodeViewModelAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(CountryCodeViewModel.self) { (_, s: CountryCodeModel, i: [CountryCodeModel], ds: @escaping (CountryCodeModel) -> Void, dd: @escaping () -> Void) in
+            CountryCodeViewModel(selected: s, items: i, didSelect: ds, didDismiss: dd)
+        }
+    }
+}
 
 class CountryCodeViewModel: ObservableObject {
     @Published var search: String = ""
