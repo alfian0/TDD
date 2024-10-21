@@ -35,13 +35,32 @@ final class ExtractKTPUsecaseTest: XCTestCase {
         case let .success(data):
 //            XCTAssertEqual(data.nama, "ANGGI PRATAMA")
             XCTAssertEqual(data.nik, "3203012503770011")
-//            XCTAssertEqual(data.pob, "WONOGIRI")
-//            XCTAssertEqual(data.dob, "28-06-2003".toDate(dateFormat: "dd-MM-yyyy"))
+            XCTAssertEqual(data.pob, "TUJIAN")
+            XCTAssertEqual(data.dob, "25-03-1977".toDate(dateFormat: "dd-MM-yyyy"))
 //            XCTAssertEqual(data.gender, GenderType.LakiLaki)
 //            XCTAssertEqual(data.job, JobType.NelayanPerikanan)
 //            XCTAssertEqual(data.religion, ReligionType.Islam)
 //            XCTAssertEqual(data.marriedStatus, MarriedStatusType.BelumKawin)
 //            XCTAssertEqual(data.nationality, NationalityType.wni)
+        case .failure:
+            XCTFail()
+        }
+    }
+
+    func test_extractKTP_withValidImage_shouldReturnData3() async {
+        let sut = ExtractKTPUsecase(repository: VisionRepositoryImpl(visionService: VisionService()))
+        let result = await sut.exec(image: image3())
+        switch result {
+        case let .success(data):
+            XCTAssertEqual(data.nama, "RIYANTO  SE")
+            XCTAssertEqual(data.nik, "3471140209790001")
+            XCTAssertEqual(data.pob, "GROBOGAN")
+            XCTAssertEqual(data.dob, "02-09-1979".toDate(dateFormat: "dd-MM-yyyy"))
+            XCTAssertEqual(data.gender, GenderType.LakiLaki)
+            XCTAssertEqual(data.job, JobType.Pedagang)
+            XCTAssertEqual(data.religion, ReligionType.Islam)
+            XCTAssertEqual(data.marriedStatus, MarriedStatusType.Kawin)
+            XCTAssertEqual(data.nationality, NationalityType.wni)
         case .failure:
             XCTFail()
         }

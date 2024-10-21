@@ -62,10 +62,11 @@ struct OCRView: View {
             viewModel.isTakePicture = true
         }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {} label: {
-                    Image(systemName: "xmark")
+            ToolbarItem(placement: .keyboard) {
+                Button("Done") {
+                    hideKeyboard()
                 }
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
     }

@@ -7,6 +7,9 @@
 
 final class ExtractGenderUsecase {
     func exec(text: String) -> GenderType? {
-        return GenderType.allCases.first { text.contains($0.rawValue) }
+        let texts = text.components(separatedBy: ":")
+        return texts.compactMap { text in
+            GenderType.allCases.first { $0.rawValue.hasPrefix(text.uppercased()) }
+        }.first
     }
 }

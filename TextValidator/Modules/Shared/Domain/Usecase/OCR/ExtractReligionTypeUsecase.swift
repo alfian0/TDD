@@ -7,6 +7,9 @@
 
 final class ExtractReligionTypeUsecase {
     func exec(text: String) -> ReligionType? {
-        return ReligionType.allCases.first { text.contains($0.rawValue) }
+        let texts = text.components(separatedBy: ":")
+        return texts.compactMap { text in
+            ReligionType.allCases.first { $0.rawValue.hasPrefix(text.uppercased()) }
+        }.first
     }
 }

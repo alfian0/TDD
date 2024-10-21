@@ -34,6 +34,7 @@ struct DocumentCameraView: UIViewControllerRepresentable {
         func documentCameraViewController(_: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
             let lastPageIndex = scan.pageCount - 1
             parent.image = scan.imageOfPage(at: lastPageIndex)
+            parent.dismiss()
         }
 
         func documentCameraViewControllerDidCancel(_: VNDocumentCameraViewController) {

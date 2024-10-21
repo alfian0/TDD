@@ -9,7 +9,7 @@ import Foundation
 
 final class ExtractDOBUsecase {
     func exec(text: String) -> (place: String, day: String, month: String, year: String)? {
-        let pattern = "([A-Za-z]+),?\\s?(\\d{2})[-\\.](\\d{2})[-\\.](\\d{4})"
+        let pattern = "([A-Za-z]+)[\\.,\\s-]?\\s?(\\d{2})[\\.,\\s-](\\d{2})[\\.,\\s-](\\d{4})"
 
         do {
             let regex = try NSRegularExpression(pattern: pattern)

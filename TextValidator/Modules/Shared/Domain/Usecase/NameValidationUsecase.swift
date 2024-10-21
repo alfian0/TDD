@@ -21,7 +21,7 @@ final class NameValidationUsecase {
             return .TOO_LONG
         }
 
-        let regex = "^[A-Za-z]{3,20}$"
+        let regex = "^[A-Za-z .,]{3,20}$"
         let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
         return predicate.evaluate(with: input) ? nil : .INVALID_FORMAT
     }

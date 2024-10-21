@@ -7,6 +7,9 @@
 
 final class ExtractJobTypeUsecase {
     func exec(text: String) -> JobType? {
-        return JobType.allCases.first { text.contains($0.rawValue) }
+        let texts = text.components(separatedBy: ":")
+        return texts.compactMap { text in
+            JobType.allCases.first { $0.rawValue.hasPrefix(text.uppercased()) }
+        }.first
     }
 }
