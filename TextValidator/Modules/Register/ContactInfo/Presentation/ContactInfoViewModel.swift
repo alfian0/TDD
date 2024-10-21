@@ -7,6 +7,43 @@
 
 import Combine
 import Foundation
+import Swinject
+
+@MainActor
+class ContactInfoViewModelAssembly: @preconcurrency Assembly {
+    func assemble(container: Container) {
+        container.register(ContactInfoViewModel.self) { (r, c: ContactInfoCoordinatorImpl, d: @escaping (() -> Void)) in
+            guard let nameValidationUsecase = r.resolve(NameValidationUsecase.self) else {
+                fatalError()
+            }
+            guard let phoneValidationUsecase = r.resolve(PhoneValidationUsecase.self) else {
+                fatalError()
+            }
+            guard let countryCodeUsecase = r.resolve(CountryCodeUsecase.self) else {
+                fatalError()
+            }
+            guard let registerPhoneUsecase = r.resolve(RegisterPhoneUsecase.self) else {
+                fatalError()
+            }
+            guard let saveNameUsecase = r.resolve(SaveNameUsecase.self) else {
+                fatalError()
+            }
+            guard let verifyOTPUsecase = r.resolve(VerifyOTPUsecase.self) else {
+                fatalError()
+            }
+            return ContactInfoViewModel(
+                nameValidationUsecase: nameValidationUsecase,
+                phoneValidationUsecase: phoneValidationUsecase,
+                countryCodeUsecase: countryCodeUsecase,
+                registerPhoneUsecase: registerPhoneUsecase,
+                saveNameUsecase: saveNameUsecase,
+                verifyOTPUsecase: verifyOTPUsecase,
+                coordinator: c,
+                didTapLogin: d
+            )
+        }
+    }
+}
 
 @MainActor
 final class ContactInfoViewModel: ObservableObject {
@@ -20,7 +57,7 @@ final class ContactInfoViewModel: ObservableObject {
     @Published var countryCode: CountryCodeModel = .dummy
     @Published var countryCodes: [CountryCodeModel] = []
 
-    private let fullnameValidationUsecase: NameValidationUsecase
+    private let nameValidationUsecase: NameValidationUsecase
     private let phoneValidationUsecase: PhoneValidationUsecase
     private let countryCodeUsecase: CountryCodeUsecase
     private let registerPhoneUsecase: RegisterPhoneUsecase
@@ -34,7 +71,7 @@ final class ContactInfoViewModel: ObservableObject {
     let didTapLogin: () -> Void
 
     init(
-        fullnameValidationUsecase: NameValidationUsecase,
+        nameValidationUsecase: NameValidationUsecase,
         phoneValidationUsecase: PhoneValidationUsecase,
         countryCodeUsecase: CountryCodeUsecase,
         registerPhoneUsecase: RegisterPhoneUsecase,
@@ -43,7 +80,7 @@ final class ContactInfoViewModel: ObservableObject {
         coordinator: any ContactInfoCoordinator,
         didTapLogin: @escaping () -> Void
     ) {
-        self.fullnameValidationUsecase = fullnameValidationUsecase
+        self.nameValidationUsecase = nameValidationUsecase
         self.phoneValidationUsecase = phoneValidationUsecase
         self.countryCodeUsecase = countryCodeUsecase
         self.registerPhoneUsecase = registerPhoneUsecase
@@ -55,7 +92,7 @@ final class ContactInfoViewModel: ObservableObject {
         $fullname
             .dropFirst()
             .removeDuplicates()
-            .map(fullnameValidationUsecase.execute)
+            .map(nameValidationUsecase.execute)
             .map { $0?.localizedDescription }
             .assign(to: &$fullnameError)
 

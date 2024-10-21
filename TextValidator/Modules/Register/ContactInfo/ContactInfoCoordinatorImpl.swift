@@ -6,6 +6,15 @@
 //
 
 import SwiftUI
+import Swinject
+
+class ContactInfoCoordinatorAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(ContactInfoCoordinatorImpl.self) { _, n in
+            ContactInfoCoordinatorImpl(navigationController: n)
+        }
+    }
+}
 
 enum ContactInfoCoordinatorPage {
     case otp(
@@ -47,10 +56,10 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
 
     @MainActor
     func start(didTapLogin: @escaping () -> Void) {
-        let vm = ContactInfoFactory().createContactInfoViewModel(didTapLogin: didTapLogin, coordinator: self)
-        let v = ContactInfoView(viewModel: vm)
+        guard let v = AppAssembler.shared.resolver.resolve(ContactInfoView.self, arguments: self, didTapLogin) else {
+            return
+        }
         let vc = UIHostingController(rootView: v)
-
         navigationController.show(vc, sender: navigationController)
     }
 

@@ -6,6 +6,18 @@
 //
 
 import Foundation
+import Swinject
+
+class CountryCodeUsecaseAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(CountryCodeUsecase.self) { r in
+            guard let repository = r.resolve(CountryCodeRepositoryImpl.self) else {
+                fatalError()
+            }
+            return CountryCodeUsecase(repository: repository)
+        }
+    }
+}
 
 enum CountryCodeError: Error {
     case ERROR_PARSE_JSON

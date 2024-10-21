@@ -6,6 +6,21 @@
 //
 
 import Foundation
+import Swinject
+
+class RegisterPhoneUsecaseAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(RegisterPhoneUsecase.self) { r in
+            guard let repository = r.resolve(AuthRepositoryImpl.self) else {
+                fatalError()
+            }
+            guard let phoneValidationUsecase = r.resolve(PhoneValidationUsecase.self) else {
+                fatalError()
+            }
+            return RegisterPhoneUsecase(repository: repository, phoneValidationUsecase: phoneValidationUsecase)
+        }
+    }
+}
 
 enum RegisterPhoneUsecaseError: Error, LocalizedError {
     case INVALID_PHONE(TextValidationError)

@@ -6,6 +6,15 @@
 //
 
 import SwiftUI
+import Swinject
+
+class OCRViewCoordinatorAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(OCRViewCoordinator.self) { _, n in
+            OCRViewCoordinator(navigationController: n)
+        }
+    }
+}
 
 enum OCRViewCoordinatorSheet {
     case error(title: String, subtitle: String, didDismiss: () -> Void)
@@ -21,14 +30,9 @@ final class OCRViewCoordinator: Coordinator {
 
     @MainActor
     func start() {
-        let vm = OCRViewModel(
-            extractKTPUsecase: AppAssembler.shared.resolver.resolve(ExtractKTPUsecase.self)!,
-            nameValidationUsecase: NameValidationUsecase(),
-            nikValidationUsecase: NIKValidationUsecase(),
-            ageValidationUsecase: AgeValidationUsecase(),
-            coordinator: self
-        )
-        let v = OCRView(viewModel: vm)
+        guard let v = AppAssembler.shared.resolver.resolve(OCRView.self, argument: self) else {
+            return
+        }
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)
     }

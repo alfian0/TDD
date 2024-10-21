@@ -7,6 +7,34 @@
 
 import Combine
 import SwiftUI
+import Swinject
+
+@MainActor
+class OCRViewModelAssembly: @preconcurrency Assembly {
+    func assemble(container: Container) {
+        container.register(OCRViewModel.self) { r, c in
+            guard let extractKTPUsecase = r.resolve(ExtractKTPUsecase.self) else {
+                fatalError()
+            }
+            guard let nameValidationUsecase = r.resolve(NameValidationUsecase.self) else {
+                fatalError()
+            }
+            guard let nikValidationUsecase = r.resolve(NIKValidationUsecase.self) else {
+                fatalError()
+            }
+            guard let ageValidationUsecase = r.resolve(AgeValidationUsecase.self) else {
+                fatalError()
+            }
+            return OCRViewModel(
+                extractKTPUsecase: extractKTPUsecase,
+                nameValidationUsecase: nameValidationUsecase,
+                nikValidationUsecase: nikValidationUsecase,
+                ageValidationUsecase: ageValidationUsecase,
+                coordinator: c
+            )
+        }
+    }
+}
 
 @MainActor
 final class OCRViewModel: ObservableObject {

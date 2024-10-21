@@ -31,6 +31,7 @@ final class AppAssembler {
         ExtractGenderUsecaseAssembly(),
         AgeValidationUsecaseAssembly(),
         NIKValidationUsecaseAssembly(),
+        NameValidationUsecaseAssembly(),
         PINValidationUsecaseAssembly(),
         EmailValidationUsecaseAssembly(),
         PhoneValidationUsecaseAssembly(),
@@ -39,6 +40,17 @@ final class AppAssembler {
         LoginUsecaseAssembly(),
         LoginViewModelAssembly(),
         LoginViewAssembly(),
+        OCRViewCoordinatorAssembly(),
+        OCRViewModelAssembly(),
+        OCRViewAssembly(),
+        ContactInfoCoordinatorDeeplinkAssembly(),
+        ContactInfoCoordinatorAssembly(),
+        SaveNameUsecaseAssembly(),
+        RegisterPhoneUsecaseAssembly(),
+        VerifyOTPUsecaseAssembly(),
+        ContactInfoViewModelAssembly(),
+        ContactInfoViewAssembly(),
+        CountryCodeUsecaseAssembly(),
     ])
 }
 

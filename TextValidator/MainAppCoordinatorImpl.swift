@@ -39,7 +39,9 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
     func present(_ sheet: MainAppCoordinatorSheet) {
         switch sheet {
         case .login:
-            let coordinator = LoginViewCoordinator()
+            guard let coordinator = AppAssembler.shared.resolver.resolve(LoginViewCoordinator.self, argument: UINavigationController()) else {
+                return
+            }
             coordinator.start(didDismiss: { [weak self] in
                 guard let self = self else { return }
                 navigationController.dismiss(animated: true) {
@@ -51,7 +53,9 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
             navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
 
         case .register:
-            let coordinator = ContactInfoCoordinatorImpl()
+            guard let coordinator = AppAssembler.shared.resolver.resolve(ContactInfoCoordinatorImpl.self, argument: UINavigationController()) else {
+                return
+            }
             coordinator.start(didTapLogin: { [weak self] in
                 guard let self = self else { return }
                 navigationController.dismiss(animated: true) {
@@ -64,7 +68,9 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
             navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
 
         case .ocr:
-            let coordinator = OCRViewCoordinator()
+            guard let coordinator = AppAssembler.shared.resolver.resolve(OCRViewCoordinator.self, argument: UINavigationController()) else {
+                return
+            }
             coordinator.start()
             coordinator.navigationController.modalPresentationStyle = .fullScreen
             childCoordinator.append(coordinator)

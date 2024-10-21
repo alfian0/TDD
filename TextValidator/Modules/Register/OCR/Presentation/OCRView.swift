@@ -6,6 +6,18 @@
 //
 
 import SwiftUI
+import Swinject
+
+class OCRViewAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(OCRView.self) { (r, c: OCRViewCoordinator) in
+            guard let viewModel = r.resolve(OCRViewModel.self, argument: c) else {
+                fatalError()
+            }
+            return OCRView(viewModel: viewModel)
+        }
+    }
+}
 
 struct OCRView: View {
     @StateObject var viewModel: OCRViewModel

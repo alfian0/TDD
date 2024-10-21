@@ -26,7 +26,9 @@ final class LoginViewCoordinator: Coordinator {
 
     @MainActor
     func start(didDismiss: @escaping () -> Void) {
-        let v = AppAssembler.shared.resolver.resolve(LoginView.self, arguments: self, didDismiss)!
+        guard let v = AppAssembler.shared.resolver.resolve(LoginView.self, arguments: self, didDismiss) else {
+            return
+        }
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)
     }
