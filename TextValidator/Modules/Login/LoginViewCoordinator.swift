@@ -6,6 +6,15 @@
 //
 
 import SwiftUI
+import Swinject
+
+class LoginViewCoordinatorAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(LoginViewCoordinator.self) { _, n in
+            LoginViewCoordinator(navigationController: n)
+        }
+    }
+}
 
 final class LoginViewCoordinator: Coordinator {
     var childCoordinator: [any Coordinator] = .init()
@@ -17,8 +26,7 @@ final class LoginViewCoordinator: Coordinator {
 
     @MainActor
     func start(didDismiss: @escaping () -> Void) {
-        let vm = LoginFactory().createLoginViewModel(didDismiss: didDismiss, coordinator: self)
-        let v = LoginView(viewModel: vm)
+        let v = AppAssembler.shared.resolver.resolve(LoginView.self, arguments: self, didDismiss)!
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)
     }

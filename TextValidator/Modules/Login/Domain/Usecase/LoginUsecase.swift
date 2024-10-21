@@ -6,6 +6,21 @@
 //
 
 import Foundation
+import Swinject
+
+class LoginUsecaseAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(LoginUsecase.self) { r in
+            guard let repository = r.resolve(AuthRepositoryImpl.self) else {
+                fatalError()
+            }
+            guard let emailValidationUsecase = r.resolve(EmailValidationUsecase.self) else {
+                fatalError()
+            }
+            return LoginUsecase(repository: repository, emailValidationUsecase: emailValidationUsecase)
+        }
+    }
+}
 
 // MARK: Usecase just single bussiness logic, validate, or conver data or error to new mapper
 

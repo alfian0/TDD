@@ -6,6 +6,15 @@
 //
 
 import Foundation
+import Swinject
+
+class EmailValidationUsecaseAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(EmailValidationUsecase.self) { _ in
+            EmailValidationUsecase()
+        }
+    }
+}
 
 final class EmailValidationUsecase {
     func execute(input: String) -> TextValidationError? {

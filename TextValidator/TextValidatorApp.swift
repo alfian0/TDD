@@ -7,6 +7,40 @@
 
 import FirebaseCore
 import SwiftUI
+import Swinject
+
+@MainActor
+final class AppAssembler {
+    static let shared: Assembler = .init([
+        VisionRepositoryImplAssembly(),
+        CountryCodeRepositoryImplAssembly(),
+        AuthRepositoryImplAssembly(),
+        VisionServiceAssembly(),
+        UserdefaultsServiceAssembly(),
+        BiometricServiceAssembly(),
+        KeychainServiceAssembly(),
+        FirebaseAuthServiceAssembly(),
+        CameraServiceAssembly(),
+        ExtractKTPUsecaseAssembly(),
+        ExtractNIKUsecaseAssembly(),
+        ExtractDOBUsecaseAssembly(),
+        ExtractNationalityTypeUsecaseAssembly(),
+        ExtractJobTypeUsecaseAssembly(),
+        ExtractReligionTypeUsecaseAssembly(),
+        ExtractMaritalStatusUsecaseAssembly(),
+        ExtractGenderUsecaseAssembly(),
+        AgeValidationUsecaseAssembly(),
+        NIKValidationUsecaseAssembly(),
+        PINValidationUsecaseAssembly(),
+        EmailValidationUsecaseAssembly(),
+        PhoneValidationUsecaseAssembly(),
+        LoginViewCoordinatorAssembly(),
+        LoginBiometricUsecaseAssembly(),
+        LoginUsecaseAssembly(),
+        LoginViewModelAssembly(),
+        LoginViewAssembly(),
+    ])
+}
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication,

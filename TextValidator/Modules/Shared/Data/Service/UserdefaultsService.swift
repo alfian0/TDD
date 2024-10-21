@@ -6,6 +6,15 @@
 //
 
 import Foundation
+import Swinject
+
+class UserdefaultsServiceAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(UserdefaultsService.self) { _ in
+            UserdefaultsService()
+        }
+    }
+}
 
 enum UserdefaultsConstants {
     static let email = "email"

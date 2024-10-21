@@ -22,7 +22,7 @@ final class OCRViewCoordinator: Coordinator {
     @MainActor
     func start() {
         let vm = OCRViewModel(
-            extractKTPUsecase: ExtractKTPUsecase(repository: VisionRepositoryImpl(visionService: VisionService())),
+            extractKTPUsecase: AppAssembler.shared.resolver.resolve(ExtractKTPUsecase.self)!,
             nameValidationUsecase: NameValidationUsecase(),
             nikValidationUsecase: NIKValidationUsecase(),
             ageValidationUsecase: AgeValidationUsecase(),

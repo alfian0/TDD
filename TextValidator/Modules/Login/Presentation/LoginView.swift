@@ -6,6 +6,18 @@
 //
 
 import SwiftUI
+import Swinject
+
+class LoginViewAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(LoginView.self) { (r, c: LoginViewCoordinator, d: @escaping (() -> Void)) in
+            guard let viewModel = r.resolve(LoginViewModel.self, arguments: c, d) else {
+                fatalError()
+            }
+            return LoginView(viewModel: viewModel)
+        }
+    }
+}
 
 struct LoginView: View {
     @StateObject var viewModel: LoginViewModel
@@ -103,11 +115,6 @@ struct LoginView: View {
 
 #Preview {
     NavigationView {
-        LoginView(
-            viewModel: LoginFactory().createLoginViewModel(
-                didDismiss: {},
-                coordinator: LoginViewCoordinator()
-            )
-        )
+        AppAssembler.shared.resolver.resolve(LoginView.self, arguments: {}, LoginViewCoordinator())
     }
 }

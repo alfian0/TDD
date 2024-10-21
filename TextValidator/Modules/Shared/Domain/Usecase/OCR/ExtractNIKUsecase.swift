@@ -6,8 +6,26 @@
 //
 
 import Foundation
+import Swinject
+
+class ExtractNIKUsecaseAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(ExtractNIKUsecase.self) { r in
+            guard let nikUsecase = r.resolve(NIKValidationUsecase.self) else {
+                fatalError()
+            }
+            return ExtractNIKUsecase(nikUsecase: nikUsecase)
+        }
+    }
+}
 
 final class ExtractNIKUsecase {
+    private let nikUsecase: NIKValidationUsecase
+
+    init(nikUsecase: NIKValidationUsecase) {
+        self.nikUsecase = nikUsecase
+    }
+
     func exec(text: String) -> String? {
         let texts = text.components(separatedBy: " ")
         return texts.compactMap { text in
@@ -17,10 +35,8 @@ final class ExtractNIKUsecase {
                 guard let dict = NIKWordDic[i].first else { continue }
                 processedNIK = text.replacingOccurrences(of: dict.key, with: dict.value)
             }
-            guard processedNIK.regex(with: "^((1[1-9])|(21)|([37][1-6])|(5[1-4])|(6[1-5])|([8-9][1-2]))[0-9]{2}[0-9]{2}(([0-6][0-9])|(7[0-1]))((0[1-9])|(1[0-2]))([0-9]{2})[0-9]{4}$") else {
-                return nil
-            }
-            return processedNIK
+
+            return nikUsecase.execute(input: processedNIK) == nil ? processedNIK : nil
         }.first
     }
 }

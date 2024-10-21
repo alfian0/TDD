@@ -5,8 +5,17 @@
 //  Created by Alfian on 19/10/24.
 //
 
+import Swinject
 import UIKit
 import Vision
+
+class VisionServiceAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(VisionService.self) { _ in
+            VisionService()
+        }
+    }
+}
 
 enum VisionServiceError: Error {
     case invalidImage

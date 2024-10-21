@@ -6,7 +6,16 @@
 //
 
 import AVFoundation
+import Swinject
 import UIKit
+
+class CameraServiceAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(CameraService.self) { _ in
+            CameraService()
+        }
+    }
+}
 
 class CameraService: NSObject {
     private(set) var captureSession: AVCaptureSession?
