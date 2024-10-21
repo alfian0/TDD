@@ -13,8 +13,10 @@ struct TextFieldModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(.subheadline)
+            if !label.isEmpty {
+                Text(label)
+                    .font(.subheadline)
+            }
             content
             Divider()
                 .frame(minHeight: (errorMessage != nil) ? 1 : 0.1)

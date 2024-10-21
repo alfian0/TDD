@@ -1,0 +1,84 @@
+//
+//  OCRView.swift
+//  TextValidator
+//
+//  Created by Alfian on 21/10/24.
+//
+
+import SwiftUI
+
+struct OCRView: View {
+    @StateObject var viewModel: OCRViewModel
+
+    var body: some View {
+        VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Identity Document Confirmation")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.title)
+
+                Text("Make sure your data matches the information on your ID card")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal)
+
+            if let image = viewModel.idImage {
+                Image(uiImage: image)
+                    .resizable()
+            }
+
+            VStack {
+                TextField("Name", text: $viewModel.name)
+                    .keyboardType(.namePhonePad)
+                    .autocapitalization(.none)
+                    .modifier(TextFieldModifier(label: "Name", errorMessage: viewModel.nameError))
+
+                TextField("NIK", text: $viewModel.idNumber)
+                    .keyboardType(.numberPad)
+                    .autocapitalization(.none)
+                    .modifier(TextFieldModifier(label: "NIK", errorMessage: viewModel.idNumberError))
+
+                DatePicker("Date of Birth", selection: $viewModel.dateOfBirth, displayedComponents: .date)
+                    .modifier(TextFieldModifier(label: "", errorMessage: viewModel.dateOfBirthError))
+
+                Spacer()
+
+                Button {} label: {
+                    Text("Continue")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(LoadingButtonStyle(isLoading: false))
+                .disabled(!viewModel.canSubmit)
+            }
+            .padding(.horizontal)
+        }
+        .fullScreenCover(isPresented: $viewModel.isTakePicture) {
+            DocumentCameraView(image: $viewModel.idImage)
+                .edgesIgnoringSafeArea(.all)
+        }
+        .onViewDidLoad {
+            viewModel.isTakePicture = true
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {} label: {
+                    Image(systemName: "xmark")
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    NavigationView {
+        OCRView(viewModel: OCRViewModel(
+            extractKTPUsecase: ExtractKTPUsecase(repository: VisionRepositoryImpl(visionService: VisionService())),
+            nameValidationUsecase: NameValidationUsecase(),
+            nikValidationUsecase: NIKValidationUsecase(),
+            ageValidationUsecase: AgeValidationUsecase(),
+            coordinator: OCRViewCoordinator()
+        ))
+    }
+}

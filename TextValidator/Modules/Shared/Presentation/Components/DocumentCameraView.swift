@@ -10,7 +10,7 @@ import VisionKit
 
 struct DocumentCameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
 
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
         let documentCameraVC = VNDocumentCameraViewController()
@@ -32,16 +32,16 @@ struct DocumentCameraView: UIViewControllerRepresentable {
         }
 
         func documentCameraViewController(_: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
-            parent.presentationMode.wrappedValue.dismiss()
-            parent.image = scan.imageOfPage(at: 0)
+            let lastPageIndex = scan.pageCount - 1
+            parent.image = scan.imageOfPage(at: lastPageIndex)
         }
 
         func documentCameraViewControllerDidCancel(_: VNDocumentCameraViewController) {
-            parent.presentationMode.wrappedValue.dismiss()
+            parent.dismiss()
         }
 
         func documentCameraViewController(_: VNDocumentCameraViewController, didFailWithError _: Error) {
-            parent.presentationMode.wrappedValue.dismiss()
+            parent.dismiss()
         }
     }
 }

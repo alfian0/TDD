@@ -16,11 +16,11 @@ struct CountryCodeItemView: View {
             Text(viewModel.flag)
             Text(viewModel.name)
                 .font(isSelected ? .body.bold() : .body)
-                .foregroundColor(isSelected ? .blue : .black)
+                .foregroundColor(isSelected ? .blue : .primary)
             Spacer()
             Text(viewModel.dialCode)
                 .font(isSelected ? .body.bold() : .body)
-                .foregroundColor(isSelected ? .blue : .black)
+                .foregroundColor(isSelected ? .blue : .primary)
         }
     }
 }

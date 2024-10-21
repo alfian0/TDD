@@ -15,6 +15,7 @@ enum TextValidationError: Error, LocalizedError {
     case CANNOT_SQUENTIAL
     case IDENTICAL_CONSECUTIVE
     case NOT_EQUAL
+    case AGE_LIMIT
 
     var errorDescription: String? {
         switch self {
@@ -32,6 +33,8 @@ enum TextValidationError: Error, LocalizedError {
             return "Your PIN cannot contain six identical consecutive digits like '111111', '222222', or '333333'. Please choose a more secure PIN."
         case .NOT_EQUAL:
             return "Not Equal"
+        case .AGE_LIMIT:
+            return "Age Limit"
         }
     }
 }

@@ -10,6 +10,10 @@ import SwiftUI
 enum MainAppCoordinatorSheet {
     case login
     case register
+
+    // MARK: Testing Purpose
+
+    case ocr
 }
 
 protocol MainAppCoordinator: Coordinator {
@@ -55,6 +59,13 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
                     self.childCoordinator.removeLast()
                 }
             })
+            coordinator.navigationController.modalPresentationStyle = .fullScreen
+            childCoordinator.append(coordinator)
+            navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
+
+        case .ocr:
+            let coordinator = OCRViewCoordinator()
+            coordinator.start()
             coordinator.navigationController.modalPresentationStyle = .fullScreen
             childCoordinator.append(coordinator)
             navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
