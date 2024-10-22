@@ -37,56 +37,70 @@ final class LoginViewModel: ObservableObject {
         self.coordinator = coordinator
         self.didDismiss = didDismiss
 
-        $username
+        setupValidation()
+    }
+
+    private func setupValidation() {
+        let validationResultPublisher = $username
             .dropFirst()
             .map(emailValidationUsecase.execute)
+
+        validationResultPublisher
             .map { $0?.localizedDescription }
             .assign(to: &$usernameError)
 
-        $username
-            .dropFirst()
-            .map(emailValidationUsecase.execute)
+        validationResultPublisher
             .map { $0 == nil }
             .assign(to: &$canSubmit)
     }
 
-    func login() async {
-        isLoading.toggle()
-
-        defer {
-            isLoading.toggle()
-        }
-
-        let result = await loginUsecase.exec(email: username, password: password)
-        switch result {
-        case let .success(user):
-            print(user)
-        case let .failure(error):
-            switch error {
-            case let .INVALID_EMAIL(error):
-                usernameError = error.localizedDescription
-            default: break
+    func login() {
+        Task {
+            await withLoadingState { [weak self] in
+                guard let self = self else { return }
+                let result = await loginUsecase.exec(email: username, password: password)
+                handleLoginResult(result)
             }
         }
     }
 
-    func loginWithBiometric() async {
-        isLoading.toggle()
-
-        defer {
-            isLoading.toggle()
-        }
-
-        let result = await loginBiometricUsecase.exec()
-        switch result {
-        case let .success(canAuthenticate):
-            print(canAuthenticate)
-        case let .failure(error):
-            print(error)
+    func loginWithBiometric() {
+        Task {
+            await withLoadingState { [weak self] in
+                guard let self = self else { return }
+                let result = await loginBiometricUsecase.exec()
+                print(result)
+            }
         }
     }
 
     func dismiss() {
         didDismiss()
+    }
+
+    private func handleLoginResult(_ result: Result<UserModel, LoginUsecaseError>) {
+        switch result {
+        case let .success(user):
+            print(user)
+        case let .failure(error):
+            handleLoginError(error)
+        }
+    }
+
+    private func handleLoginError(_ error: LoginUsecaseError) {
+        switch error {
+        case let .INVALID_EMAIL(err):
+            usernameError = err.localizedDescription
+        default:
+            break
+        }
+    }
+
+    private func withLoadingState<T>(execute: @escaping () async -> T) async -> T {
+        isLoading = true
+        defer {
+            isLoading = false
+        }
+        return await execute()
     }
 }

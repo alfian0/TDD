@@ -60,9 +60,7 @@ struct LoginView: View {
 
             HStack(spacing: 8) {
                 Button {
-                    Task {
-                        await viewModel.login()
-                    }
+                    viewModel.login()
                 } label: {
                     Text("Continue")
                         .frame(maxWidth: .infinity)
@@ -71,9 +69,7 @@ struct LoginView: View {
                 .disabled(!viewModel.canSubmit)
 
                 Button {
-                    Task {
-                        await viewModel.loginWithBiometric()
-                    }
+                    viewModel.loginWithBiometric()
                 } label: {
                     Image(systemName: "faceid")
                 }

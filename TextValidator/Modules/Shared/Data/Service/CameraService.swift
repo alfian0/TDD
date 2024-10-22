@@ -31,7 +31,7 @@ class CameraService: NSObject {
         }
     }
 
-    func adInput() {
+    func addInput() {
         captureSession = AVCaptureSession()
 
         guard let captureSession = captureSession else {
