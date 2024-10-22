@@ -6,15 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class AgeValidationUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(AgeValidationUsecase.self) { _ in
-            AgeValidationUsecase()
-        }
-    }
-}
 
 final class AgeValidationUsecase {
     func execute(input: Date) -> TextValidationError? {

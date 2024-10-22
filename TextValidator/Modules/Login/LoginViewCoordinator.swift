@@ -6,15 +6,6 @@
 //
 
 import SwiftUI
-import Swinject
-
-class LoginViewCoordinatorAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(LoginViewCoordinator.self) { _, n in
-            LoginViewCoordinator(navigationController: n)
-        }
-    }
-}
 
 final class LoginViewCoordinator: Coordinator {
     var childCoordinator: [any Coordinator] = .init()

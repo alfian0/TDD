@@ -7,22 +7,6 @@
 
 import Combine
 import SwiftUI
-import Swinject
-
-@MainActor
-class PasswordViewModelAssembly: @preconcurrency Assembly {
-    func assemble(container: Container) {
-        container.register(PasswordViewModel.self) { (r, c: PasswordCoordinator) in
-            guard let setPasswordUsecase = r.resolve(SetPasswordUsecase.self) else {
-                fatalError()
-            }
-            guard let passwordStrengthUsecase = r.resolve(PasswordStrengthUsecase.self) else {
-                fatalError()
-            }
-            return PasswordViewModel(setPasswordUsecase: setPasswordUsecase, passwordStrengthUsecase: passwordStrengthUsecase, coordinator: c)
-        }
-    }
-}
 
 @MainActor
 final class PasswordViewModel: ObservableObject {

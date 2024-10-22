@@ -7,18 +7,6 @@
 
 import Combine
 import Foundation
-import Swinject
-
-class SetPasswordUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(SetPasswordUsecase.self) { r in
-            guard let repository = r.resolve(AuthRepositoryImpl.self) else {
-                fatalError()
-            }
-            return SetPasswordUsecase(repository: repository)
-        }
-    }
-}
 
 enum SetPasswordUsecaseError: Error, LocalizedError {
     case UNKNOWN

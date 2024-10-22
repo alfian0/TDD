@@ -6,18 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class VerifyOTPUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(VerifyOTPUsecase.self) { r in
-            guard let repository = r.resolve(AuthRepositoryImpl.self) else {
-                fatalError()
-            }
-            return VerifyOTPUsecase(repository: repository)
-        }
-    }
-}
 
 enum VerifyOTPUsecaseError: Error, LocalizedError {
     case UNKNOWN

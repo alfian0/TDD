@@ -5,16 +5,6 @@
 //  Created by Alfian on 22/10/24.
 //
 
-import Swinject
-
-class CandidateMatchingUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(CandidateMatchingUsecase.self) { _ in
-            CandidateMatchingUsecase()
-        }
-    }
-}
-
 enum KTPKeywords {
     static let province = "PROVINSI"
     static let kabupaten = "KABUPATEN"

@@ -5,16 +5,6 @@
 //  Created by Alfian on 19/10/24.
 //
 
-import Swinject
-
-class ExtractGenderUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ExtractGenderUsecase.self) { _ in
-            ExtractGenderUsecase()
-        }
-    }
-}
-
 final class ExtractGenderUsecase {
     func exec(texts: [String]) -> GenderType? {
         let texts = texts.filter { $0.regex(with: "^[^0-9]+$") }

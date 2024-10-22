@@ -6,15 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class ExtractDOBUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ExtractDOBUsecase.self) { _ in
-            ExtractDOBUsecase()
-        }
-    }
-}
 
 final class ExtractDOBUsecase {
     func exec(texts: [String]) -> (place: String, day: String, month: String, year: String)? {

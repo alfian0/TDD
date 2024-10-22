@@ -6,21 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class SaveNameUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(SaveNameUsecase.self) { r in
-            guard let repository = r.resolve(AuthRepositoryImpl.self) else {
-                fatalError()
-            }
-            guard let nameValidationUsecase = r.resolve(NameValidationUsecase.self) else {
-                fatalError()
-            }
-            return SaveNameUsecase(repository: repository, nameValidationUsecase: nameValidationUsecase)
-        }
-    }
-}
 
 enum SaveNameUsecaseError: Error, LocalizedError {
     case INVALID_NAME(TextValidationError)

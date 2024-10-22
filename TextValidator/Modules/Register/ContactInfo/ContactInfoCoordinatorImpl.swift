@@ -6,15 +6,6 @@
 //
 
 import SwiftUI
-import Swinject
-
-class ContactInfoCoordinatorAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ContactInfoCoordinatorImpl.self) { _, n in
-            ContactInfoCoordinatorImpl(navigationController: n)
-        }
-    }
-}
 
 enum ContactInfoCoordinatorPage {
     case otp(

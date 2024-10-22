@@ -7,31 +7,6 @@
 
 import Combine
 import SwiftUI
-import Swinject
-
-@MainActor
-class LoginViewModelAssembly: @preconcurrency Assembly {
-    func assemble(container: Container) {
-        container.register(LoginViewModel.self) { (r, c: LoginViewCoordinator, d: @escaping (() -> Void)) in
-            guard let loginUsecase = r.resolve(LoginUsecase.self) else {
-                fatalError()
-            }
-            guard let loginBiometricUsecase = r.resolve(LoginBiometricUsecase.self) else {
-                fatalError()
-            }
-            guard let emailValidationUsecase = r.resolve(EmailValidationUsecase.self) else {
-                fatalError()
-            }
-            return LoginViewModel(
-                loginUsecase: loginUsecase,
-                loginBiometricUsecase: loginBiometricUsecase,
-                emailValidationUsecase: emailValidationUsecase,
-                coordinator: c,
-                didDismiss: d
-            )
-        }
-    }
-}
 
 @MainActor
 final class LoginViewModel: ObservableObject {

@@ -6,21 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class RegisterEmailUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(RegisterEmailUsecase.self) { r in
-            guard let repository = r.resolve(AuthRepositoryImpl.self) else {
-                fatalError()
-            }
-            guard let emailValidationUsecase = r.resolve(EmailValidationUsecase.self) else {
-                fatalError()
-            }
-            return RegisterEmailUsecase(repository: repository, emailValidationUsecase: emailValidationUsecase)
-        }
-    }
-}
 
 enum RegisterEmailUsecaseError: Error, LocalizedError {
     case INVALID_EMAIL(TextValidationError)

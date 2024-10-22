@@ -6,18 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class PINValidationUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(PINValidationUsecase.self) { r in
-            guard let service = r.resolve(SetPINService.self) else {
-                fatalError()
-            }
-            return PINValidationUsecase(service: service)
-        }
-    }
-}
 
 enum VerifyError: Error {
     case TEXT_ERROR(TextValidationError)

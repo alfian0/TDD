@@ -6,18 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class ExtractNIKUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ExtractNIKUsecase.self) { r in
-            guard let nikUsecase = r.resolve(NIKValidationUsecase.self) else {
-                fatalError()
-            }
-            return ExtractNIKUsecase(nikUsecase: nikUsecase)
-        }
-    }
-}
 
 final class ExtractNIKUsecase {
     private let nikUsecase: NIKValidationUsecase

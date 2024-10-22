@@ -6,18 +6,6 @@
 //
 
 import SwiftUI
-import Swinject
-
-class CountrySearchListViewAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(CountrySearchListView.self) { (r, s: CountryCodeModel, i: [CountryCodeModel], ds: @escaping (CountryCodeModel) -> Void, dd: @escaping () -> Void) in
-            guard let viewModel = r.resolve(CountryCodeViewModel.self, arguments: s, i, ds, dd) else {
-                fatalError()
-            }
-            return CountrySearchListView(viewModel: viewModel)
-        }
-    }
-}
 
 struct CountrySearchListView: View {
     @StateObject var viewModel: CountryCodeViewModel

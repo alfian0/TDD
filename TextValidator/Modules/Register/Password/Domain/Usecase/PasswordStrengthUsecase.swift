@@ -7,15 +7,6 @@
 
 import Foundation
 import SwiftUI
-import Swinject
-
-class PasswordStrengthUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(PasswordStrengthUsecase.self) { _ in
-            PasswordStrengthUsecase()
-        }
-    }
-}
 
 enum PasswordStrength: Int, CaseIterable {
     case veryWeak

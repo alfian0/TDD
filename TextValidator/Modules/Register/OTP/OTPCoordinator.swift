@@ -6,15 +6,6 @@
 //
 
 import SwiftUI
-import Swinject
-
-class OTPCoordinatorAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(OTPCoordinator.self) { _, n in
-            OTPCoordinator(navigationController: n)
-        }
-    }
-}
 
 enum OTPCoordinatorSheet {
     case error(title: String, subtitle: String, didDismiss: () -> Void)

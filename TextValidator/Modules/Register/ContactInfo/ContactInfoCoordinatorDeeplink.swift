@@ -6,18 +6,6 @@
 //
 
 import SwiftUI
-import Swinject
-
-class ContactInfoCoordinatorDeeplinkAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ContactInfoCoordinatorDeeplink.self) { (r, n: UINavigationController) in
-            guard let wrapped = r.resolve(ContactInfoCoordinatorImpl.self, argument: n) else {
-                fatalError()
-            }
-            return ContactInfoCoordinatorDeeplink(wrapped: wrapped)
-        }
-    }
-}
 
 final class ContactInfoCoordinatorDeeplink: ContactInfoCoordinator {
     private let wrapped: ContactInfoCoordinator

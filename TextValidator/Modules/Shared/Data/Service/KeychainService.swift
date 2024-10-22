@@ -6,15 +6,6 @@
 //
 
 import KeychainSwift
-import Swinject
-
-class KeychainServiceAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(KeychainService.self) { _ in
-            KeychainService()
-        }
-    }
-}
 
 enum KeychainConstants {
     static let authToken = "authToken"

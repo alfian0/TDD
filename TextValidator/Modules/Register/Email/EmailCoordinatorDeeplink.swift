@@ -6,18 +6,6 @@
 //
 
 import SwiftUI
-import Swinject
-
-class EmailCoordinatorDeeplinkAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(EmailCoordinatorDeeplink.self) { (r, n: UINavigationController) in
-            guard let wrapped = r.resolve(EmailCoordinatorImpl.self, argument: n) else {
-                fatalError()
-            }
-            return EmailCoordinatorDeeplink(wrapped: wrapped)
-        }
-    }
-}
 
 final class EmailCoordinatorDeeplink: EmailCoordinator {
     private let wrapped: EmailCoordinator

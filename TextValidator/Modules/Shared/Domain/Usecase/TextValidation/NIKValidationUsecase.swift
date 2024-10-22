@@ -6,15 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class NIKValidationUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(NIKValidationUsecase.self) { _ in
-            NIKValidationUsecase()
-        }
-    }
-}
 
 final class NIKValidationUsecase {
     func execute(input: String) -> TextValidationError? {

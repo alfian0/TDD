@@ -6,15 +6,6 @@
 //
 
 import SwiftUI
-import Swinject
-
-class OCRViewCoordinatorAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(OCRViewCoordinator.self) { _, n in
-            OCRViewCoordinator(navigationController: n)
-        }
-    }
-}
 
 enum OCRViewCoordinatorSheet {
     case error(title: String, subtitle: String, didDismiss: () -> Void)

@@ -6,18 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class ReloadUserUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ReloadUserUsecase.self) { r in
-            guard let repository = r.resolve(AuthRepositoryImpl.self) else {
-                fatalError()
-            }
-            return ReloadUserUsecase(repository: repository)
-        }
-    }
-}
 
 enum ReloadUserUsecaseError: Error, LocalizedError {
     case EMPTY

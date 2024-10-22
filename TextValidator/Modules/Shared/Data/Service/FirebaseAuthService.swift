@@ -6,15 +6,6 @@
 //
 
 import FirebaseAuth
-import Swinject
-
-class FirebaseAuthServiceAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(FirebaseAuthService.self) { _ in
-            FirebaseAuthService()
-        }
-    }
-}
 
 final class FirebaseAuthService {
     func signInWithEmail(email: String, password: String) async throws -> User {

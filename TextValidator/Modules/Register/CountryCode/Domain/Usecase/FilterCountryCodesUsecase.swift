@@ -5,16 +5,6 @@
 //  Created by Alfian on 04/10/24.
 //
 
-import Swinject
-
-class FilterCountryCodesUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(FilterCountryCodesUsecase.self) { _ in
-            FilterCountryCodesUsecase()
-        }
-    }
-}
-
 struct FilterCountryCodesUsecase {
     struct Input {
         let search: String

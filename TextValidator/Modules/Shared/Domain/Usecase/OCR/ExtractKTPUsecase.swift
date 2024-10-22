@@ -5,53 +5,7 @@
 //  Created by Alfian on 20/10/24.
 //
 
-import Swinject
 import UIKit
-
-class ExtractKTPUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ExtractKTPUsecase.self) { r in
-            guard let repository = r.resolve(VisionRepositoryImpl.self) else {
-                fatalError()
-            }
-            guard let extractNIKUsecase = r.resolve(ExtractNIKUsecase.self) else {
-                fatalError()
-            }
-            guard let extractDOBUsecase = r.resolve(ExtractDOBUsecase.self) else {
-                fatalError()
-            }
-            guard let extractReligionTypeUsecase = r.resolve(ExtractReligionTypeUsecase.self) else {
-                fatalError()
-            }
-            guard let extractGenderUsecase = r.resolve(ExtractGenderUsecase.self) else {
-                fatalError()
-            }
-            guard let extractMaritalStatusUsecase = r.resolve(ExtractMaritalStatusUsecase.self) else {
-                fatalError()
-            }
-            guard let extractJobTypeUsecase = r.resolve(ExtractJobTypeUsecase.self) else {
-                fatalError()
-            }
-            guard let extractNationalityTypeUsecase = r.resolve(ExtractNationalityTypeUsecase.self) else {
-                fatalError()
-            }
-            guard let candidateMatchingUsecase = r.resolve(CandidateMatchingUsecase.self) else {
-                fatalError()
-            }
-            return ExtractKTPUsecase(
-                repository: repository,
-                extractNIKUsecase: extractNIKUsecase,
-                extractDOBUsecase: extractDOBUsecase,
-                extractReligionTypeUsecase: extractReligionTypeUsecase,
-                extractGenderUsecase: extractGenderUsecase,
-                extractMaritalStatusUsecase: extractMaritalStatusUsecase,
-                extractJobTypeUsecase: extractJobTypeUsecase,
-                extractNationalityTypeUsecase: extractNationalityTypeUsecase,
-                candidateMatchingUsecase: candidateMatchingUsecase
-            )
-        }
-    }
-}
 
 enum ExtractKTPUsecaseError: Error, LocalizedError {
     case NOT_VALID_KTP
@@ -59,7 +13,7 @@ enum ExtractKTPUsecaseError: Error, LocalizedError {
 }
 
 final class ExtractKTPUsecase {
-    private let repository: VisionRepositoryImpl
+    private let repository: VisionRepository
     private let extractNIKUsecase: ExtractNIKUsecase
     private let extractDOBUsecase: ExtractDOBUsecase
     private let extractReligionTypeUsecase: ExtractReligionTypeUsecase
@@ -70,7 +24,7 @@ final class ExtractKTPUsecase {
     private let candidateMatchingUsecase: CandidateMatchingUsecase
 
     init(
-        repository: VisionRepositoryImpl,
+        repository: VisionRepository,
         extractNIKUsecase: ExtractNIKUsecase,
         extractDOBUsecase: ExtractDOBUsecase,
         extractReligionTypeUsecase: ExtractReligionTypeUsecase,

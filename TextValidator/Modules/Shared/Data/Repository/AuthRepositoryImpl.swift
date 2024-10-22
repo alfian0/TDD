@@ -6,21 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class AuthRepositoryImplAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(AuthRepositoryImpl.self) { r in
-            guard let firebaseAuthService = r.resolve(FirebaseAuthService.self) else {
-                fatalError()
-            }
-            guard let biometricService = r.resolve(BiometricService.self) else {
-                fatalError()
-            }
-            return AuthRepositoryImpl(firebaseAuthService: firebaseAuthService, biometricService: biometricService)
-        }
-    }
-}
 
 enum AuthRepositoryError: Error, LocalizedError {
     case BIOMETRIC_NOT_AVAILABLE

@@ -5,16 +5,6 @@
 //  Created by Alfian on 19/10/24.
 //
 
-import Swinject
-
-class ExtractMaritalStatusUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ExtractMaritalStatusUsecase.self) { _ in
-            ExtractMaritalStatusUsecase()
-        }
-    }
-}
-
 final class ExtractMaritalStatusUsecase {
     func exec(texts: [String]) -> MarriedStatusType? {
         let texts = texts.filter { $0.regex(with: "^[^0-9]+$") }

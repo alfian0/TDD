@@ -7,43 +7,6 @@
 
 import Combine
 import Foundation
-import Swinject
-
-@MainActor
-class ContactInfoViewModelAssembly: @preconcurrency Assembly {
-    func assemble(container: Container) {
-        container.register(ContactInfoViewModel.self) { (r, c: ContactInfoCoordinatorImpl, d: @escaping (() -> Void)) in
-            guard let nameValidationUsecase = r.resolve(NameValidationUsecase.self) else {
-                fatalError()
-            }
-            guard let phoneValidationUsecase = r.resolve(PhoneValidationUsecase.self) else {
-                fatalError()
-            }
-            guard let countryCodeUsecase = r.resolve(CountryCodeUsecase.self) else {
-                fatalError()
-            }
-            guard let registerPhoneUsecase = r.resolve(RegisterPhoneUsecase.self) else {
-                fatalError()
-            }
-            guard let saveNameUsecase = r.resolve(SaveNameUsecase.self) else {
-                fatalError()
-            }
-            guard let verifyOTPUsecase = r.resolve(VerifyOTPUsecase.self) else {
-                fatalError()
-            }
-            return ContactInfoViewModel(
-                nameValidationUsecase: nameValidationUsecase,
-                phoneValidationUsecase: phoneValidationUsecase,
-                countryCodeUsecase: countryCodeUsecase,
-                registerPhoneUsecase: registerPhoneUsecase,
-                saveNameUsecase: saveNameUsecase,
-                verifyOTPUsecase: verifyOTPUsecase,
-                coordinator: c,
-                didTapLogin: d
-            )
-        }
-    }
-}
 
 @MainActor
 final class ContactInfoViewModel: ObservableObject {

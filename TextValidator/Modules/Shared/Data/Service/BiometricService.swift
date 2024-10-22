@@ -6,15 +6,6 @@
 //
 
 import LocalAuthentication
-import Swinject
-
-class BiometricServiceAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(BiometricService.self) { _ in
-            BiometricService()
-        }
-    }
-}
 
 class BiometricService {
     func isBiometricAvailable() throws -> Bool {

@@ -6,21 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class LoginBiometricUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(LoginBiometricUsecase.self) { r in
-            guard let loginRepository = r.resolve(AuthRepositoryImpl.self) else {
-                fatalError()
-            }
-            guard let loginUsecase = r.resolve(LoginUsecase.self) else {
-                fatalError()
-            }
-            return LoginBiometricUsecase(loginRepository: loginRepository, loginUsecase: loginUsecase)
-        }
-    }
-}
 
 enum LoginBiometricUsecaseError: Error, LocalizedError {
     case NOT_AVAILABLE

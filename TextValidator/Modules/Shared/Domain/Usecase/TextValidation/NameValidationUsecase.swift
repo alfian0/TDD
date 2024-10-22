@@ -6,15 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class NameValidationUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(NameValidationUsecase.self) { _ in
-            NameValidationUsecase()
-        }
-    }
-}
 
 final class NameValidationUsecase {
     func execute(input: String) -> TextValidationError? {

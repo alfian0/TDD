@@ -6,15 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class CountryCodeRepositoryImplAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(CountryCodeRepositoryImpl.self) { _ in
-            CountryCodeRepositoryImpl()
-        }
-    }
-}
 
 final class CountryCodeRepositoryImpl: CountryCodeRepository {
     func getCountryCodes() async throws -> [CountryCodeModel] {

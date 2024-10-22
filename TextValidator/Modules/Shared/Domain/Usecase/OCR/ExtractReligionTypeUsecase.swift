@@ -5,16 +5,6 @@
 //  Created by Alfian on 19/10/24.
 //
 
-import Swinject
-
-class ExtractReligionTypeUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ExtractReligionTypeUsecase.self) { _ in
-            ExtractReligionTypeUsecase()
-        }
-    }
-}
-
 final class ExtractReligionTypeUsecase {
     func exec(texts: [String]) -> ReligionType? {
         let texts = texts.filter { $0.regex(with: "^[^0-9]+$") }

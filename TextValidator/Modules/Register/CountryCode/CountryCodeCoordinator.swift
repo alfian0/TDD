@@ -6,15 +6,6 @@
 //
 
 import SwiftUI
-import Swinject
-
-class CountryCodeCoordinatorAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(CountryCodeCoordinator.self) { _, n in
-            CountryCodeCoordinator(navigationController: n)
-        }
-    }
-}
 
 final class CountryCodeCoordinator: Coordinator {
     var childCoordinator: [any Coordinator] = .init()

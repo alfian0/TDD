@@ -6,15 +6,6 @@
 //
 
 import SwiftUI
-import Swinject
-
-class EmailCoordinatorImplAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(EmailCoordinatorImpl.self) { _, n in
-            EmailCoordinatorImpl(navigationController: n)
-        }
-    }
-}
 
 enum EmailCoordinatorPage {
     case password

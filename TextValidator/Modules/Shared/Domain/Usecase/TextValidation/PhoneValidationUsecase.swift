@@ -6,15 +6,6 @@
 //
 
 import Foundation
-import Swinject
-
-class PhoneValidationUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(PhoneValidationUsecase.self) { _ in
-            PhoneValidationUsecase()
-        }
-    }
-}
 
 final class PhoneValidationUsecase {
     func execute(input: String) -> TextValidationError? {

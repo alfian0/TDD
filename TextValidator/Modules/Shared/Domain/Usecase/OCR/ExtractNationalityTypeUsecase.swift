@@ -5,16 +5,6 @@
 //  Created by Alfian on 19/10/24.
 //
 
-import Swinject
-
-class ExtractNationalityTypeUsecaseAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ExtractNationalityTypeUsecase.self) { _ in
-            ExtractNationalityTypeUsecase()
-        }
-    }
-}
-
 final class ExtractNationalityTypeUsecase {
     func exec(texts: [String]) -> NationalityType? {
         let texts = texts.filter { $0.regex(with: "^[^0-9]+$") }

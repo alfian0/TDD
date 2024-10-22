@@ -7,18 +7,6 @@
 
 import Combine
 import SwiftUI
-import Swinject
-
-class ContactInfoViewAssembly: Assembly {
-    func assemble(container: Container) {
-        container.register(ContactInfoView.self) { (r, c: ContactInfoCoordinatorImpl, d: @escaping (() -> Void)) in
-            guard let viewModel = r.resolve(ContactInfoViewModel.self, arguments: c, d) else {
-                fatalError()
-            }
-            return ContactInfoView(viewModel: viewModel)
-        }
-    }
-}
 
 struct ContactInfoView: View {
     @StateObject var viewModel: ContactInfoViewModel
