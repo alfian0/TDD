@@ -56,7 +56,7 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
             guard let coordinator = AppAssembler.shared.resolver.resolve(ContactInfoCoordinatorImpl.self, argument: UINavigationController()) else {
                 return
             }
-            coordinator.start(didTapLogin: { [weak self] in
+            coordinator.start(onLoginTapped: { [weak self] in
                 guard let self = self else { return }
                 navigationController.dismiss(animated: true) {
                     self.present(.login)

@@ -25,13 +25,13 @@ final class ContactInfoCoordinatorDeeplink: ContactInfoCoordinator {
     }
 
     @MainActor
-    func start(didTapLogin: @escaping () -> Void) async {
-        await wrapped.start(didTapLogin: didTapLogin)
+    func start(onLoginTapped didTapLogin: @escaping () -> Void) async {
+        await wrapped.start(onLoginTapped: didTapLogin)
     }
 
     @MainActor
     func start(_ deeplink: DeeplinkType, didTapLogin: @escaping () -> Void) async {
-        await wrapped.start(didTapLogin: didTapLogin)
+        await wrapped.start(onLoginTapped: didTapLogin)
         let coordinator = EmailCoordinatorDeeplink(
             wrapped: EmailCoordinatorImpl(navigationController: navigationController)
         )

@@ -125,10 +125,10 @@ final class ContactInfoViewModel: ObservableObject {
         await coordinator.present(.countryCode(
             selected: countryCode,
             items: countryCodes,
-            didSelect: { [weak self] selectedCode in
+            onSelect: { [weak self] selectedCode in
                 self?.countryCode = selectedCode
             },
-            didDismiss: {}
+            onDismiss: {}
         ))
     }
 
@@ -152,11 +152,11 @@ final class ContactInfoViewModel: ObservableObject {
             subtitle: "Enter the OTP code sent to \(countryCode.dialCode)\(phone)",
             count: 6,
             duration: 10,
-            didResend: { [weak self] in
+            onResendTapped: { [weak self] in
                 self?.resendOTP()
             },
-            didChange: {},
-            didSuccess: { [weak self] otp in
+            onOTPChanged: {},
+            onOTPSuccess: { [weak self] otp in
                 self?.validateOTP(otp: otp)
             }
         ))
@@ -200,7 +200,7 @@ final class ContactInfoViewModel: ObservableObject {
     }
 
     private func handleError(_ error: Error) async {
-        await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+        await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, onDismiss: {}))
     }
 
     private func updateLoadingState(_ isLoading: Bool) {

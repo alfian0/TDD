@@ -13,32 +13,32 @@ enum ContactInfoCoordinatorPage {
         subtitle: String,
         count: Int,
         duration: Int,
-        didResend: () -> Void,
-        didChange: () -> Void,
-        didSuccess: (String) -> Void
+        onResendTapped: () -> Void,
+        onOTPChanged: () -> Void,
+        onOTPSuccess: (String) -> Void
     )
     case email
     case password
 }
 
 enum ContactInfoCoordinatorSheet {
-    case error(title: String, subtitle: String, didDismiss: () -> Void)
+    case error(title: String, subtitle: String, onDismiss: () -> Void)
     case countryCode(
         selected: CountryCodeModel,
         items: [CountryCodeModel],
-        didSelect: (CountryCodeModel) -> Void,
-        didDismiss: () -> Void
+        onSelect: (CountryCodeModel) -> Void,
+        onDismiss: () -> Void
     )
 }
 
 protocol ContactInfoCoordinator: Coordinator {
-    func start(didTapLogin: @escaping () -> Void) async
+    func start(onLoginTapped: @escaping () -> Void) async
     func push(_ page: ContactInfoCoordinatorPage) async
     func present(_ sheet: ContactInfoCoordinatorSheet) async
 }
 
 final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
-    var childCoordinator: [any Coordinator] = .init()
+    var childCoordinator: [any Coordinator] = []
     var navigationController: UINavigationController
 
     init(navigationController: UINavigationController = UINavigationController()) {
@@ -46,30 +46,30 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
     }
 
     @MainActor
-    func start(didTapLogin: @escaping () -> Void) {
-        guard let v = AppAssembler.shared.resolver.resolve(ContactInfoView.self, arguments: self, didTapLogin) else {
+    func start(onLoginTapped: @escaping () -> Void) {
+        guard let view = AppAssembler.shared.resolver.resolve(ContactInfoView.self, arguments: self, onLoginTapped) else {
             return
         }
-        let vc = UIHostingController(rootView: v)
-        navigationController.show(vc, sender: navigationController)
+        let vc = UIHostingController(rootView: view)
+        navigationController.show(vc, sender: nil)
     }
 
     @MainActor
     func push(_ page: ContactInfoCoordinatorPage) {
         switch page {
-        case let .otp(title, subtitle, count, duration, didResend, didChange, didSuccess):
+        case let .otp(title, subtitle, count, duration, onResendTapped, onOTPChanged, onOTPSuccess):
             let coordinator = OTPCoordinator(navigationController: navigationController)
             coordinator.start(
                 title: title,
                 subtitle: subtitle,
                 count: count,
                 duration: duration,
-                didResend: didResend,
+                didResend: onResendTapped,
                 didChange: { [weak self] in
-                    didChange()
+                    onOTPChanged()
                     self?.navigationController.popViewController(animated: true)
                 },
-                didSuccess: didSuccess
+                didSuccess: onOTPSuccess
             )
 
         case .email:
@@ -85,18 +85,14 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
     @MainActor
     func present(_ sheet: ContactInfoCoordinatorSheet) {
         switch sheet {
-        case let .error(title, subtitle, didDismiss):
+        case let .error(title, subtitle, onDismiss):
             let coordinator = ErrorCoordinator()
             coordinator.start(title: title, subtitle: subtitle, didDismiss: { [weak self] in
-                didDismiss()
-                self?.navigationController.dismiss(animated: true)
-                self?.childCoordinator.removeLast()
+                self?.dismissCoordinator(coordinator, completion: onDismiss)
             })
-            coordinator.navigationController.modalPresentationStyle = .fullScreen
-            childCoordinator.append(coordinator)
-            navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
+            presentModal(coordinator)
 
-        case let .countryCode(selected, items, didSelect, didDismiss):
+        case let .countryCode(selected, items, onSelect, onDismiss):
             guard let coordinator = AppAssembler.shared.resolver.resolve(CountryCodeCoordinator.self, argument: UINavigationController()) else {
                 return
             }
@@ -104,21 +100,34 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
                 selected: selected,
                 items: items,
                 didSelect: { [weak self] item in
-                    didSelect(item)
-                    self?.navigationController.dismiss(animated: true, completion: {
-                        self?.childCoordinator.removeLast()
-                    })
+                    self?.dismissCoordinator(coordinator, completion: { onSelect(item) })
                 },
                 didDismiss: { [weak self] in
-                    didDismiss()
-                    self?.navigationController.dismiss(animated: true, completion: {
-                        self?.childCoordinator.removeLast()
-                    })
+                    self?.dismissCoordinator(coordinator, completion: onDismiss)
                 }
             )
-            coordinator.navigationController.modalPresentationStyle = .fullScreen
-            childCoordinator.append(coordinator)
-            navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
+            presentModal(coordinator)
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func presentModal(_ coordinator: any Coordinator) {
+        coordinator.navigationController.modalPresentationStyle = .fullScreen
+        childCoordinator.append(coordinator)
+        navigationController.showDetailViewController(coordinator.navigationController, sender: nil)
+    }
+
+    private func dismissCoordinator(_ coordinator: any Coordinator, completion: @escaping () -> Void) {
+        navigationController.dismiss(animated: true, completion: {
+            self.removeCoordinator(coordinator)
+            completion()
+        })
+    }
+
+    private func removeCoordinator(_ coordinator: any Coordinator) {
+        if let index = childCoordinator.firstIndex(where: { $0 === coordinator }) {
+            childCoordinator.remove(at: index)
         }
     }
 }
