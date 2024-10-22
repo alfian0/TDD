@@ -11,45 +11,77 @@ import Vision
 enum VisionServiceError: Error {
     case invalidImage
     case noTextFound
+    case noFaceFound
+    case invalidSampleBuffer
+    case noResultsFound
 }
 
 final class VisionService {
-    func textRecognizer(image: UIImage) async throws -> [VNRecognizedTextObservation] {
-        // Convert the UIImage to CGImage
+    // Generic method to handle Vision requests
+    private func performVisionRequest<T: VNRequest>(on handler: VNImageRequestHandler, request: T) async throws -> [Any] {
+        return try await withCheckedThrowingContinuation { continuation in
+            do {
+                try handler.perform([request])
+                continuation.resume(returning: request.results ?? [])
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        }
+    }
+
+    // Helper method to create a VNImageRequestHandler from an image
+    private func createImageRequestHandler(from image: UIImage) throws -> VNImageRequestHandler {
         guard let cgImage = image.cgImage else {
             throw VisionServiceError.invalidImage
         }
+        return VNImageRequestHandler(cgImage: cgImage, options: [:])
+    }
 
-        // Use a throwing continuation to handle the asynchronous nature of VNRequest
-        return try await withCheckedThrowingContinuation { continuation in
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-
-            // Create the text recognition request
-            let request = VNRecognizeTextRequest { request, error in
-                if let error = error {
-                    continuation.resume(throwing: error) // Resume with error if it fails
-                    return
+    // Helper method for setting up device for simulator testing
+    private func configureFaceDetectionRequest(_ request: VNDetectFaceRectanglesRequest) {
+        #if targetEnvironment(simulator)
+            if #available(iOS 17.0, *) {
+                if let cpuDevice = MLComputeDevice.allComputeDevices.first(where: { $0.description.contains("MLCPUComputeDevice") }) {
+                    request.setComputeDevice(.some(cpuDevice), for: .main)
                 }
-
-                guard let observations = request.results as? [VNRecognizedTextObservation] else {
-                    continuation.resume(throwing: VisionServiceError.noTextFound) // Resume with an error if no text was found
-                    return
-                }
-
-                // Resume with the populated data model
-                continuation.resume(returning: observations)
+            } else {
+                request.usesCPUOnly = true
             }
+        #endif
+    }
 
-            // Configure request options
-            request.recognitionLanguages = ["id"]
-            request.recognitionLevel = .accurate
+    // Text recognition from UIImage
+    func recognizeText(in image: UIImage, language: String = "id") async throws -> [VNRecognizedTextObservation] {
+        let handler = try createImageRequestHandler(from: image)
+        let request = VNRecognizeTextRequest()
+        request.recognitionLanguages = [language]
+        request.recognitionLevel = .accurate
 
-            // Perform the text recognition request
-            do {
-                try handler.perform([request])
-            } catch {
-                continuation.resume(throwing: error) // Resume with error if the handler fails
-            }
+        let results = try await performVisionRequest(on: handler, request: request)
+        return results as? [VNRecognizedTextObservation] ?? []
+    }
+
+    // Face detection from UIImage
+    func detectFaces(in image: UIImage) async throws -> [VNFaceObservation] {
+        let handler = try createImageRequestHandler(from: image)
+        let request = VNDetectFaceRectanglesRequest()
+        configureFaceDetectionRequest(request)
+
+        let results = try await performVisionRequest(on: handler, request: request)
+        return results as? [VNFaceObservation] ?? []
+    }
+
+    // Face detection from CMSampleBuffer
+    func detectFaces(in sampleBuffer: CMSampleBuffer) async throws -> [VNFaceObservation] {
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            throw VisionServiceError.invalidSampleBuffer
         }
+
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
+        let request = VNDetectFaceRectanglesRequest()
+        configureFaceDetectionRequest(request)
+
+        let results = try await performVisionRequest(on: handler, request: request)
+        return results as? [VNFaceObservation] ?? []
     }
 }

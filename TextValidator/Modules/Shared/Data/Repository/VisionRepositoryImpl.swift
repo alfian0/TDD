@@ -15,7 +15,7 @@ final class VisionRepositoryImpl: VisionRepository {
     }
 
     func textRecognizer(image: UIImage) async throws -> [TextRecognizerModel] {
-        try await visionService.textRecognizer(image: image)
+        try await visionService.recognizeText(in: image)
             .compactMap { VNRecognizedTextObservationMapper.map(model: $0) }
     }
 }
