@@ -7,14 +7,8 @@
 
 import Foundation
 
-final class PhoneValidationUsecase {
+final class PhoneValidationUsecase: BaseValidationUsecase {
     func execute(input: String) -> TextValidationError? {
-        guard !input.isEmpty else {
-            return .EMPTY
-        }
-
-        let regex = "^\\+[1-9][0-9]{5,15}$"
-        let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
-        return predicate.evaluate(with: input) ? nil : .INVALID_FORMAT
+        return validate(input: input, regex: ValidationRegex.phone, minLength: 5, maxLength: 15)
     }
 }

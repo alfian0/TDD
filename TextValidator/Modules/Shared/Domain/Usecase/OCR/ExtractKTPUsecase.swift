@@ -98,7 +98,7 @@ final class ExtractKTPUsecase {
 
         if let validPDOB = extractDOBUsecase.exec(texts: texts) {
             idData.pob = validPDOB.place
-            idData.dob = "\(validPDOB.day)-\(validPDOB.month)-\(validPDOB.year)".toDate(dateFormat: "dd-MM-yyyy")
+            idData.dob = "\(validPDOB.day)-\(validPDOB.month)-\(validPDOB.year)".toDate(dateFormat: OCRDateFormat.ktp)
         }
     }
 }

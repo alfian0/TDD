@@ -74,12 +74,6 @@ struct OCRView: View {
 
 #Preview {
     NavigationView {
-        OCRView(viewModel: OCRViewModel(
-            extractKTPUsecase: AppAssembler.shared.resolver.resolve(ExtractKTPUsecase.self)!,
-            nameValidationUsecase: NameValidationUsecase(),
-            nikValidationUsecase: NIKValidationUsecase(),
-            ageValidationUsecase: AgeValidationUsecase(),
-            coordinator: OCRViewCoordinator()
-        ))
+        AppAssembler.shared.resolver.resolve(OCRView.self, argument: OCRViewCoordinator())
     }
 }

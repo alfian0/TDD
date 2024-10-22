@@ -20,20 +20,12 @@ final class PINValidationUsecase {
     }
 
     func execute(pin: String, repin: String) -> Result<Bool, VerifyError> {
-        if pin.isEmpty {
-            return failWithError(.EMPTY)
+        if let error = ValidationHelper.validateEmpty(pin) {
+            return failWithError(error)
         }
 
-        // MARK: ISO 9564-1
-
-        if pin.count < 4 {
-            return failWithError(.TOO_SHORT)
-        }
-
-        // MARK: ISO 9564-1
-
-        if pin.count > 12 {
-            return failWithError(.TOO_LONG)
+        if let lengthError = ValidationHelper.validateLength(pin, min: 4, max: 12) {
+            return failWithError(lengthError)
         }
 
         if hasIdenticalConsecutiveCharacters(in: pin) {
@@ -44,7 +36,7 @@ final class PINValidationUsecase {
             return failWithError(.CANNOT_SQUENTIAL)
         }
 
-        if repin.isEmpty {
+        guard !repin.isEmpty else {
             return .success(false)
         }
 
@@ -56,8 +48,6 @@ final class PINValidationUsecase {
             .map { true }
             .mapError { VerifyError.NETWORK_ERROR($0) }
     }
-
-    // Helper methods
 
     private func hasIdenticalConsecutiveCharacters(in pin: String) -> Bool {
         return Set(Array(pin)).count == 1

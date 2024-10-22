@@ -7,22 +7,8 @@
 
 import Foundation
 
-final class NameValidationUsecase {
+final class NameValidationUsecase: BaseValidationUsecase {
     func execute(input: String) -> TextValidationError? {
-        guard !input.isEmpty else {
-            return .EMPTY
-        }
-
-        guard input.count > 3 else {
-            return .TOO_SHORT
-        }
-
-        guard input.count <= 20 else {
-            return .TOO_LONG
-        }
-
-        let regex = "^[A-Za-z .,]{3,20}$"
-        let predicate = NSPredicate(format: "SELF MATCHES %@", regex)
-        return predicate.evaluate(with: input) ? nil : .INVALID_FORMAT
+        return validate(input: input, regex: ValidationRegex.name, minLength: 3, maxLength: 20)
     }
 }

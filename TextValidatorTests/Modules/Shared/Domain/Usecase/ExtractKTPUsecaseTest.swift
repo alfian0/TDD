@@ -28,7 +28,7 @@ final class ExtractKTPUsecaseTest: XCTestCase {
             XCTAssertEqual(data.nama, "ANGGI PRATAMA")
             XCTAssertEqual(data.nik, "3403162806030001")
             XCTAssertEqual(data.pob, "WONOGIRI")
-            XCTAssertEqual(data.dob, "28-06-2003".toDate(dateFormat: "dd-MM-yyyy"))
+            XCTAssertEqual(data.dob, "28-06-2003".toDate(dateFormat: OCRDateFormat.ktp))
             XCTAssertEqual(data.gender, GenderType.LakiLaki)
             XCTAssertEqual(data.job, JobType.NelayanPerikanan)
             XCTAssertEqual(data.religion, ReligionType.Islam)
@@ -46,7 +46,7 @@ final class ExtractKTPUsecaseTest: XCTestCase {
         case let .success(data):
             XCTAssertEqual(data.nik, "3203012503770011")
             XCTAssertEqual(data.pob, "TUJIAN")
-            XCTAssertEqual(data.dob, "25-03-1977".toDate(dateFormat: "dd-MM-yyyy"))
+            XCTAssertEqual(data.dob, "25-03-1977".toDate(dateFormat: OCRDateFormat.ktp))
         case .failure:
             XCTFail()
         }
@@ -60,7 +60,7 @@ final class ExtractKTPUsecaseTest: XCTestCase {
             XCTAssertEqual(data.nama, "RIYANTO  SE")
             XCTAssertEqual(data.nik, "3471140209790001")
             XCTAssertEqual(data.pob, "GROBOGAN")
-            XCTAssertEqual(data.dob, "02-09-1979".toDate(dateFormat: "dd-MM-yyyy"))
+            XCTAssertEqual(data.dob, "02-09-1979".toDate(dateFormat: OCRDateFormat.ktp))
             XCTAssertEqual(data.gender, GenderType.LakiLaki)
             XCTAssertEqual(data.job, JobType.Pedagang)
             XCTAssertEqual(data.religion, ReligionType.Islam)

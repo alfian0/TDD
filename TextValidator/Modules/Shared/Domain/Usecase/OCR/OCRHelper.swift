@@ -44,6 +44,16 @@ let keywords = [
     KTPKeywords.validuntil,
 ]
 
+enum OCRRegex {
+    static let nik = "^[A-Za-z0-9]{16}+$"
+    static let dob = "([A-Za-z]+)[\\.,\\s-]?\\s?(\\d{2})[\\.,\\s-](\\d{2})[\\.,\\s-](\\d{4})"
+    static let alphabetical = "^[^0-9]+$"
+}
+
+enum OCRDateFormat {
+    static let ktp = "dd-MM-yyyy"
+}
+
 func levenshteinDistance(_ str1: String, _ str2: String) -> Int {
     let len1 = str1.count
     let len2 = str2.count

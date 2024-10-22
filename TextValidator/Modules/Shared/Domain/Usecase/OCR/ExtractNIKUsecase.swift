@@ -21,7 +21,7 @@ final class ExtractNIKUsecase {
 
         // Loop through each word and check regex
         for word in allWords {
-            guard word.regex(with: "^[A-Za-z0-9]{16}+$") else { continue }
+            guard word.regex(with: OCRRegex.nik) else { continue }
 
             var processedNIK = word
 
