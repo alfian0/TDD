@@ -26,12 +26,10 @@ final class ContactInfoViewModel: ObservableObject {
     private let registerPhoneUsecase: RegisterPhoneUsecase
     private let saveNameUsecase: SaveNameUsecase
     private let verifyOTPUsecase: VerifyOTPUsecase
-    private var coordinator: any ContactInfoCoordinator
-
+    private let coordinator: any ContactInfoCoordinator
     private var verificationID: String = ""
-
+    private let didTapLogin: () -> Void
     var cancellables = Set<AnyCancellable>()
-    let didTapLogin: () -> Void
 
     init(
         nameValidationUsecase: NameValidationUsecase,
@@ -52,6 +50,11 @@ final class ContactInfoViewModel: ObservableObject {
         self.coordinator = coordinator
         self.didTapLogin = didTapLogin
 
+        bindValidation()
+    }
+
+    private func bindValidation() {
+        // Handle fullname validation
         $fullname
             .dropFirst()
             .removeDuplicates()
@@ -59,135 +62,148 @@ final class ContactInfoViewModel: ObservableObject {
             .map { $0?.localizedDescription }
             .assign(to: &$fullnameError)
 
+        // Handle phone validation with country code
         Publishers.CombineLatest($countryCode, $phone)
-            .map { countryCode, phone in
-                countryCode.dialCode + phone
-            }
+            .map { $0.dialCode + $1 }
             .dropFirst()
             .removeDuplicates()
             .map(phoneValidationUsecase.execute)
             .map { $0?.localizedDescription }
             .assign(to: &$phoneError)
 
+        // Combine validity checks for submission
         Publishers.CombineLatest3($fullnameError, $phoneError, $isAgreeToTnC)
-            .map { [weak self] emailError, passwordError, isAgreeToTnC in
+            .map { [weak self] fullnameError, phoneError, isAgreeToTnC in
                 guard let self = self else { return false }
-                return emailError == nil && passwordError == nil && isAgreeToTnC && !self.fullname.isEmpty && !self.phone.isEmpty
+                return fullnameError == nil && phoneError == nil && isAgreeToTnC && !self.fullname.isEmpty && !self.phone.isEmpty
             }
             .assign(to: \.canSubmit, on: self)
             .store(in: &cancellables)
     }
 
-    func didTapCountryCode() async {
-        if !countryCodes.isEmpty {
-            await launchCountryCode()
-        } else {
-            isLoading = true
-
-            defer {
-                isLoading = false
-            }
-
-            let result = await countryCodeUsecase.execute()
-            switch result {
-            case let .success(countries):
-                countryCodes = countries
-                await launchCountryCode()
-            case let .failure(error):
-                await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+    func didTapCountryCode() {
+        Task {
+            if !countryCodes.isEmpty {
+                await presentCountryCodeSelection()
+            } else {
+                await fetchCountryCodes()
             }
         }
     }
 
-    func didTapCountinue() async {
-        isLoading = true
-
-        defer {
-            isLoading = false
-        }
-
-        let result = await registerPhoneUsecase.execute(phone: countryCode.dialCode + phone)
-        guard case let .success(verificationID) = result else {
-            if case let .failure(error) = result {
-                await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
-            }
-            return
-        }
-
-        self.verificationID = verificationID
-        await coordinator.push(.otp(
-            title: "Verify your phone number",
-            subtitle: "Enter the 5-digit OTP code sent to \(countryCode.dialCode)\(phone)",
-            count: 6,
-            duration: 10,
-            didResend: { [weak self] in
-                Task {
-                    guard let self = self else { return }
-                    let result = await self.registerPhoneUsecase.execute(phone: self.countryCode.dialCode + self.phone)
-                    guard case let .success(verificationID) = result else {
-                        if case let .failure(error) = result {
-                            await self.coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
-                        }
-                        return
-                    }
-                    self.verificationID = verificationID
-                }
-            },
-            didChange: {
-                print("didchange")
-            },
-            didSuccess: { [weak self] otp in
-                Task {
-                    await self?.validate(with: otp)
-                }
-            }
-        ))
+    func didTapContinue() {
+        registerPhone()
     }
 
     func launchLogin() {
         didTapLogin()
     }
 
-    func launchCountryCode() async {
-        await coordinator.present(.countryCode(selected: countryCode, items: countryCodes, didSelect: { [weak self] item in
-            self?.countryCode = item
-        }, didDismiss: {}))
-    }
-
     func cancel() {
-        for cancellable in cancellables {
-            cancellable.cancel()
-        }
+        cancellables.forEach { $0.cancel() }
         cancellables.removeAll()
     }
 
-    private func validate(with otp: String) async {
-        isLoading = true
+    private func registerPhone() {
+        Task {
+            updateLoadingState(true)
+            defer { updateLoadingState(false) }
 
-        defer {
-            isLoading = false
-        }
-
-        let result2 = await verifyOTPUsecase.execute(verificationID: verificationID, verificationCode: otp)
-        guard case let .success(user) = result2 else {
-            if case let .failure(error) = result2 {
-                await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+            let result = await registerPhoneUsecase.execute(phone: countryCode.dialCode + phone)
+            guard case let .success(verificationID) = result else {
+                if case let .failure(error) = result {
+                    await handleError(error)
+                }
+                return
             }
-            return
+            self.verificationID = verificationID
+            await showOTPVerificationScreen()
         }
+    }
 
-        let result3 = await saveNameUsecase.execute(name: fullname)
-        guard case let .success(isEmailVerified) = result3 else {
-            if case let .failure(error) = result3 {
-                await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+    private func presentCountryCodeSelection() async {
+        await coordinator.present(.countryCode(
+            selected: countryCode,
+            items: countryCodes,
+            didSelect: { [weak self] selectedCode in
+                self?.countryCode = selectedCode
+            },
+            didDismiss: {}
+        ))
+    }
+
+    private func fetchCountryCodes() async {
+        updateLoadingState(true)
+        defer { updateLoadingState(false) }
+
+        let result = await countryCodeUsecase.execute()
+        switch result {
+        case let .success(countries):
+            countryCodes = countries
+            await presentCountryCodeSelection()
+        case let .failure(error):
+            await handleError(error)
+        }
+    }
+
+    private func showOTPVerificationScreen() async {
+        await coordinator.push(.otp(
+            title: "Verify your phone number",
+            subtitle: "Enter the OTP code sent to \(countryCode.dialCode)\(phone)",
+            count: 6,
+            duration: 10,
+            didResend: { [weak self] in
+                self?.resendOTP()
+            },
+            didChange: {},
+            didSuccess: { [weak self] otp in
+                self?.validateOTP(otp: otp)
             }
-            return
-        }
+        ))
+    }
 
+    private func resendOTP() {
+        registerPhone() // Reuse the registerPhone function
+    }
+
+    private func validateOTP(otp: String) {
+        Task {
+            updateLoadingState(true)
+            defer { updateLoadingState(false) }
+
+            let otpResult = await verifyOTPUsecase.execute(verificationID: verificationID, verificationCode: otp)
+            guard case .success = otpResult else {
+                if case let .failure(error) = otpResult {
+                    await handleError(error)
+                }
+                return
+            }
+
+            let nameResult = await saveNameUsecase.execute(name: fullname)
+            guard case let .success(isEmailVerified) = nameResult else {
+                if case let .failure(error) = nameResult {
+                    await handleError(error)
+                }
+                return
+            }
+
+            await proceedAfterValidation(isEmailVerified: isEmailVerified)
+        }
+    }
+
+    private func proceedAfterValidation(isEmailVerified: Bool) async {
         if isEmailVerified {
             await coordinator.push(.password)
         } else {
             await coordinator.push(.email)
         }
+    }
+
+    private func handleError(_ error: Error) async {
+        await coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+    }
+
+    private func updateLoadingState(_ isLoading: Bool) {
+        self.isLoading = isLoading
     }
 }

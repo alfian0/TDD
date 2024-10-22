@@ -24,7 +24,7 @@ struct OCRView: View {
             }
             .padding(.horizontal)
 
-            if let image = viewModel.idImage {
+            if let image = viewModel.idCardImage {
                 Image(uiImage: image)
                     .resizable()
             }
@@ -55,7 +55,7 @@ struct OCRView: View {
             .padding(.horizontal)
         }
         .fullScreenCover(isPresented: $viewModel.isTakePicture) {
-            DocumentCameraView(image: $viewModel.idImage)
+            DocumentCameraView(image: $viewModel.idCardImage)
                 .edgesIgnoringSafeArea(.all)
         }
         .onViewDidLoad {

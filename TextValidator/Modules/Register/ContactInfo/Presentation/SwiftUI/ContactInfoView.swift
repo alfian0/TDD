@@ -40,9 +40,7 @@ struct ContactInfoView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Button {
-                            Task {
-                                await viewModel.didTapCountryCode()
-                            }
+                            viewModel.didTapCountryCode()
                         } label: {
                             Group {
                                 if viewModel.isLoading {
@@ -91,9 +89,7 @@ struct ContactInfoView: View {
                 .toggleStyle(iOSCheckboxToggleStyle())
 
                 Button(action: {
-                    Task {
-                        await viewModel.didTapCountinue()
-                    }
+                    viewModel.didTapContinue()
                 }) {
                     Text("Continue")
                         .frame(maxWidth: .infinity)

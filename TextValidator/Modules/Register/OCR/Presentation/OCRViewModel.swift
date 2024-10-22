@@ -11,7 +11,7 @@ import SwiftUI
 @MainActor
 final class OCRViewModel: ObservableObject {
     @Published var isTakePicture: Bool = false
-    @Published var idImage: UIImage? = UIImage(named: "img_id_card_placeholder")
+    @Published var idCardImage: UIImage? = UIImage(named: "img_id_card_placeholder")
     @Published var name: String = ""
     @Published var nameError: String?
     @Published var idNumber: String = ""
@@ -40,55 +40,46 @@ final class OCRViewModel: ObservableObject {
         self.ageValidationUsecase = ageValidationUsecase
         self.coordinator = coordinator
 
-        $name
-            .removeDuplicates()
-            .map(nameValidationUsecase.execute)
-            .map { $0?.localizedDescription }
-            .assign(to: &$nameError)
+        setupBindings()
+    }
 
-        $idNumber
-            .removeDuplicates()
-            .map(nikValidationUsecase.execute)
-            .map { $0?.localizedDescription }
-            .assign(to: &$idNumberError)
+    private func setupBindings() {
+        Publishers.CombineLatest3(
+            $name.map(nameValidationUsecase.execute),
+            $idNumber.map(nikValidationUsecase.execute),
+            $dateOfBirth.map(ageValidationUsecase.execute)
+        )
+        .sink { [weak self] nameError, idNumberError, dobError in
+            self?.nameError = nameError?.localizedDescription
+            self?.idNumberError = idNumberError?.localizedDescription
+            self?.dateOfBirthError = dobError?.localizedDescription
+            self?.canSubmit = nameError == nil && idNumberError == nil && dobError == nil && !self!.name.isEmpty && !self!.idNumber.isEmpty
+        }
+        .store(in: &cancellables)
 
-        $dateOfBirth
-            .removeDuplicates()
-            .map(ageValidationUsecase.execute)
-            .map { $0?.localizedDescription }
-            .assign(to: &$dateOfBirthError)
-
-        $idImage
+        $idCardImage
             .sink { [weak self] image in
-                guard let self = self else { return }
-                guard let image = image else { return }
-                Task {
-                    let result = await extractKTPUsecase.exec(image: image)
-                    guard case let .success(model) = result else {
-                        if case let .failure(error) = result {
-                            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
-                        }
-                        return
-                    }
-                    if let extractedName = model.nama {
-                        self.name = extractedName
-                    }
-                    if let extractedNIK = model.nik {
-                        self.idNumber = extractedNIK
-                    }
-                    if let extractedDOB = model.dob {
-                        self.dateOfBirth = extractedDOB
-                    }
-                }
+                guard let self = self, let image = image else { return }
+                self.extractDataFromImage(image)
             }
             .store(in: &cancellables)
+    }
 
-        Publishers.CombineLatest3($nameError, $idNumberError, $dateOfBirthError)
-            .map { [weak self] nameError, idNumberError, dateOfBirthError in
-                guard let self = self else { return false }
-                return nameError == nil && idNumberError == nil && dateOfBirthError == nil && !name.isEmpty && !idNumber.isEmpty
-            }
-            .assign(to: \.canSubmit, on: self)
-            .store(in: &cancellables)
+    private func extractDataFromImage(_ image: UIImage) {
+        Task {
+            let result = await extractKTPUsecase.exec(image: image)
+            handleExtractionResult(result)
+        }
+    }
+
+    private func handleExtractionResult(_ result: Result<IDModel, ExtractKTPUsecaseError>) {
+        switch result {
+        case let .success(model):
+            name = model.nama ?? ""
+            idNumber = model.nik ?? ""
+            dateOfBirth = model.dob ?? .init()
+        case let .failure(error):
+            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
+        }
     }
 }
