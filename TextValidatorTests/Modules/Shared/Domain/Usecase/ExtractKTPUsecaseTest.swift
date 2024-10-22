@@ -9,8 +9,19 @@
 import XCTest
 
 final class ExtractKTPUsecaseTest: XCTestCase {
+    func test_extractKTP_withInValidImage_shouldReturnError() async {
+        let sut = makeSUT()
+        let result = await sut.exec(image: invalidImage())
+        switch result {
+        case .success:
+            XCTFail()
+        case let .failure(error):
+            print(error)
+        }
+    }
+
     func test_extractKTP_withValidImage_shouldReturnData() async {
-        let sut = ExtractKTPUsecase(repository: VisionRepositoryImpl(visionService: VisionService()))
+        let sut = makeSUT()
         let result = await sut.exec(image: image())
         switch result {
         case let .success(data):
@@ -29,7 +40,7 @@ final class ExtractKTPUsecaseTest: XCTestCase {
     }
 
     func test_extractKTP_withValidImage_shouldReturnData2() async {
-        let sut = ExtractKTPUsecase(repository: VisionRepositoryImpl(visionService: VisionService()))
+        let sut = makeSUT()
         let result = await sut.exec(image: image2())
         switch result {
         case let .success(data):
@@ -42,13 +53,13 @@ final class ExtractKTPUsecaseTest: XCTestCase {
 //            XCTAssertEqual(data.religion, ReligionType.Islam)
 //            XCTAssertEqual(data.marriedStatus, MarriedStatusType.BelumKawin)
 //            XCTAssertEqual(data.nationality, NationalityType.wni)
-        case .failure:
+        case let .failure(error):
             XCTFail()
         }
     }
 
     func test_extractKTP_withValidImage_shouldReturnData3() async {
-        let sut = ExtractKTPUsecase(repository: VisionRepositoryImpl(visionService: VisionService()))
+        let sut = makeSUT()
         let result = await sut.exec(image: image3())
         switch result {
         case let .success(data):
@@ -64,5 +75,18 @@ final class ExtractKTPUsecaseTest: XCTestCase {
         case .failure:
             XCTFail()
         }
+    }
+
+    private func makeSUT() -> ExtractKTPUsecase {
+        return ExtractKTPUsecase(
+            repository: VisionRepositoryImpl(visionService: VisionService()),
+            extractNIKUsecase: ExtractNIKUsecase(nikUsecase: NIKValidationUsecase()),
+            extractDOBUsecase: ExtractDOBUsecase(),
+            extractReligionTypeUsecase: ExtractReligionTypeUsecase(),
+            extractGenderUsecase: ExtractGenderUsecase(),
+            extractMaritalStatusUsecase: ExtractMaritalStatusUsecase(),
+            extractJobTypeUsecase: ExtractJobTypeUsecase(),
+            extractNationalityTypeUsecase: ExtractNationalityTypeUsecase()
+        )
     }
 }

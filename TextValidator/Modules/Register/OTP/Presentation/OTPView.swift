@@ -6,6 +6,19 @@
 //
 
 import SwiftUI
+import Swinject
+
+class OTPViewAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(OTPView.self) {
+            (r, t: String, s: String, c: Int, d: Int, cr: OTPCoordinator, dr: @escaping () -> Void, dc: @escaping () -> Void, ds: @escaping (String) -> Void) in
+            guard let viewModel = r.resolve(OTPViewModel.self, arguments: t, s, c, d, cr, dr, dc, ds) else {
+                fatalError()
+            }
+            return OTPView(viewModel: viewModel)
+        }
+    }
+}
 
 struct OTPView: View {
     @StateObject var viewModel: OTPViewModel

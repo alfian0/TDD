@@ -7,6 +7,26 @@
 
 import Combine
 import Foundation
+import Swinject
+
+@MainActor
+class OTPViewModelAssembly: @preconcurrency Assembly {
+    func assemble(container: Container) {
+        container.register(OTPViewModel.self) {
+            (_, t: String, s: String, c: Int, d: Int, cr: OTPCoordinator, dr: @escaping () -> Void, dc: @escaping () -> Void, ds: @escaping (String) -> Void) in
+            OTPViewModel(
+                title: t,
+                subtitle: s,
+                count: c,
+                duration: d,
+                coordinator: cr,
+                didResend: dr,
+                didChange: dc,
+                didSuccess: ds
+            )
+        }
+    }
+}
 
 @MainActor
 final class OTPViewModel: ObservableObject {

@@ -6,6 +6,15 @@
 //
 
 import SwiftUI
+import Swinject
+
+class EmailCoordinatorImplAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(EmailCoordinatorImpl.self) { _, n in
+            EmailCoordinatorImpl(navigationController: n)
+        }
+    }
+}
 
 enum EmailCoordinatorPage {
     case password
@@ -31,8 +40,9 @@ final class EmailCoordinatorImpl: EmailCoordinator {
 
     @MainActor
     func start(viewState: EmailViewState) {
-        let vm = EmailViewFactory().createEmailViewModel(viewState: viewState, coordinator: self)
-        let v = EmailView(viewModel: vm)
+        guard let v = AppAssembler.shared.resolver.resolve(EmailView.self, arguments: viewState, self) else {
+            return
+        }
         let vc = UIHostingController(rootView: v)
         navigationController.setViewControllers([vc], animated: true)
     }

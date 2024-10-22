@@ -6,6 +6,18 @@
 //
 
 import SwiftUI
+import Swinject
+
+class EmailViewAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(EmailView.self) { (r, v: EmailViewState, c: EmailCoordinator) in
+            guard let viewModel = r.resolve(EmailViewModel.self, arguments: v, c) else {
+                fatalError()
+            }
+            return EmailView(viewModel: viewModel)
+        }
+    }
+}
 
 struct EmailView: View {
     @StateObject var viewModel: EmailViewModel

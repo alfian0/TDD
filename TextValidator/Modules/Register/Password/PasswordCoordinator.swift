@@ -6,6 +6,15 @@
 //
 
 import SwiftUI
+import Swinject
+
+class PasswordCoordinatorAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(PasswordCoordinator.self) { _, n in
+            PasswordCoordinator(navigationController: n)
+        }
+    }
+}
 
 enum PasswordCoordinatorPage {
     case pin
@@ -25,8 +34,9 @@ final class PasswordCoordinator: Coordinator {
 
     @MainActor
     func start() {
-        let vm = PasswordViewFactory().createPasswordViewModel(coordinator: self)
-        let v = PasswordView(viewModel: vm)
+        guard let v = AppAssembler.shared.resolver.resolve(PasswordView.self, argument: self) else {
+            return
+        }
         let vc = UIHostingController(rootView: v)
         navigationController.setViewControllers([vc], animated: true)
     }

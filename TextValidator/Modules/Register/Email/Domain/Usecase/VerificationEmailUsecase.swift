@@ -6,6 +6,18 @@
 //
 
 import Foundation
+import Swinject
+
+class VerificationEmailUsecaseAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(VerificationEmailUsecase.self) { r in
+            guard let repository = r.resolve(AuthRepositoryImpl.self) else {
+                fatalError()
+            }
+            return VerificationEmailUsecase(repository: repository)
+        }
+    }
+}
 
 enum VerificationEmailUsecaseError: Error, LocalizedError {
     case UNKNOWN

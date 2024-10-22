@@ -7,6 +7,35 @@
 
 import Combine
 import SwiftUI
+import Swinject
+
+@MainActor
+class EmailViewModelAssembly: @preconcurrency Assembly {
+    func assemble(container: Container) {
+        container.register(EmailViewModel.self) { (r, v: EmailViewState, c: EmailCoordinator) in
+            guard let emailValidationUsecase = r.resolve(EmailValidationUsecase.self) else {
+                fatalError()
+            }
+            guard let registerEmailUsecase = r.resolve(RegisterEmailUsecase.self) else {
+                fatalError()
+            }
+            guard let reloadUserUsecase = r.resolve(ReloadUserUsecase.self) else {
+                fatalError()
+            }
+            guard let verificationEmailUsecase = r.resolve(VerificationEmailUsecase.self) else {
+                fatalError()
+            }
+            return EmailViewModel(
+                viewState: v,
+                emailValidationUsecase: emailValidationUsecase,
+                registerEmailUsecase: registerEmailUsecase,
+                reloadUserUsecase: reloadUserUsecase,
+                verificationEmailUsecase: verificationEmailUsecase,
+                coordinator: c
+            )
+        }
+    }
+}
 
 enum EmailViewState {
     case formInput

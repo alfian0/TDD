@@ -50,6 +50,7 @@ class ExtractKTPUsecaseAssembly: Assembly {
 }
 
 enum ExtractKTPUsecaseError: Error, LocalizedError {
+    case NOT_VALID_KTP
     case UNKNOWN
 }
 
@@ -87,6 +88,28 @@ final class ExtractKTPUsecase {
         do {
             var idData = IDModel()
             let data = try await repository.textRecognizer(image: image)
+
+            guard data.filter({
+                "PROVINSI".hasPrefix($0.candidate)
+                    || "NIK".hasPrefix($0.candidate)
+                    || "Nama".hasPrefix($0.candidate)
+                    || "Tempat/Tgi Lahir".hasPrefix($0.candidate)
+                    || "Jenis kelamin".hasPrefix($0.candidate)
+                    || "Gol. Darah".hasPrefix($0.candidate)
+                    || "Alamat".hasPrefix($0.candidate)
+                    || "RT/RW".hasPrefix($0.candidate)
+                    || "Kel/Desa".hasPrefix($0.candidate)
+                    || "Kecamatan".hasPrefix($0.candidate)
+                    || "Agama".hasPrefix($0.candidate)
+                    || "Status Perkawinan".hasPrefix($0.candidate)
+                    || "Pekerjaan".hasPrefix($0.candidate)
+                    || "Kewarganegaraan".hasPrefix($0.candidate)
+                    || "Berlaku Hingga".hasPrefix($0.candidate)
+            }).count >= 2
+
+            else {
+                return .failure(.NOT_VALID_KTP)
+            }
 
             // MARK: Extract Name
 

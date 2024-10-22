@@ -25,6 +25,7 @@ class CountryCodeCoordinatorTest: XCTestCase {
         super.tearDown()
     }
 
+    @MainActor
     func testStart_whenNavigationStackIsEmpty_shouldPushContactInfoView() {
         // Given
         XCTAssertTrue(mockNavController.viewControllers.isEmpty)

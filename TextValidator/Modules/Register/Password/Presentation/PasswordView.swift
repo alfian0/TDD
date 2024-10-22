@@ -6,6 +6,18 @@
 //
 
 import SwiftUI
+import Swinject
+
+class PasswordViewAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(PasswordView.self) { (r, c: PasswordCoordinator) in
+            guard let viewModel = r.resolve(PasswordViewModel.self, argument: c) else {
+                fatalError()
+            }
+            return PasswordView(viewModel: viewModel)
+        }
+    }
+}
 
 struct PasswordView: View {
     @StateObject var viewModel: PasswordViewModel

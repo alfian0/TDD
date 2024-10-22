@@ -7,56 +7,6 @@
 
 import FirebaseCore
 import SwiftUI
-import Swinject
-
-@MainActor
-final class AppAssembler {
-    static let shared: Assembler = .init([
-        VisionRepositoryImplAssembly(),
-        CountryCodeRepositoryImplAssembly(),
-        AuthRepositoryImplAssembly(),
-        VisionServiceAssembly(),
-        UserdefaultsServiceAssembly(),
-        BiometricServiceAssembly(),
-        KeychainServiceAssembly(),
-        FirebaseAuthServiceAssembly(),
-        CameraServiceAssembly(),
-        ExtractKTPUsecaseAssembly(),
-        ExtractNIKUsecaseAssembly(),
-        ExtractDOBUsecaseAssembly(),
-        ExtractNationalityTypeUsecaseAssembly(),
-        ExtractJobTypeUsecaseAssembly(),
-        ExtractReligionTypeUsecaseAssembly(),
-        ExtractMaritalStatusUsecaseAssembly(),
-        ExtractGenderUsecaseAssembly(),
-        AgeValidationUsecaseAssembly(),
-        NIKValidationUsecaseAssembly(),
-        NameValidationUsecaseAssembly(),
-        PINValidationUsecaseAssembly(),
-        EmailValidationUsecaseAssembly(),
-        PhoneValidationUsecaseAssembly(),
-        LoginViewCoordinatorAssembly(),
-        LoginBiometricUsecaseAssembly(),
-        LoginUsecaseAssembly(),
-        LoginViewModelAssembly(),
-        LoginViewAssembly(),
-        OCRViewCoordinatorAssembly(),
-        OCRViewModelAssembly(),
-        OCRViewAssembly(),
-        ContactInfoCoordinatorDeeplinkAssembly(),
-        ContactInfoCoordinatorAssembly(),
-        SaveNameUsecaseAssembly(),
-        RegisterPhoneUsecaseAssembly(),
-        VerifyOTPUsecaseAssembly(),
-        ContactInfoViewModelAssembly(),
-        ContactInfoViewAssembly(),
-        CountryCodeUsecaseAssembly(),
-        FilterCountryCodesUsecaseAssembly(),
-        CountryCodeViewModelAssembly(),
-        CountrySearchListViewAssembly(),
-        CountryCodeCoordinatorAssembly(),
-    ])
-}
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication,

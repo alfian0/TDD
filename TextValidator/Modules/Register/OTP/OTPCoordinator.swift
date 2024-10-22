@@ -6,6 +6,15 @@
 //
 
 import SwiftUI
+import Swinject
+
+class OTPCoordinatorAssembly: Assembly {
+    func assemble(container: Container) {
+        container.register(OTPCoordinator.self) { _, n in
+            OTPCoordinator(navigationController: n)
+        }
+    }
+}
 
 enum OTPCoordinatorSheet {
     case error(title: String, subtitle: String, didDismiss: () -> Void)
@@ -29,17 +38,9 @@ final class OTPCoordinator: Coordinator {
         didChange: @escaping () -> Void,
         didSuccess: @escaping (String) -> Void
     ) {
-        let vm = OTPViewFactory().createOTPViewModel(
-            title: title,
-            subtitle: subtitle,
-            count: count,
-            duration: duration,
-            coordinator: self,
-            didResend: didResend,
-            didChange: didChange,
-            didSuccess: didSuccess
-        )
-        let v = OTPView(viewModel: vm)
+        guard let v = AppAssembler.shared.resolver.resolve(OTPView.self, arguments: title, subtitle, count, duration, self, didResend, didChange, didSuccess) else {
+            return
+        }
         let vc = UIHostingController(rootView: v)
         navigationController.show(vc, sender: navigationController)
     }
