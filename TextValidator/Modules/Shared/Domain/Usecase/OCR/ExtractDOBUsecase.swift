@@ -17,7 +17,16 @@ class ExtractDOBUsecaseAssembly: Assembly {
 }
 
 final class ExtractDOBUsecase {
-    func exec(text: String) -> (place: String, day: String, month: String, year: String)? {
+    func exec(texts: [String]) -> (place: String, day: String, month: String, year: String)? {
+        for text in texts {
+            if let result = exect(text: text) {
+                return result
+            }
+        }
+        return nil
+    }
+
+    private func exect(text: String) -> (place: String, day: String, month: String, year: String)? {
         let pattern = "([A-Za-z]+)[\\.,\\s-]?\\s?(\\d{2})[\\.,\\s-](\\d{2})[\\.,\\s-](\\d{4})"
 
         do {

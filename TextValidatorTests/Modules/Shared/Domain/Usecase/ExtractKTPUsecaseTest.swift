@@ -44,16 +44,10 @@ final class ExtractKTPUsecaseTest: XCTestCase {
         let result = await sut.exec(image: image2())
         switch result {
         case let .success(data):
-//            XCTAssertEqual(data.nama, "ANGGI PRATAMA")
             XCTAssertEqual(data.nik, "3203012503770011")
             XCTAssertEqual(data.pob, "TUJIAN")
             XCTAssertEqual(data.dob, "25-03-1977".toDate(dateFormat: "dd-MM-yyyy"))
-//            XCTAssertEqual(data.gender, GenderType.LakiLaki)
-//            XCTAssertEqual(data.job, JobType.NelayanPerikanan)
-//            XCTAssertEqual(data.religion, ReligionType.Islam)
-//            XCTAssertEqual(data.marriedStatus, MarriedStatusType.BelumKawin)
-//            XCTAssertEqual(data.nationality, NationalityType.wni)
-        case let .failure(error):
+        case .failure:
             XCTFail()
         }
     }

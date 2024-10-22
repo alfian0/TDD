@@ -88,27 +88,30 @@ final class ExtractKTPUsecase {
         do {
             var idData = IDModel()
             let data = try await repository.textRecognizer(image: image)
+            var texts = data.map { $0.candidate.sanitize() }
 
-            guard data.filter({
-                "PROVINSI".hasPrefix($0.candidate)
-                    || "NIK".hasPrefix($0.candidate)
-                    || "Nama".hasPrefix($0.candidate)
-                    || "Tempat/Tgi Lahir".hasPrefix($0.candidate)
-                    || "Jenis kelamin".hasPrefix($0.candidate)
-                    || "Gol. Darah".hasPrefix($0.candidate)
-                    || "Alamat".hasPrefix($0.candidate)
-                    || "RT/RW".hasPrefix($0.candidate)
-                    || "Kel/Desa".hasPrefix($0.candidate)
-                    || "Kecamatan".hasPrefix($0.candidate)
-                    || "Agama".hasPrefix($0.candidate)
-                    || "Status Perkawinan".hasPrefix($0.candidate)
-                    || "Pekerjaan".hasPrefix($0.candidate)
-                    || "Kewarganegaraan".hasPrefix($0.candidate)
-                    || "Berlaku Hingga".hasPrefix($0.candidate)
-            }).count >= 2
-
-            else {
+            guard CandidateMatchingUsecase().exec(texts) else {
                 return .failure(.NOT_VALID_KTP)
+            }
+
+            texts = texts.map {
+                $0.replacingOccurrences(of: KTPKeywords.province, with: "")
+                    .replacingOccurrences(of: KTPKeywords.kabupaten, with: "")
+                    .replacingOccurrences(of: KTPKeywords.kota, with: "")
+                    .replacingOccurrences(of: KTPKeywords.nik, with: "")
+                    .replacingOccurrences(of: KTPKeywords.name, with: "")
+                    .replacingOccurrences(of: KTPKeywords.pobdob, with: "")
+                    .replacingOccurrences(of: KTPKeywords.gender, with: "")
+                    .replacingOccurrences(of: KTPKeywords.bloodtype, with: "")
+                    .replacingOccurrences(of: KTPKeywords.address, with: "")
+                    .replacingOccurrences(of: KTPKeywords.rtrw, with: "")
+                    .replacingOccurrences(of: KTPKeywords.keldesa, with: "")
+                    .replacingOccurrences(of: KTPKeywords.kecamatan, with: "")
+                    .replacingOccurrences(of: KTPKeywords.religion, with: "")
+                    .replacingOccurrences(of: KTPKeywords.maritalstatus, with: "")
+                    .replacingOccurrences(of: KTPKeywords.jobtype, with: "")
+                    .replacingOccurrences(of: KTPKeywords.nationality, with: "")
+                    .replacingOccurrences(of: KTPKeywords.validuntil, with: "")
             }
 
             // MARK: Extract Name
@@ -117,37 +120,33 @@ final class ExtractKTPUsecase {
                 idData.nama = data[5].candidate.sanitize()
             }
 
-            for text in data {
-                let sanitizedText = text.candidate.sanitize()
+            if let validNIK = extractNIKUsecase.exec(texts: texts) {
+                idData.nik = validNIK
+            }
 
-                if let validNIK = extractNIKUsecase.exec(text: sanitizedText) {
-                    idData.nik = validNIK
-                }
+            if let validReligion = extractReligionTypeUsecase.exec(texts: texts) {
+                idData.religion = validReligion
+            }
 
-                if let validPDOB = extractDOBUsecase.exec(text: sanitizedText) {
-                    idData.pob = validPDOB.place
-                    idData.dob = "\(validPDOB.day)-\(validPDOB.month)-\(validPDOB.year)".toDate(dateFormat: "dd-MM-yyyy")
-                }
+            if let validGender = extractGenderUsecase.exec(texts: texts) {
+                idData.gender = validGender
+            }
 
-                if let validReligion = extractReligionTypeUsecase.exec(text: sanitizedText) {
-                    idData.religion = validReligion
-                }
+            if let validMaritalStatus = extractMaritalStatusUsecase.exec(texts: texts) {
+                idData.marriedStatus = validMaritalStatus
+            }
 
-                if let validGender = extractGenderUsecase.exec(text: sanitizedText) {
-                    idData.gender = validGender
-                }
+            if let validJob = extractJobTypeUsecase.exec(texts: texts) {
+                idData.job = validJob
+            }
 
-                if let validMaritalStatus = extractMaritalStatusUsecase.exec(text: sanitizedText) {
-                    idData.marriedStatus = validMaritalStatus
-                }
+            if let validNationality = extractNationalityTypeUsecase.exec(texts: texts) {
+                idData.nationality = validNationality
+            }
 
-                if let validJob = extractJobTypeUsecase.exec(text: sanitizedText) {
-                    idData.job = validJob
-                }
-
-                if let validNationality = extractNationalityTypeUsecase.exec(text: sanitizedText) {
-                    idData.nationality = validNationality
-                }
+            if let validPDOB = extractDOBUsecase.exec(texts: texts) {
+                idData.pob = validPDOB.place
+                idData.dob = "\(validPDOB.day)-\(validPDOB.month)-\(validPDOB.year)".toDate(dateFormat: "dd-MM-yyyy")
             }
 
             return .success(idData)

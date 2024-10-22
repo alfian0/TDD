@@ -16,7 +16,12 @@ class ExtractMaritalStatusUsecaseAssembly: Assembly {
 }
 
 final class ExtractMaritalStatusUsecase {
-    func exec(text: String) -> MarriedStatusType? {
-        return MarriedStatusType.allCases.first { text.contains($0.rawValue) }
+    func exec(texts: [String]) -> MarriedStatusType? {
+        let texts = texts.filter { $0.regex(with: "^[^0-9]+$") }
+        return MarriedStatusType.allCases.min { jobType1, jobType2 in
+            let minDistance1 = texts.map { levenshteinDistance($0, jobType1.rawValue) }.min() ?? Int.max
+            let minDistance2 = texts.map { levenshteinDistance($0, jobType2.rawValue) }.min() ?? Int.max
+            return minDistance1 < minDistance2
+        }
     }
 }

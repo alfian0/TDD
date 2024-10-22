@@ -20,6 +20,7 @@ final class AppAssembler {
         KeychainServiceAssembly(),
         FirebaseAuthServiceAssembly(),
         CameraServiceAssembly(),
+        CandidateMatchingUsecaseAssembly(),
         ExtractKTPUsecaseAssembly(),
         ExtractNIKUsecaseAssembly(),
         ExtractDOBUsecaseAssembly(),
