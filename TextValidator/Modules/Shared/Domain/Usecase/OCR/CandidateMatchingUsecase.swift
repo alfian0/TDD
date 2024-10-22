@@ -35,27 +35,42 @@ enum KTPKeywords {
     static let validuntil = "Berlaku Hingga"
 }
 
+let keywords = [
+    KTPKeywords.province,
+    KTPKeywords.kota,
+    KTPKeywords.nik,
+    KTPKeywords.name,
+    KTPKeywords.pobdob,
+    KTPKeywords.gender,
+    KTPKeywords.bloodtype,
+    KTPKeywords.address,
+    KTPKeywords.rtrw,
+    KTPKeywords.keldesa,
+    KTPKeywords.kecamatan,
+    KTPKeywords.religion,
+    KTPKeywords.maritalstatus,
+    KTPKeywords.jobtype,
+    KTPKeywords.nationality,
+    KTPKeywords.validuntil,
+]
+
 final class CandidateMatchingUsecase {
     func exec(_ texts: [String]) -> Bool {
-        let filtered = texts.filter {
-            levenshteinDistance($0, KTPKeywords.province) < 3
-                || levenshteinDistance($0, KTPKeywords.kota) < 3
-                || levenshteinDistance($0, KTPKeywords.nik) < 3
-                || levenshteinDistance($0, KTPKeywords.name) < 3
-                || levenshteinDistance($0, KTPKeywords.pobdob) < 3
-                || levenshteinDistance($0, KTPKeywords.gender) < 3
-                || levenshteinDistance($0, KTPKeywords.bloodtype) < 3
-                || levenshteinDistance($0, KTPKeywords.address) < 3
-                || levenshteinDistance($0, KTPKeywords.rtrw) < 3
-                || levenshteinDistance($0, KTPKeywords.keldesa) < 3
-                || levenshteinDistance($0, KTPKeywords.kecamatan) < 3
-                || levenshteinDistance($0, KTPKeywords.religion) < 3
-                || levenshteinDistance($0, KTPKeywords.maritalstatus) < 3
-                || levenshteinDistance($0, KTPKeywords.jobtype) < 3
-                || levenshteinDistance($0, KTPKeywords.nationality) < 3
-                || levenshteinDistance($0, KTPKeywords.validuntil) < 3
+        var matchCount = 0
+
+        for text in texts {
+            for keyword in keywords {
+                if levenshteinDistance(text, keyword) < 3 {
+                    matchCount += 1
+                    if matchCount >= 3 {
+                        return true // Early exit when 3 matches found
+                    }
+                    break // Avoid checking other keywords once a match is found
+                }
+            }
         }
-        return filtered.count >= 3
+
+        return false // Return false if fewer than 3 matches
     }
 }
 

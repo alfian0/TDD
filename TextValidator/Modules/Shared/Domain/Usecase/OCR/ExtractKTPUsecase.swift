@@ -35,6 +35,9 @@ class ExtractKTPUsecaseAssembly: Assembly {
             guard let extractNationalityTypeUsecase = r.resolve(ExtractNationalityTypeUsecase.self) else {
                 fatalError()
             }
+            guard let candidateMatchingUsecase = r.resolve(CandidateMatchingUsecase.self) else {
+                fatalError()
+            }
             return ExtractKTPUsecase(
                 repository: repository,
                 extractNIKUsecase: extractNIKUsecase,
@@ -43,7 +46,8 @@ class ExtractKTPUsecaseAssembly: Assembly {
                 extractGenderUsecase: extractGenderUsecase,
                 extractMaritalStatusUsecase: extractMaritalStatusUsecase,
                 extractJobTypeUsecase: extractJobTypeUsecase,
-                extractNationalityTypeUsecase: extractNationalityTypeUsecase
+                extractNationalityTypeUsecase: extractNationalityTypeUsecase,
+                candidateMatchingUsecase: candidateMatchingUsecase
             )
         }
     }
@@ -63,6 +67,7 @@ final class ExtractKTPUsecase {
     private let extractMaritalStatusUsecase: ExtractMaritalStatusUsecase
     private let extractJobTypeUsecase: ExtractJobTypeUsecase
     private let extractNationalityTypeUsecase: ExtractNationalityTypeUsecase
+    private let candidateMatchingUsecase: CandidateMatchingUsecase
 
     init(
         repository: VisionRepositoryImpl,
@@ -72,7 +77,8 @@ final class ExtractKTPUsecase {
         extractGenderUsecase: ExtractGenderUsecase,
         extractMaritalStatusUsecase: ExtractMaritalStatusUsecase,
         extractJobTypeUsecase: ExtractJobTypeUsecase,
-        extractNationalityTypeUsecase: ExtractNationalityTypeUsecase
+        extractNationalityTypeUsecase: ExtractNationalityTypeUsecase,
+        candidateMatchingUsecase: CandidateMatchingUsecase
     ) {
         self.repository = repository
         self.extractNIKUsecase = extractNIKUsecase
@@ -82,76 +88,63 @@ final class ExtractKTPUsecase {
         self.extractMaritalStatusUsecase = extractMaritalStatusUsecase
         self.extractJobTypeUsecase = extractJobTypeUsecase
         self.extractNationalityTypeUsecase = extractNationalityTypeUsecase
+        self.candidateMatchingUsecase = candidateMatchingUsecase
     }
 
     func exec(image: UIImage) async -> Result<IDModel, ExtractKTPUsecaseError> {
         do {
             var idData = IDModel()
             let data = try await repository.textRecognizer(image: image)
-            var texts = data.map { $0.candidate.sanitize() }
+            var texts = sanitizeTexts(data.map { $0.candidate })
 
-            guard CandidateMatchingUsecase().exec(texts) else {
+            guard candidateMatchingUsecase.exec(texts) else {
                 return .failure(.NOT_VALID_KTP)
             }
 
-            texts = texts.map {
-                $0.replacingOccurrences(of: KTPKeywords.province, with: "")
-                    .replacingOccurrences(of: KTPKeywords.kabupaten, with: "")
-                    .replacingOccurrences(of: KTPKeywords.kota, with: "")
-                    .replacingOccurrences(of: KTPKeywords.nik, with: "")
-                    .replacingOccurrences(of: KTPKeywords.name, with: "")
-                    .replacingOccurrences(of: KTPKeywords.pobdob, with: "")
-                    .replacingOccurrences(of: KTPKeywords.gender, with: "")
-                    .replacingOccurrences(of: KTPKeywords.bloodtype, with: "")
-                    .replacingOccurrences(of: KTPKeywords.address, with: "")
-                    .replacingOccurrences(of: KTPKeywords.rtrw, with: "")
-                    .replacingOccurrences(of: KTPKeywords.keldesa, with: "")
-                    .replacingOccurrences(of: KTPKeywords.kecamatan, with: "")
-                    .replacingOccurrences(of: KTPKeywords.religion, with: "")
-                    .replacingOccurrences(of: KTPKeywords.maritalstatus, with: "")
-                    .replacingOccurrences(of: KTPKeywords.jobtype, with: "")
-                    .replacingOccurrences(of: KTPKeywords.nationality, with: "")
-                    .replacingOccurrences(of: KTPKeywords.validuntil, with: "")
-            }
+            texts = removeKeywords(from: texts)
 
-            // MARK: Extract Name
+            idData.nama = extractName(from: data)
 
-            if data.count > 6 {
-                idData.nama = data[5].candidate.sanitize()
-            }
-
-            if let validNIK = extractNIKUsecase.exec(texts: texts) {
-                idData.nik = validNIK
-            }
-
-            if let validReligion = extractReligionTypeUsecase.exec(texts: texts) {
-                idData.religion = validReligion
-            }
-
-            if let validGender = extractGenderUsecase.exec(texts: texts) {
-                idData.gender = validGender
-            }
-
-            if let validMaritalStatus = extractMaritalStatusUsecase.exec(texts: texts) {
-                idData.marriedStatus = validMaritalStatus
-            }
-
-            if let validJob = extractJobTypeUsecase.exec(texts: texts) {
-                idData.job = validJob
-            }
-
-            if let validNationality = extractNationalityTypeUsecase.exec(texts: texts) {
-                idData.nationality = validNationality
-            }
-
-            if let validPDOB = extractDOBUsecase.exec(texts: texts) {
-                idData.pob = validPDOB.place
-                idData.dob = "\(validPDOB.day)-\(validPDOB.month)-\(validPDOB.year)".toDate(dateFormat: "dd-MM-yyyy")
-            }
+            extractUseCases(texts: texts, into: &idData)
 
             return .success(idData)
         } catch {
             return .failure(.UNKNOWN)
+        }
+    }
+
+    // MARK: - Helper Functions
+
+    private func sanitizeTexts(_ texts: [String]) -> [String] {
+        return texts.map { $0.sanitize() }
+    }
+
+    private func removeKeywords(from texts: [String]) -> [String] {
+        return texts.map { text in
+            var newText = text
+            for keyword in keywords {
+                newText = newText.replacingOccurrences(of: keyword, with: "")
+            }
+            return newText
+        }
+    }
+
+    private func extractName(from data: [TextRecognizerModel]) -> String? {
+        guard data.count > 6 else { return nil }
+        return data[5].candidate.sanitize()
+    }
+
+    private func extractUseCases(texts: [String], into idData: inout IDModel) {
+        idData.nik = extractNIKUsecase.exec(texts: texts)
+        idData.religion = extractReligionTypeUsecase.exec(texts: texts)
+        idData.gender = extractGenderUsecase.exec(texts: texts)
+        idData.marriedStatus = extractMaritalStatusUsecase.exec(texts: texts)
+        idData.job = extractJobTypeUsecase.exec(texts: texts)
+        idData.nationality = extractNationalityTypeUsecase.exec(texts: texts)
+
+        if let validPDOB = extractDOBUsecase.exec(texts: texts) {
+            idData.pob = validPDOB.place
+            idData.dob = "\(validPDOB.day)-\(validPDOB.month)-\(validPDOB.year)".toDate(dateFormat: "dd-MM-yyyy")
         }
     }
 }

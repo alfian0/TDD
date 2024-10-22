@@ -16,7 +16,7 @@ final class ExtractKTPUsecaseTest: XCTestCase {
         case .success:
             XCTFail()
         case let .failure(error):
-            print(error)
+            XCTAssertEqual(error, ExtractKTPUsecaseError.NOT_VALID_KTP)
         }
     }
 
@@ -80,7 +80,8 @@ final class ExtractKTPUsecaseTest: XCTestCase {
             extractGenderUsecase: ExtractGenderUsecase(),
             extractMaritalStatusUsecase: ExtractMaritalStatusUsecase(),
             extractJobTypeUsecase: ExtractJobTypeUsecase(),
-            extractNationalityTypeUsecase: ExtractNationalityTypeUsecase()
+            extractNationalityTypeUsecase: ExtractNationalityTypeUsecase(),
+            candidateMatchingUsecase: CandidateMatchingUsecase()
         )
     }
 }
