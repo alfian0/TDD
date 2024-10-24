@@ -25,17 +25,17 @@ enum ValidationRegex {
 // Common validation helper
 enum ValidationHelper {
     static func validateEmpty(_ input: String) -> TextValidationError? {
-        return input.isEmpty ? .EMPTY : nil
+        return input.isEmpty ? .empty : nil
     }
 
     static func validateLength(_ input: String, min: Int, max: Int) -> TextValidationError? {
-        if input.count < min { return .TOO_SHORT }
-        if input.count > max { return .TOO_LONG }
+        if input.count < min { return .tooShort }
+        if input.count > max { return .tooLong }
         return nil
     }
 
     static func validateRegex(_ input: String, regex: String) -> TextValidationError? {
-        return input.regex(with: regex) ? nil : .INVALID_FORMAT
+        return input.regex(with: regex) ? nil : .invalidFormat
     }
 }
 

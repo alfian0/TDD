@@ -50,7 +50,7 @@ final class PasswordViewModel: ObservableObject {
             $password.filter { $0.count >= 8 },
             $repeatPassword.dropFirst().filter { $0.count >= 8 }
         )
-        .map { $0 == $1 ? nil : TextValidationError.NOT_EQUAL.localizedDescription }
+        .map { $0 == $1 ? nil : TextValidationError.notEqual.localizedDescription }
         .assign(to: &$repeatPasswordError)
 
         Publishers.CombineLatest($passwordError, $repeatPasswordError)

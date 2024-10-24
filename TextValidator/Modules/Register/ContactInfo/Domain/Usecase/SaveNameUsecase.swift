@@ -8,8 +8,8 @@
 import Foundation
 
 enum SaveNameUsecaseError: Error, LocalizedError {
-    case INVALID_NAME(TextValidationError)
-    case UNKNOWN
+    case invalidName(TextValidationError)
+    case unknown
 }
 
 final class SaveNameUsecase {
@@ -26,14 +26,14 @@ final class SaveNameUsecase {
 
     func execute(name: String) async -> Result<Bool, SaveNameUsecaseError> {
         if let error = nameValidationUsecase.execute(input: name) {
-            return .failure(.INVALID_NAME(error))
+            return .failure(.invalidName(error))
         }
 
         do {
             let isEmailVerified = try await repository.saveFullname(name: name)
             return .success(isEmailVerified)
         } catch {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
     }
 }

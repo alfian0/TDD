@@ -7,24 +7,51 @@
 
 import Foundation
 
+enum NetworkError: Error, LocalizedError {
+    case offline
+
+    var errorDescription: String? {
+        switch self {
+        case .offline:
+            return "No Internet Connection"
+        }
+    }
+}
+
 enum AuthRepositoryError: Error, LocalizedError {
-    case BIOMETRIC_NOT_AVAILABLE
-    case CANNOT_AUTHENTICATE
+    case biometric(BiometricError)
+    case network(NetworkError)
+
+    var errorDescription: String? {
+        switch self {
+        case let .biometric(error):
+            return error.localizedDescription
+        case let .network(error):
+            return error.localizedDescription
+        }
+    }
 }
 
 final class AuthRepositoryImpl: AuthRepository {
     private let firebaseAuthService: FirebaseAuthService
     private let biometricService: BiometricService
+    private let networkMonitorService: NetworkMonitorService
 
     init(
         firebaseAuthService: FirebaseAuthService,
-        biometricService: BiometricService
+        biometricService: BiometricService,
+        networkMonitorService: NetworkMonitorService
     ) {
         self.firebaseAuthService = firebaseAuthService
         self.biometricService = biometricService
+        self.networkMonitorService = networkMonitorService
     }
 
     func signInWithEmail(email: String, password: String) async throws -> UserModel {
+        let isConnected = try await networkMonitorService.isConnected()
+        guard isConnected else {
+            throw AuthRepositoryError.network(.offline)
+        }
         let user = try await firebaseAuthService.signInWithEmail(email: email, password: password)
 
         return UserMapper.map(user: user)
@@ -33,11 +60,11 @@ final class AuthRepositoryImpl: AuthRepository {
     func signInWithFaceID() async throws -> UserModel {
         let isBiometricAvailable = try biometricService.isBiometricAvailable()
         guard isBiometricAvailable else {
-            throw AuthRepositoryError.BIOMETRIC_NOT_AVAILABLE
+            throw AuthRepositoryError.biometric(.notAvailable)
         }
         let isAuthenticated = try await biometricService.authenticateWithBiometrics()
         guard isAuthenticated else {
-            throw AuthRepositoryError.CANNOT_AUTHENTICATE
+            throw AuthRepositoryError.biometric(.notMatched)
         }
         // To Do: Get email and password from keychain
         let email = ""
@@ -45,20 +72,6 @@ final class AuthRepositoryImpl: AuthRepository {
         let user = try await firebaseAuthService.signInWithEmail(email: email, password: password)
         return UserMapper.map(user: user)
     }
-
-//    func sendSignInLink(email: String) async throws {
-//        try await firebaseAuthService.sendSignInLink(email: email)
-//    }
-//
-//    func signInWithEmail(email: String, link: String) async throws -> UserModel {
-//        let authDataResult = try await firebaseAuthService.signInWithEmail(email: email, link: link)
-//
-//        guard authDataResult.user.emailVerified() else {
-//            throw NSError(domain: "login.repository", code: 0)
-//        }
-//
-//        return UserMapper.map(user: authDataResult.user)
-//    }
 
     func verifyPhoneNumber(phone: String) async throws -> String {
         try await firebaseAuthService.verifyPhoneNumber(phone: phone)
@@ -72,10 +85,6 @@ final class AuthRepositoryImpl: AuthRepository {
         try await firebaseAuthService.sendEmailVerification(email: email)
     }
 
-//    func reload() async throws -> Bool {
-//        return try await firebaseAuthService.reload()?.isEmailVerified ?? false
-//    }
-
     func verifyCode(verificationID: String, verificationCode: String) async throws -> UserModel {
         let result = try await firebaseAuthService.verifyCode(
             verificationID: verificationID,
@@ -87,10 +96,6 @@ final class AuthRepositoryImpl: AuthRepository {
     func updatePassword(password: String) async throws {
         try await firebaseAuthService.updatePassword(password: password)
     }
-
-//    func isBiometricAvailable() async throws -> Bool {
-//        try biometricService.isBiometricAvailable()
-//    }
 
     func biometricType() -> BiometricType {
         switch biometricService.biometricType() {
@@ -106,8 +111,4 @@ final class AuthRepositoryImpl: AuthRepository {
             return .none
         }
     }
-
-//    func authenticateWithBiometrics() async throws -> Bool {
-//        try await biometricService.authenticateWithBiometrics()
-//    }
 }

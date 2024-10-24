@@ -8,33 +8,33 @@
 import Foundation
 
 enum TextValidationError: Error, LocalizedError {
-    case EMPTY
-    case TOO_SHORT
-    case TOO_LONG
-    case INVALID_FORMAT
-    case CANNOT_SQUENTIAL
-    case IDENTICAL_CONSECUTIVE
-    case NOT_EQUAL
-    case AGE_LIMIT
+    case empty
+    case tooShort
+    case tooLong
+    case invalidFormat
+    case cannotSequential
+    case identicalConsecutive
+    case notEqual
+    case ageLimit
 
     var errorDescription: String? {
         switch self {
-        case .EMPTY:
-            return "Empty"
-        case .TOO_SHORT:
-            return "Too short"
-        case .TOO_LONG:
-            return "Too long"
-        case .INVALID_FORMAT:
-            return "Invalid format"
-        case .CANNOT_SQUENTIAL:
-            return "Cannot squential"
-        case .IDENTICAL_CONSECUTIVE:
-            return "Your PIN cannot contain six identical consecutive digits like '111111', '222222', or '333333'. Please choose a more secure PIN."
-        case .NOT_EQUAL:
-            return "Not Equal"
-        case .AGE_LIMIT:
-            return "Age Limit"
+        case .empty:
+            return "The field cannot be empty."
+        case .tooShort:
+            return "The input is too short."
+        case .tooLong:
+            return "The input is too long."
+        case .invalidFormat:
+            return "The input format is invalid."
+        case .cannotSequential:
+            return "The input cannot be sequential."
+        case .identicalConsecutive:
+            return "Your PIN cannot contain six identical consecutive digits."
+        case .notEqual:
+            return "The inputs do not match."
+        case .ageLimit:
+            return "The age limit is not met."
         }
     }
 }

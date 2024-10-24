@@ -8,7 +8,7 @@
 import Foundation
 
 enum VerifyOTPUsecaseError: Error, LocalizedError {
-    case UNKNOWN
+    case unknown
 }
 
 final class VerifyOTPUsecase {
@@ -23,7 +23,7 @@ final class VerifyOTPUsecase {
             let user = try await repository.verifyCode(verificationID: verificationID, verificationCode: verificationCode)
             return .success(user)
         } catch {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
     }
 }

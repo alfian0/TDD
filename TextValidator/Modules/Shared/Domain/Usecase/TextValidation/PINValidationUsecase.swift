@@ -29,11 +29,11 @@ final class PINValidationUsecase {
         }
 
         if hasIdenticalConsecutiveCharacters(in: pin) {
-            return failWithError(.IDENTICAL_CONSECUTIVE)
+            return failWithError(.identicalConsecutive)
         }
 
         if isSequentialOrReverse(pin) {
-            return failWithError(.CANNOT_SQUENTIAL)
+            return failWithError(.cannotSequential)
         }
 
         guard !repin.isEmpty else {
@@ -41,7 +41,7 @@ final class PINValidationUsecase {
         }
 
         if pin != repin {
-            return failWithError(.NOT_EQUAL)
+            return failWithError(.notEqual)
         }
 
         return service.verifyPIN(pin: pin)

@@ -8,8 +8,8 @@
 import Foundation
 
 enum RegisterPhoneUsecaseError: Error, LocalizedError {
-    case INVALID_PHONE(TextValidationError)
-    case UNKNOWN
+    case invalidPhone(TextValidationError)
+    case unknown
 }
 
 final class RegisterPhoneUsecase {
@@ -26,14 +26,14 @@ final class RegisterPhoneUsecase {
 
     func execute(phone: String) async -> Result<String, RegisterPhoneUsecaseError> {
         if let error = phoneValidationUsecase.execute(input: phone) {
-            return .failure(.INVALID_PHONE(error))
+            return .failure(.invalidPhone(error))
         }
 
         do {
             let verificationID = try await repository.verifyPhoneNumber(phone: phone)
             return .success(verificationID)
         } catch {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
     }
 }

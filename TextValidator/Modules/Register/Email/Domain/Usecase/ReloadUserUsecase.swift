@@ -8,8 +8,7 @@
 import Foundation
 
 enum ReloadUserUsecaseError: Error, LocalizedError {
-    case EMPTY
-    case UNKNOWN
+    case unknown
 }
 
 final class ReloadUserUsecase {
@@ -24,7 +23,7 @@ final class ReloadUserUsecase {
 //            let isEmailVerified = try await repository.reload()
 //            return .success(isEmailVerified)
 //        } catch {
-        return .failure(.UNKNOWN)
+        return .failure(.unknown)
 //        }
     }
 }

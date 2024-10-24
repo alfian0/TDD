@@ -24,7 +24,7 @@ struct PasswordView: View {
             }
             .padding(.horizontal)
 
-            VStack(spacing: 16) {
+            VStack(spacing: 0) {
                 SecureField("Password", text: $viewModel.password)
                     .autocapitalization(.none)
                     .modifier(TextFieldModifier(label: "Password", errorMessage: viewModel.passwordError))
@@ -61,7 +61,7 @@ struct PasswordView: View {
             .buttonStyle(LoadingButtonStyle(isLoading: false))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .safeAreaBottomPadding()
+        .padding(.bottom)
     }
 }
 

@@ -10,9 +10,10 @@ import Foundation
 // MARK: Usecase just single bussiness logic, validate, or conver data or error to new mapper
 
 enum LoginUsecaseError: Error, LocalizedError {
-    case INVALID_EMAIL(TextValidationError)
-    case ERROR_INVALID_CREDENTIAL
-    case UNKNOWN
+    case invalidEmail(TextValidationError)
+    case biometricError(BiometricError)
+    case invalidCredentials
+    case unknown
 }
 
 final class LoginUsecase {
@@ -29,14 +30,14 @@ final class LoginUsecase {
 
     func exec(email: String, password: String) async -> Result<UserModel, LoginUsecaseError> {
         if let error = emailValidationUsecase.execute(input: email) {
-            return .failure(.INVALID_EMAIL(error))
+            return .failure(.invalidEmail(error))
         }
 
         do {
             let user = try await repository.signInWithEmail(email: email, password: password)
             return .success(user)
         } catch {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
     }
 }

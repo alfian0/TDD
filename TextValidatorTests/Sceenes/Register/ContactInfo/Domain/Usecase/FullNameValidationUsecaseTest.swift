@@ -12,19 +12,19 @@ final class FullNameValidationUsecaseTest: XCTestCase {
     func test_FullNameValidationUsecase_withEmptyText_shouldBeReturnError() {
         let sut = NameValidationUsecase()
         let error = sut.execute(input: "")
-        XCTAssertEqual(error, TextValidationError.EMPTY)
+        XCTAssertEqual(error, TextValidationError.empty)
     }
 
     func test_FullNameValidationUsecase_withShortText_shouldBeReturnError() {
         let sut = NameValidationUsecase()
         let error = sut.execute(input: "A")
-        XCTAssertEqual(error, TextValidationError.TOO_SHORT)
+        XCTAssertEqual(error, TextValidationError.tooShort)
     }
 
     func test_FullNameValidationUsecase_withLongText_shouldBeReturnError() {
         let sut = NameValidationUsecase()
         let error = sut.execute(input: "AAAAAAAAAAAAAAAAAAAAA")
-        XCTAssertEqual(error, TextValidationError.TOO_LONG)
+        XCTAssertEqual(error, TextValidationError.tooLong)
     }
 
     func test_FullNameValidationUsecase_withValidText_shouldBeReturnError() {

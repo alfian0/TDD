@@ -8,10 +8,10 @@
 import Foundation
 
 enum RegisterEmailUsecaseError: Error, LocalizedError {
-    case INVALID_EMAIL(TextValidationError)
-    case ERROR_UNAUTHORIZED_DOMAIN
-    case ERROR_INVALID_CONTINUE_URI
-    case UNKNOWN
+    case invalidEmail(TextValidationError)
+    case unauthorizeDomain
+    case invalidURI
+    case unknown
 }
 
 final class RegisterEmailUsecase {
@@ -28,14 +28,14 @@ final class RegisterEmailUsecase {
 
     func execute(email: String) async -> Result<Void, RegisterEmailUsecaseError> {
         if let error = emailValidationUsecase.execute(input: email) {
-            return .failure(.INVALID_EMAIL(error))
+            return .failure(.invalidEmail(error))
         }
 
         do {
             try await repository.sendEmailVerification(email: email)
             return .success(())
         } catch {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
     }
 }

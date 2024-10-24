@@ -99,7 +99,7 @@ struct ContactInfoView: View {
             }
             .padding(.horizontal)
         }
-        .safeAreaBottomPadding()
+        .padding(.bottom)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {} label: {

@@ -9,7 +9,7 @@ import Foundation
 
 final class AgeValidationUsecase {
     func execute(input: Date) -> TextValidationError? {
-        return isValidAge(dob: input) ? nil : .AGE_LIMIT
+        return isValidAge(dob: input) ? nil : .ageLimit
     }
 
     func isValidAge(dob: Date) -> Bool {

@@ -32,5 +32,9 @@ final class ServiceAssembler: Assembly {
         container.register(CameraService.self) { _ in
             CameraService()
         }
+
+        container.register(NetworkMonitorService.self) { _ in
+            NetworkMonitorService()
+        }
     }
 }

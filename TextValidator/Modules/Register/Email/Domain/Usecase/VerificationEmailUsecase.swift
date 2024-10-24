@@ -8,7 +8,7 @@
 import Foundation
 
 enum VerificationEmailUsecaseError: Error, LocalizedError {
-    case UNKNOWN
+    case unknown
 }
 
 final class VerificationEmailUsecase {
@@ -20,23 +20,23 @@ final class VerificationEmailUsecase {
 
     func execute(link: String) async -> Result<UserModel, VerificationEmailUsecaseError> {
         guard let urlComponents = URLComponents(string: link) else {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
         guard let continueUrl = urlComponents.queryItems?.filter({ $0.name == "continueUrl" }).first?.value else {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
         guard let urlComponents = URLComponents(string: continueUrl) else {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
         guard let email = urlComponents.queryItems?.filter({ $0.name == "email" }).first?.value else {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
 
 //        do {
 //            let user = try await repository.signInWithEmail(email: email, link: link)
 //            return .success(user)
 //        } catch {
-        return .failure(.UNKNOWN)
+        return .failure(.unknown)
 //        }
     }
 }

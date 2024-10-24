@@ -92,7 +92,7 @@ struct OTPView: View {
             .disabled(!viewModel.canSubmit)
             .buttonStyle(LoadingButtonStyle(isLoading: false))
         }
-        .safeAreaBottomPadding()
+        .padding(.bottom)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

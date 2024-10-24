@@ -9,7 +9,7 @@ import Combine
 import Foundation
 
 enum SetPasswordUsecaseError: Error, LocalizedError {
-    case UNKNOWN
+    case unknown
 }
 
 final class SetPasswordUsecase {
@@ -24,7 +24,7 @@ final class SetPasswordUsecase {
             try await repository.updatePassword(password: password)
             return .success(())
         } catch {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
     }
 }

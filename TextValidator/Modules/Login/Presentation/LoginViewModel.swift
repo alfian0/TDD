@@ -89,7 +89,7 @@ final class LoginViewModel: ObservableObject {
 
     private func handleLoginError(_ error: LoginUsecaseError) {
         switch error {
-        case let .INVALID_EMAIL(err):
+        case let .invalidEmail(err):
             usernameError = err.localizedDescription
         default:
             break

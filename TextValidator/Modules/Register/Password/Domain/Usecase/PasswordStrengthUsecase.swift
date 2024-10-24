@@ -34,7 +34,7 @@ enum PasswordStrength: Int, CaseIterable {
 final class PasswordStrengthUsecase {
     func execute(password: String) -> Result<PasswordStrength, TextValidationError> {
         guard password.count >= 8 else {
-            return .failure(.TOO_SHORT)
+            return .failure(.tooShort)
         }
 
         var includesLowercaseCharacter = false,

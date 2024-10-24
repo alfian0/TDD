@@ -82,6 +82,7 @@ final class VisionService {
         configureFaceDetectionRequest(request)
 
         let results = try await performVisionRequest(on: handler, request: request)
+        (results as? [VNFaceObservation])?.first?.landmarks
         return results as? [VNFaceObservation] ?? []
     }
 }

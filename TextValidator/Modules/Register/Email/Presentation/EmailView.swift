@@ -49,7 +49,7 @@ struct EmailView: View {
                 }
             }
             .padding(.horizontal)
-            .safeAreaBottomPadding()
+            .padding(.bottom)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .toolbar {

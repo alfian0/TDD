@@ -7,14 +7,33 @@
 
 import Foundation
 
-enum LoginBiometricUsecaseError: Error, LocalizedError {
-    case NOT_AVAILABLE
-    case NOT_MATCHED
-    case ACCESS_DENIED
-    case NO_FACEID_ENROLLED
-    case NO_TOUCHID_ENROLLED
-    case NO_OPTICID_ENROLLED
-    case UNKNOWN
+enum BiometricError: Error, LocalizedError {
+    case notAvailable
+    case notMatched
+    case accessDenied
+    case noFaceIDEnrolled
+    case noTouchIDEnrolled
+    case noOpticIDEnrolled
+    case unknown
+
+    var errorDescription: String? {
+        switch self {
+        case .notAvailable:
+            return "Biometric authentication is not available."
+        case .notMatched:
+            return "The biometric data did not match."
+        case .accessDenied:
+            return "Access denied. Please check your settings."
+        case .noFaceIDEnrolled:
+            return "No Face ID is enrolled."
+        case .noTouchIDEnrolled:
+            return "No Touch ID is enrolled."
+        case .noOpticIDEnrolled:
+            return "No Optic ID is enrolled."
+        case .unknown:
+            return "An unknown biometric error occurred."
+        }
+    }
 }
 
 final class LoginBiometricUsecase {
@@ -29,29 +48,31 @@ final class LoginBiometricUsecase {
         self.loginUsecase = loginUsecase
     }
 
-    func exec() async -> Result<Bool, LoginBiometricUsecaseError> {
+    func exec() async -> Result<Bool, BiometricError> {
         do {
             let user = try await loginRepository.signInWithFaceID()
             return .success(true)
         } catch {
             let error = error as NSError
-            switch error.code {
-            case -6:
-                return .failure(.ACCESS_DENIED)
-            case -7:
-                switch loginRepository.biometricType() {
-                case .none:
-                    return .failure(.NOT_AVAILABLE)
-                case .face:
-                    return .failure(.NO_FACEID_ENROLLED)
-                case .touch:
-                    return .failure(.NO_TOUCHID_ENROLLED)
-                case .optic:
-                    return .failure(.NO_OPTICID_ENROLLED)
-                }
-            default:
-                return .failure(.NOT_MATCHED)
+            return .failure(mapBiometricError(from: error))
+        }
+    }
+
+    func mapBiometricError(from error: NSError) -> BiometricError {
+        switch error.code {
+        case -7:
+            switch loginRepository.biometricType() {
+            case .none:
+                return .notAvailable
+            case .face:
+                return .noFaceIDEnrolled
+            case .touch:
+                return .noTouchIDEnrolled
+            case .optic:
+                return .noOpticIDEnrolled
             }
+        default:
+            return .notMatched
         }
     }
 }

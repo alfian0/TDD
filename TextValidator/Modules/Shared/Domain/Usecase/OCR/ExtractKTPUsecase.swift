@@ -8,8 +8,8 @@
 import UIKit
 
 enum ExtractKTPUsecaseError: Error, LocalizedError {
-    case NOT_VALID_KTP
-    case UNKNOWN
+    case invalidKTP
+    case unknown
 }
 
 final class ExtractKTPUsecase {
@@ -52,7 +52,7 @@ final class ExtractKTPUsecase {
             var texts = sanitizeTexts(data.map { $0.candidate })
 
             guard candidateMatchingUsecase.exec(texts) else {
-                return .failure(.NOT_VALID_KTP)
+                return .failure(.invalidKTP)
             }
 
             texts = removeKeywords(from: texts)
@@ -63,7 +63,7 @@ final class ExtractKTPUsecase {
 
             return .success(idData)
         } catch {
-            return .failure(.UNKNOWN)
+            return .failure(.unknown)
         }
     }
 

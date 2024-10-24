@@ -77,8 +77,6 @@ struct LoginView: View {
             }
             .padding(.horizontal)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .safeAreaBottomPadding()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {} label: {
@@ -98,7 +96,11 @@ struct LoginView: View {
 }
 
 #Preview {
-    NavigationView {
-        AppAssembler.shared.resolver.resolve(LoginView.self, arguments: {}, LoginViewCoordinator())
-    }
+    let coordinator = LoginViewCoordinator()
+
+    NavigationControllerWrapper(coordinator: coordinator)
+        .edgesIgnoringSafeArea(.all)
+        .onViewDidLoad {
+            coordinator.start {}
+        }
 }

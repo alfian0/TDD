@@ -16,7 +16,7 @@ final class ExtractKTPUsecaseTest: XCTestCase {
         case .success:
             XCTFail()
         case let .failure(error):
-            XCTAssertEqual(error, ExtractKTPUsecaseError.NOT_VALID_KTP)
+            XCTAssertEqual(error, ExtractKTPUsecaseError.invalidKTP)
         }
     }
 
