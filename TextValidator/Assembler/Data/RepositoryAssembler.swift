@@ -24,16 +24,8 @@ final class RepositoryAssembler: Assembly {
             guard let firebaseAuthService = r.resolve(FirebaseAuthService.self) else {
                 fatalError()
             }
-            guard let biometricService = r.resolve(BiometricService.self) else {
-                fatalError()
-            }
-            guard let networkMonitorService = r.resolve(NetworkMonitorService.self) else {
-                fatalError()
-            }
             return AuthRepositoryImpl(
-                firebaseAuthService: firebaseAuthService,
-                biometricService: biometricService,
-                networkMonitorService: networkMonitorService
+                firebaseAuthService: firebaseAuthService
             )
         }
     }

@@ -11,20 +11,23 @@ import Foundation
 
 enum LoginUsecaseError: Error, LocalizedError {
     case invalidEmail(TextValidationError)
-    case biometricError(BiometricError)
-    case invalidCredentials
+    case biometric(BiometricError)
+    case network(NetworkError)
     case unknown
 }
 
 final class LoginUsecase {
     private let repository: AuthRepository
+    private let networkMonitorService: NetworkMonitorService
     private let emailValidationUsecase: EmailValidationUsecase
 
     init(
         repository: AuthRepository,
+        networkMonitorService: NetworkMonitorService,
         emailValidationUsecase: EmailValidationUsecase
     ) {
         self.repository = repository
+        self.networkMonitorService = networkMonitorService
         self.emailValidationUsecase = emailValidationUsecase
     }
 
@@ -34,6 +37,15 @@ final class LoginUsecase {
         }
 
         do {
+            // MARK: Check if connected to internet
+
+            let isConnected = try await networkMonitorService.isConnected()
+            guard isConnected else {
+                return .failure(.network(.offline))
+            }
+
+            // MARK: SignIn with email and password
+
             let user = try await repository.signInWithEmail(email: email, password: password)
             return .success(user)
         } catch {

@@ -16,17 +16,35 @@ final class UseCaseAssembler: Assembly {
             guard let loginUsecase = r.resolve(LoginUsecase.self) else {
                 fatalError()
             }
-            return LoginBiometricUsecase(loginRepository: loginRepository, loginUsecase: loginUsecase)
+            guard let biometricService = r.resolve(BiometricService.self) else {
+                fatalError()
+            }
+            guard let keychainService = r.resolve(KeychainService.self) else {
+                fatalError()
+            }
+            return LoginBiometricUsecase(
+                loginRepository: loginRepository,
+                biometricService: biometricService,
+                keychainService: keychainService,
+                loginUsecase: loginUsecase
+            )
         }
 
         container.register(LoginUsecase.self) { r in
             guard let repository = r.resolve(AuthRepositoryImpl.self) else {
                 fatalError()
             }
+            guard let networkMonitorService = r.resolve(NetworkMonitorService.self) else {
+                fatalError()
+            }
             guard let emailValidationUsecase = r.resolve(EmailValidationUsecase.self) else {
                 fatalError()
             }
-            return LoginUsecase(repository: repository, emailValidationUsecase: emailValidationUsecase)
+            return LoginUsecase(
+                repository: repository,
+                networkMonitorService: networkMonitorService,
+                emailValidationUsecase: emailValidationUsecase
+            )
         }
 
         container.register(SaveNameUsecase.self) { r in
