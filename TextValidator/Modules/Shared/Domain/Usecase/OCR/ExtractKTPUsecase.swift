@@ -13,7 +13,7 @@ enum ExtractKTPUsecaseError: Error, LocalizedError {
 }
 
 final class ExtractKTPUsecase {
-    private let repository: VisionRepository
+    private let repository: MachineLearningRepository
     private let extractNIKUsecase: ExtractNIKUsecase
     private let extractDOBUsecase: ExtractDOBUsecase
     private let extractReligionTypeUsecase: ExtractReligionTypeUsecase
@@ -24,7 +24,7 @@ final class ExtractKTPUsecase {
     private let candidateMatchingUsecase: CandidateMatchingUsecase
 
     init(
-        repository: VisionRepository,
+        repository: MachineLearningRepository,
         extractNIKUsecase: ExtractNIKUsecase,
         extractDOBUsecase: ExtractDOBUsecase,
         extractReligionTypeUsecase: ExtractReligionTypeUsecase,

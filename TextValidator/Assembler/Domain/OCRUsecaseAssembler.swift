@@ -14,7 +14,7 @@ final class OCRUsecaseAssembler: Assembly {
         }
 
         container.register(ExtractKTPUsecase.self) { r in
-            guard let repository = r.resolve(VisionRepositoryImpl.self) else {
+            guard let repository = r.resolve(MachineLearningRepositoryImpl.self) else {
                 fatalError()
             }
             guard let extractNIKUsecase = r.resolve(ExtractNIKUsecase.self) else {

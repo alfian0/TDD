@@ -9,11 +9,11 @@ import Swinject
 
 final class RepositoryAssembler: Assembly {
     func assemble(container: Swinject.Container) {
-        container.register(VisionRepositoryImpl.self) { r in
+        container.register(MachineLearningRepositoryImpl.self) { r in
             guard let visionService = r.resolve(VisionService.self) else {
                 fatalError()
             }
-            return VisionRepositoryImpl(visionService: visionService)
+            return MachineLearningRepositoryImpl(visionService: visionService)
         }
 
         container.register(CountryCodeRepositoryImpl.self) { _ in

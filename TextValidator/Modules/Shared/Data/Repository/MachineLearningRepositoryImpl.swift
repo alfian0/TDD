@@ -1,5 +1,5 @@
 //
-//  VisionRepositoryImpl.swift
+//  MachineLearningRepositoryImpl.swift
 //  TextValidator
 //
 //  Created by Alfian on 20/10/24.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class VisionRepositoryImpl: VisionRepository {
+final class MachineLearningRepositoryImpl: MachineLearningRepository {
     private let visionService: VisionService
 
     init(visionService: VisionService) {
