@@ -10,6 +10,7 @@ import SwiftUI
 enum MainAppCoordinatorSheet {
     case login
     case register
+    case password
 
     // MARK: Testing Purpose
 
@@ -49,8 +50,7 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
                 }
             })
             coordinator.navigationController.modalPresentationStyle = .fullScreen
-            childCoordinator.append(coordinator)
-            navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
+            presentModal(coordinator)
 
         case .register:
             guard let coordinator = AppAssembler.shared.resolver.resolve(ContactInfoCoordinatorImpl.self, argument: UINavigationController()) else {
@@ -63,18 +63,33 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
                     self.childCoordinator.removeLast()
                 }
             })
-            coordinator.navigationController.modalPresentationStyle = .fullScreen
-            childCoordinator.append(coordinator)
-            navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
+            presentModal(coordinator)
 
         case .ocr:
             guard let coordinator = AppAssembler.shared.resolver.resolve(OCRViewCoordinator.self, argument: UINavigationController()) else {
                 return
             }
             coordinator.start()
-            coordinator.navigationController.modalPresentationStyle = .fullScreen
-            childCoordinator.append(coordinator)
-            navigationController.showDetailViewController(coordinator.navigationController, sender: navigationController)
+            presentModal(coordinator)
+
+        case .password:
+            guard let coordinator = childCoordinator.last else {
+                password()
+                return
+            }
+            dismissCoordinator(coordinator, completion: { [weak self] in
+                guard let self = self else { return }
+                password()
+            })
         }
+    }
+
+    @MainActor
+    private func password() {
+        guard let coordinator = AppAssembler.shared.resolver.resolve(PasswordCoordinator.self, argument: UINavigationController()) else {
+            return
+        }
+        coordinator.start()
+        presentModal(coordinator)
     }
 }

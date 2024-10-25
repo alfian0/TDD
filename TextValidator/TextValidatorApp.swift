@@ -51,7 +51,7 @@ struct TextValidatorApp: App {
                     Task {
                         do {
                             let items = try await url.handleDeeplinkType(type: verificationEmailDeeplink)
-                            print(items)
+                            coordinator.present(.password)
                         } catch {
                             print(error)
                         }

@@ -123,25 +123,4 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
             presentModal(coordinator)
         }
     }
-
-    // MARK: - Helpers
-
-    private func presentModal(_ coordinator: any Coordinator) {
-        coordinator.navigationController.modalPresentationStyle = .fullScreen
-        childCoordinator.append(coordinator)
-        navigationController.showDetailViewController(coordinator.navigationController, sender: nil)
-    }
-
-    private func dismissCoordinator(_ coordinator: any Coordinator, completion: @escaping () -> Void) {
-        navigationController.dismiss(animated: true, completion: {
-            self.removeCoordinator(coordinator)
-            completion()
-        })
-    }
-
-    private func removeCoordinator(_ coordinator: any Coordinator) {
-        if let index = childCoordinator.firstIndex(where: { $0 === coordinator }) {
-            childCoordinator.remove(at: index)
-        }
-    }
 }
