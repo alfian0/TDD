@@ -8,16 +8,10 @@
 import FirebaseAuth
 
 final class FirebaseAuthService {
+    private var authStateDidChangeListenerHandle: AuthStateDidChangeListenerHandle?
+
     func signInWithEmail(email: String, password: String) async throws -> User {
         try await Auth.auth().signIn(withEmail: email, password: password).user
-    }
-
-    func sendSignInLink(email: String) async throws {
-        let actionCodeSettings = ActionCodeSettings()
-        actionCodeSettings.handleCodeInApp = true
-        actionCodeSettings.url = URL(string: String(format: "https://textvalidator-fddd6.firebaseapp.com/?email=%@", email))
-        actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier ?? "")
-        try await Auth.auth().sendSignInLink(toEmail: email, actionCodeSettings: actionCodeSettings)
     }
 
     func signInWithEmail(email: String, link: String) async throws -> AuthDataResult {
@@ -38,8 +32,7 @@ final class FirebaseAuthService {
 
     func sendEmailVerification(email: String) async throws {
         let actionCodeSettings = ActionCodeSettings()
-        actionCodeSettings.handleCodeInApp = true
-        actionCodeSettings.url = URL(string: String(format: "https://textvalidator-fddd6.firebaseapp.com/?email=%@", email))
+        actionCodeSettings.url = URL(string: "https://textvalidator.page.link/AvmB")
         actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier ?? "")
         try await Auth.auth().currentUser?.sendEmailVerification(beforeUpdatingEmail: email, actionCodeSettings: actionCodeSettings)
     }
@@ -56,5 +49,9 @@ final class FirebaseAuthService {
 
     func updatePassword(password: String) async throws {
         try await Auth.auth().currentUser?.updatePassword(to: password)
+    }
+
+    func signOut() throws {
+        try Auth.auth().signOut()
     }
 }

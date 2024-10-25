@@ -21,8 +21,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 @main
 struct TextValidatorApp: App {
+    @Environment(\.openURL) var openURL
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    let coordinator = MainAppCoordinatorDeeplink(wrapped: MainAppCoordinatorImpl())
+    let coordinator = MainAppCoordinatorImpl()
 
     var body: some Scene {
         WindowGroup {
@@ -32,17 +33,28 @@ struct TextValidatorApp: App {
                     coordinator.start()
                 }
                 .onOpenURL { url in
-                    guard let path = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+
+                    // MARK: FirebaseAuth
+
+                    guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
                         return
                     }
-                    guard let queryItems = path.queryItems else {
+                    guard let queryItems = components.queryItems else {
                         return
                     }
-                    guard let link = queryItems.filter({ $0.name == "link" }).first?.value else {
+                    guard let urlString = queryItems.filter({ $0.name == "ifl" }).first?.value else {
                         return
                     }
-                    if let host = path.host, host == "textvalidator.page.link" {
-                        coordinator.start(.verifyEmail(link: link))
+                    guard let url = URL(string: urlString) else {
+                        return
+                    }
+                    Task {
+                        do {
+                            let items = try await url.handleDeeplinkType(type: verificationEmailDeeplink)
+                            print(items)
+                        } catch {
+                            print(error)
+                        }
                     }
                 }
         }

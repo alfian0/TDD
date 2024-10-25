@@ -8,15 +8,6 @@
 import SwiftUI
 
 enum ContactInfoCoordinatorPage {
-    case otp(
-        title: String,
-        subtitle: String,
-        count: Int,
-        duration: Int,
-        onResendTapped: () -> Void,
-        onOTPChanged: () -> Void,
-        onOTPSuccess: (String) -> Void
-    )
     case email
     case password
 }
@@ -28,6 +19,15 @@ enum ContactInfoCoordinatorSheet {
         items: [CountryCodeModel],
         onSelect: (CountryCodeModel) -> Void,
         onDismiss: () -> Void
+    )
+    case otp(
+        title: String,
+        subtitle: String,
+        count: Int,
+        duration: Int,
+        onResendTapped: () -> Void,
+        onOTPChanged: () -> Void,
+        onOTPSuccess: (String) -> Void
     )
 }
 
@@ -57,27 +57,16 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
     @MainActor
     func push(_ page: ContactInfoCoordinatorPage) {
         switch page {
-        case let .otp(title, subtitle, count, duration, onResendTapped, onOTPChanged, onOTPSuccess):
-            let coordinator = OTPCoordinator(navigationController: navigationController)
-            coordinator.start(
-                title: title,
-                subtitle: subtitle,
-                count: count,
-                duration: duration,
-                didResend: onResendTapped,
-                didChange: { [weak self] in
-                    onOTPChanged()
-                    self?.navigationController.popViewController(animated: true)
-                },
-                didSuccess: onOTPSuccess
-            )
-
         case .email:
-            let coordinator = EmailCoordinatorImpl(navigationController: navigationController)
-            coordinator.start(viewState: .formInput)
+            guard let coordinator = AppAssembler.shared.resolver.resolve(EmailCoordinatorImpl.self, argument: navigationController) else {
+                return
+            }
+            coordinator.start()
 
         case .password:
-            let coordinator = PasswordCoordinator(navigationController: navigationController)
+            guard let coordinator = AppAssembler.shared.resolver.resolve(PasswordCoordinator.self, argument: navigationController) else {
+                return
+            }
             coordinator.start()
         }
     }
@@ -86,10 +75,35 @@ final class ContactInfoCoordinatorImpl: ContactInfoCoordinator {
     func present(_ sheet: ContactInfoCoordinatorSheet) {
         switch sheet {
         case let .error(title, subtitle, onDismiss):
-            let coordinator = ErrorCoordinator()
+            guard let coordinator = AppAssembler.shared.resolver.resolve(ErrorCoordinator.self, argument: UINavigationController()) else {
+                return
+            }
             coordinator.start(title: title, subtitle: subtitle, didDismiss: { [weak self] in
                 self?.dismissCoordinator(coordinator, completion: onDismiss)
             })
+            presentModal(coordinator)
+
+        case let .otp(title, subtitle, count, duration, onResendTapped, onOTPChanged, onOTPSuccess):
+            guard let coordinator = AppAssembler.shared.resolver.resolve(OTPCoordinator.self, argument: UINavigationController()) else {
+                return
+            }
+            coordinator.start(
+                title: title,
+                subtitle: subtitle,
+                count: count,
+                duration: duration,
+                didResend: onResendTapped,
+                didChange: { [weak self] in
+                    self?.dismissCoordinator(coordinator, completion: {
+                        onOTPChanged()
+                    })
+                },
+                didSuccess: { [weak self] otp in
+                    self?.dismissCoordinator(coordinator, completion: {
+                        onOTPSuccess(otp)
+                    })
+                }
+            )
             presentModal(coordinator)
 
         case let .countryCode(selected, items, onSelect, onDismiss):

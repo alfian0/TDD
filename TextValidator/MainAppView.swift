@@ -11,31 +11,40 @@ struct MainAppView: View {
     var coordinator: MainAppCoordinatorImpl
 
     var body: some View {
-        VStack {
-            Spacer()
-            Button {
-                coordinator.present(.login)
-            } label: {
-                Text("Login")
-                    .frame(maxWidth: .infinity)
+        SplitView {
+            ZStack {
+                Color("EFEFF0")
+                Image("img_error")
             }
-            .buttonStyle(.bordered)
+        } rightContent: {
+            VStack {
+                Spacer()
+                Button {
+                    coordinator.present(.login)
+                } label: {
+                    Text("Login")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
 
-            Button {
-                coordinator.present(.register)
-            } label: {
-                Text("Register")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
+                Button {
+                    coordinator.present(.register)
+                } label: {
+                    Text("Register")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
 
-            Button {
-                coordinator.present(.ocr)
-            } label: {
-                Text("Show scanner")
+                Button {
+                    coordinator.present(.ocr)
+                } label: {
+                    Text("Show scanner")
+                }
             }
+            .padding()
+            .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.horizontal)
+        .ignoresSafeArea()
     }
 }
 

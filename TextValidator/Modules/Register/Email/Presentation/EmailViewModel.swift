@@ -8,17 +8,12 @@
 import Combine
 import SwiftUI
 
-enum EmailViewState {
-    case formInput
-    case waitingForVerification(link: String)
-}
-
 @MainActor
 final class EmailViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var emailError: String?
-    @Published var canSubmit: Bool = false
-    @Published var viewState: EmailViewState
+    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var canSubmit: Bool = false
 
     private let emailValidationUsecase: EmailValidationUsecase
     private let registerEmailUsecase: RegisterEmailUsecase
@@ -29,14 +24,12 @@ final class EmailViewModel: ObservableObject {
     private(set) var cancellables = Set<AnyCancellable>()
 
     init(
-        viewState: EmailViewState,
         emailValidationUsecase: EmailValidationUsecase,
         registerEmailUsecase: RegisterEmailUsecase,
         reloadUserUsecase: ReloadUserUsecase,
         verificationEmailUsecase: VerificationEmailUsecase,
         coordinator: EmailCoordinator
     ) {
-        self.viewState = viewState
         self.emailValidationUsecase = emailValidationUsecase
         self.registerEmailUsecase = registerEmailUsecase
         self.reloadUserUsecase = reloadUserUsecase
@@ -58,28 +51,20 @@ final class EmailViewModel: ObservableObject {
             .assign(to: &$canSubmit)
     }
 
-    func verification() async {
-        switch viewState {
-        case let .waitingForVerification(link):
-            let result = await verificationEmailUsecase.execute(link: link)
+    func didTapCountinue() {
+        isLoading = true
+        defer {
+            isLoading = false
+        }
+        Task {
+            let result = await registerEmailUsecase.execute(email: email)
+
             switch result {
-            case let .success(user):
-                print(user)
+            case .success:
+                print("---")
             case let .failure(error):
                 coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
             }
-        default: break
-        }
-    }
-
-    func didTapCountinue() async {
-        let result = await registerEmailUsecase.execute(email: email)
-
-        switch result {
-        case .success:
-            viewState = .waitingForVerification(link: "")
-        case let .failure(error):
-            coordinator.present(.error(title: "Error", subtitle: error.localizedDescription, didDismiss: {}))
         }
     }
 

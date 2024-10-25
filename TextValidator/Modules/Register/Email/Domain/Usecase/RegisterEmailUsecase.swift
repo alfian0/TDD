@@ -35,6 +35,7 @@ final class RegisterEmailUsecase {
             try await repository.sendEmailVerification(email: email)
             return .success(())
         } catch {
+            print(error, error.localizedDescription)
             return .failure(.unknown)
         }
     }

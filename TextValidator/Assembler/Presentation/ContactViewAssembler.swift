@@ -11,13 +11,6 @@ import UIKit
 @MainActor
 final class ContactViewAssembler: @preconcurrency Assembly {
     func assemble(container: Swinject.Container) {
-        container.register(ContactInfoCoordinatorDeeplink.self) { (r, n: UINavigationController) in
-            guard let wrapped = r.resolve(ContactInfoCoordinatorImpl.self, argument: n) else {
-                fatalError()
-            }
-            return ContactInfoCoordinatorDeeplink(wrapped: wrapped)
-        }
-
         container.register(ContactInfoCoordinatorImpl.self) { _, n in
             ContactInfoCoordinatorImpl(navigationController: n)
         }

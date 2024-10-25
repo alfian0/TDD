@@ -16,7 +16,7 @@ enum EmailCoordinatorSheet {
 }
 
 protocol EmailCoordinator: Coordinator {
-    func start(viewState: EmailViewState) async
+    func start() async
     func push(_ page: EmailCoordinatorPage) async
     func present(_ sheet: EmailCoordinatorSheet)
 }
@@ -30,8 +30,8 @@ final class EmailCoordinatorImpl: EmailCoordinator {
     }
 
     @MainActor
-    func start(viewState: EmailViewState) {
-        guard let v = AppAssembler.shared.resolver.resolve(EmailView.self, arguments: viewState, self) else {
+    func start() {
+        guard let v = AppAssembler.shared.resolver.resolve(EmailView.self, argument: self) else {
             return
         }
         let vc = UIHostingController(rootView: v)

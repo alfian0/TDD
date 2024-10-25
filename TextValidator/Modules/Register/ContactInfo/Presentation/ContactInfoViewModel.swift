@@ -147,7 +147,7 @@ final class ContactInfoViewModel: ObservableObject {
     }
 
     private func showOTPVerificationScreen() async {
-        await coordinator.push(.otp(
+        await coordinator.present(.otp(
             title: "Verify your phone number",
             subtitle: "Enter the OTP code sent to \(countryCode.dialCode)\(phone)",
             count: 6,

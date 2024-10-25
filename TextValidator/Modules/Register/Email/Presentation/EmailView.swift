@@ -34,15 +34,13 @@ struct EmailView: View {
 
             VStack {
                 Button {
-                    Task {
-                        await viewModel.didTapCountinue()
-                    }
+                    viewModel.didTapCountinue()
                 } label: {
                     Text("Continue")
                         .frame(maxWidth: .infinity)
                 }
                 .disabled(!viewModel.canSubmit)
-                .buttonStyle(LoadingButtonStyle(isLoading: false))
+                .buttonStyle(LoadingButtonStyle(isLoading: viewModel.isLoading))
 
                 Button {} label: {
                     Text("Skip")
@@ -59,11 +57,6 @@ struct EmailView: View {
                 }
             }
         }
-        .onAppear {
-            Task {
-                await viewModel.verification()
-            }
-        }
     }
 }
 
@@ -73,6 +66,6 @@ struct EmailView: View {
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)
         .onViewDidLoad {
-            coordinator.start(viewState: .formInput)
+            coordinator.start()
         }
 }

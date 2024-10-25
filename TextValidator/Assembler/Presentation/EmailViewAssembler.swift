@@ -15,14 +15,7 @@ final class EmailViewAssembler: @preconcurrency Assembly {
             EmailCoordinatorImpl(navigationController: n)
         }
 
-        container.register(EmailCoordinatorDeeplink.self) { (r, n: UINavigationController) in
-            guard let wrapped = r.resolve(EmailCoordinatorImpl.self, argument: n) else {
-                fatalError()
-            }
-            return EmailCoordinatorDeeplink(wrapped: wrapped)
-        }
-
-        container.register(EmailViewModel.self) { (r, v: EmailViewState, c: EmailCoordinator) in
+        container.register(EmailViewModel.self) { (r, c: EmailCoordinatorImpl) in
             guard let emailValidationUsecase = r.resolve(EmailValidationUsecase.self) else {
                 fatalError()
             }
@@ -36,7 +29,6 @@ final class EmailViewAssembler: @preconcurrency Assembly {
                 fatalError()
             }
             return EmailViewModel(
-                viewState: v,
                 emailValidationUsecase: emailValidationUsecase,
                 registerEmailUsecase: registerEmailUsecase,
                 reloadUserUsecase: reloadUserUsecase,
@@ -45,8 +37,8 @@ final class EmailViewAssembler: @preconcurrency Assembly {
             )
         }
 
-        container.register(EmailView.self) { (r, v: EmailViewState, c: EmailCoordinator) in
-            guard let viewModel = r.resolve(EmailViewModel.self, arguments: v, c) else {
+        container.register(EmailView.self) { (r, c: EmailCoordinatorImpl) in
+            guard let viewModel = r.resolve(EmailViewModel.self, argument: c) else {
                 fatalError()
             }
             return EmailView(viewModel: viewModel)
