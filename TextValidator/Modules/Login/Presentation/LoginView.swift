@@ -101,6 +101,9 @@ struct LoginView: View {
     NavigationControllerWrapper(coordinator: coordinator)
         .edgesIgnoringSafeArea(.all)
         .onViewDidLoad {
-            coordinator.start {}
+            coordinator.start(
+                didDismiss: {},
+                didFinish: {}
+            )
         }
 }

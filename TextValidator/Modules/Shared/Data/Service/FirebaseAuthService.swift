@@ -54,4 +54,16 @@ final class FirebaseAuthService {
     func signOut() throws {
         try Auth.auth().signOut()
     }
+
+    func authStateChangeStream() -> AsyncStream<User?> {
+        AsyncStream { continuation in
+            let handle = Auth.auth().addStateDidChangeListener { _, user in
+                continuation.yield(user)
+            }
+
+            continuation.onTermination = { _ in
+                Auth.auth().removeStateDidChangeListener(handle)
+            }
+        }
+    }
 }

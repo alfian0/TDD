@@ -20,6 +20,7 @@ final class LoginViewModel: ObservableObject {
     private let loginBiometricUsecase: LoginBiometricUsecase
     private let emailValidationUsecase: EmailValidationUsecase
     private let didDismiss: () -> Void
+    private let didFinish: () -> Void
     private let coordinator: LoginViewCoordinator
 
     private var cancellables = Set<AnyCancellable>()
@@ -29,13 +30,15 @@ final class LoginViewModel: ObservableObject {
         loginBiometricUsecase: LoginBiometricUsecase,
         emailValidationUsecase: EmailValidationUsecase,
         coordinator: LoginViewCoordinator,
-        didDismiss: @escaping () -> Void
+        didDismiss: @escaping () -> Void,
+        didFinish: @escaping () -> Void
     ) {
         self.loginUsecase = loginUsecase
         self.loginBiometricUsecase = loginBiometricUsecase
         self.emailValidationUsecase = emailValidationUsecase
         self.coordinator = coordinator
         self.didDismiss = didDismiss
+        self.didFinish = didFinish
 
         setupValidation()
     }
@@ -80,8 +83,8 @@ final class LoginViewModel: ObservableObject {
 
     private func handleLoginResult(_ result: Result<UserModel, LoginUsecaseError>) {
         switch result {
-        case let .success(user):
-            print(user)
+        case .success:
+            didFinish()
         case let .failure(error):
             handleLoginError(error)
         }

@@ -17,6 +17,10 @@ enum MainAppCoordinatorSheet {
     case ocr
 }
 
+enum MainAppCoordinatorPage {
+    case home
+}
+
 protocol MainAppCoordinator: Coordinator {
     func start()
     func present(_ sheet: MainAppCoordinatorSheet) async
@@ -33,7 +37,17 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
     func start() {
         let v = MainAppView(coordinator: self)
         let vc = UIHostingController(rootView: v)
-        navigationController.show(vc, sender: navigationController)
+        navigationController.setViewControllers([vc], animated: false)
+    }
+
+    @MainActor
+    func push(_ page: MainAppCoordinatorPage) {
+        switch page {
+        case .home:
+            let v = HomeView()
+            let vc = UIHostingController(rootView: v)
+            navigationController.setViewControllers([vc], animated: false)
+        }
     }
 
     @MainActor
@@ -43,12 +57,17 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
             guard let coordinator = AppAssembler.shared.resolver.resolve(LoginViewCoordinator.self, argument: UINavigationController()) else {
                 return
             }
-            coordinator.start(didDismiss: { [weak self] in
-                guard let self = self else { return }
-                navigationController.dismiss(animated: true) {
-                    self.childCoordinator.removeLast()
+            coordinator.start(
+                didDismiss: { [weak self] in
+                    guard let self = self else { return }
+                    dismissCoordinator(coordinator, completion: {})
+                }, didFinish: { [weak self] in
+                    guard let self = self else { return }
+                    dismissCoordinator(coordinator, completion: {
+                        self.push(.home)
+                    })
                 }
-            })
+            )
             coordinator.navigationController.modalPresentationStyle = .fullScreen
             presentModal(coordinator)
 
@@ -58,10 +77,9 @@ final class MainAppCoordinatorImpl: MainAppCoordinator {
             }
             coordinator.start(onLoginTapped: { [weak self] in
                 guard let self = self else { return }
-                navigationController.dismiss(animated: true) {
+                dismissCoordinator(coordinator, completion: {
                     self.present(.login)
-                    self.childCoordinator.removeLast()
-                }
+                })
             })
             presentModal(coordinator)
 

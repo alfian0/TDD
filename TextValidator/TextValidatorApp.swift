@@ -9,9 +9,10 @@ import FirebaseCore
 import SwiftUI
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    func application(_: UIApplication,
-                     didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool
-    {
+    func application(
+        _: UIApplication,
+        didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
         FirebaseApp.configure()
         return true
     }
@@ -30,7 +31,15 @@ struct TextValidatorApp: App {
             NavigationControllerWrapper(coordinator: coordinator)
                 .edgesIgnoringSafeArea(.all)
                 .onViewDidLoad {
-                    coordinator.start()
+                    Task {
+                        for await user in FirebaseAuthService().authStateChangeStream() {
+                            if let user = user {
+                                coordinator.push(.home)
+                            } else {
+                                coordinator.start()
+                            }
+                        }
+                    }
                 }
                 .onOpenURL { url in
 

@@ -14,7 +14,7 @@ class CameraService: NSObject {
     private var photoOutput = AVCapturePhotoOutput()
     private var videoOutput = AVCaptureVideoDataOutput()
     private var imageContinuation: CheckedContinuation<UIImage, Error>?
-    private var videoContinuation: CheckedContinuation<CMSampleBuffer, Error>?
+    private var videoContinuation: AsyncStream<CMSampleBuffer>.Continuation?
 
     func isCameraAuthorized() async throws -> Bool {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -86,9 +86,13 @@ class CameraService: NSObject {
         }
     }
 
-    func startCapture() async throws -> CMSampleBuffer {
-        return try await withCheckedThrowingContinuation { continuation in
+    func startCapture() async throws -> AsyncStream<CMSampleBuffer> {
+        return AsyncStream { continuation in
             videoContinuation = continuation
+
+            continuation.onTermination = { [weak self] _ in
+                self?.videoContinuation = nil
+            }
         }
     }
 }
@@ -117,7 +121,7 @@ extension CameraService: AVCapturePhotoCaptureDelegate {
 
 extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from _: AVCaptureConnection) {
-        videoContinuation?.resume(returning: sampleBuffer)
+        videoContinuation?.yield(sampleBuffer)
     }
 }
 

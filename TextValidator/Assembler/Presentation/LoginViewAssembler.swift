@@ -14,7 +14,7 @@ final class LoginViewAssembler: @preconcurrency Assembly {
             LoginViewCoordinator(navigationController: n)
         }
 
-        container.register(LoginViewModel.self) { (r, c: LoginViewCoordinator, d: @escaping (() -> Void)) in
+        container.register(LoginViewModel.self) { (r, c: LoginViewCoordinator, dd: @escaping (() -> Void), ds: @escaping (() -> Void)) in
             guard let loginUsecase = r.resolve(LoginUsecase.self) else {
                 fatalError()
             }
@@ -29,12 +29,13 @@ final class LoginViewAssembler: @preconcurrency Assembly {
                 loginBiometricUsecase: loginBiometricUsecase,
                 emailValidationUsecase: emailValidationUsecase,
                 coordinator: c,
-                didDismiss: d
+                didDismiss: dd,
+                didFinish: ds
             )
         }
 
-        container.register(LoginView.self) { (r, c: LoginViewCoordinator, d: @escaping (() -> Void)) in
-            guard let viewModel = r.resolve(LoginViewModel.self, arguments: c, d) else {
+        container.register(LoginView.self) { (r, c: LoginViewCoordinator, dd: @escaping (() -> Void), ds: @escaping (() -> Void)) in
+            guard let viewModel = r.resolve(LoginViewModel.self, arguments: c, dd, ds) else {
                 fatalError()
             }
             return LoginView(viewModel: viewModel)
