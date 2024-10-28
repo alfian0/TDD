@@ -18,7 +18,7 @@ struct LoginView: View {
                         .font(.title)
                     Image(systemName: "flame.circle.fill")
                         .font(.title)
-                        .foregroundStyle(.orange)
+                        .foregroundColor(.orange)
                 }
 
                 Text("It's good to see you again")

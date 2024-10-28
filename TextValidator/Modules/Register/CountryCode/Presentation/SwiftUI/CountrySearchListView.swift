@@ -14,7 +14,7 @@ struct CountrySearchListView: View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(Color("8A8A8D"))
+                    .foregroundColor(Color("8A8A8D"))
                 TextField("Search", text: $viewModel.search)
             }
             .padding(.all, 8)

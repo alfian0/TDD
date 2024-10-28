@@ -62,12 +62,12 @@ struct OCRView: View {
             viewModel.isTakePicture = true
         }
         .toolbar {
-            ToolbarItem(placement: .keyboard) {
-                Button("Done") {
-                    hideKeyboard()
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
+//            ToolbarItem(placement: .keyboard) {
+//                Button("Done") {
+//                    hideKeyboard()
+//                }
+//                .frame(maxWidth: .infinity, alignment: .trailing)
+//            }
         }
     }
 }

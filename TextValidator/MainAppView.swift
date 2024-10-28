@@ -25,7 +25,7 @@ struct MainAppView: View {
                     Text("Login")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.automatic)
 
                 Button {
                     coordinator.present(.register)
@@ -33,7 +33,7 @@ struct MainAppView: View {
                     Text("Register")
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.automatic)
 
                 Button {
                     coordinator.present(.ocr)

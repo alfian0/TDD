@@ -35,11 +35,12 @@ struct PasswordView: View {
 
                 HStack(spacing: 4) {
                     ForEach(PasswordStrength.allCases, id: \.self) { value in
-                        Color("D5D5D6")
-                            .overlay {
-                                viewModel.passwordStrength.color.opacity(value.rawValue <= viewModel.passwordStrength.rawValue ? 1 : 0)
-                                    .animation(.easeInOut, value: viewModel.passwordStrength)
-                            }
+                        ZStack {
+                            Color("D5D5D6")
+
+                            viewModel.passwordStrength.color.opacity(value.rawValue <= viewModel.passwordStrength.rawValue ? 1 : 0)
+                                .animation(.easeInOut, value: viewModel.passwordStrength)
+                        }
                     }
                 }
                 .frame(height: 4)

@@ -14,14 +14,21 @@ struct PasscodeIndicatorView: View {
     var body: some View {
         HStack {
             ForEach(0 ..< count, id: \.self) { index in
-                Circle()
-                    .fill(passcode.count > index ? .primary : Color(.white))
-                    .frame(width: 20, height: 20)
-                    .overlay {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(Color("D5D5D6"), lineWidth: 1)
+
+                    ZStack {
                         Circle()
-                            .stroke(.primary, lineWidth: 1)
+                            .fill(passcode.count > index ? .primary : Color(.white))
+
+                        Circle()
+                            .stroke(Color.gray, lineWidth: 1)
                     }
-                    .frame(maxWidth: .infinity)
+                    .frame(width: 8, height: 8)
+                }
+                .frame(width: 45, height: 45)
+                .frame(maxWidth: .infinity)
             }
         }
     }

@@ -11,6 +11,7 @@ import Foundation
 @MainActor
 final class OTPViewModel: ObservableObject {
     @Published var otpText: String = ""
+    @Published var becomeFirstResponder: Bool = false
     @Published private(set) var canSubmit: Bool = false
     @Published private(set) var isEnableOtherAction: Bool = false
     @Published private(set) var timer: String = ""

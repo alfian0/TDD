@@ -9,7 +9,6 @@ import SwiftUI
 
 struct OTPView: View {
     @StateObject var viewModel: OTPViewModel
-    @FocusState var isKeyboardShowing: Bool
 
     var body: some View {
         VStack(spacing: 16) {
@@ -26,23 +25,23 @@ struct OTPView: View {
             .padding(.horizontal)
 
             VStack(alignment: .leading, spacing: 16) {
-                OTPTextBoxView(
-                    otpcode: $viewModel.otpText,
-                    isKeyboardShowing: _isKeyboardShowing,
-                    count: viewModel.count
-                )
-                .background {
-                    TextField("", text: $viewModel.otpText.limit(viewModel.count))
+                ZStack {
+                    CustomTextField(text: $viewModel.otpText.limit(viewModel.count), becomeFirstResponder: $viewModel.becomeFirstResponder)
                         .keyboardType(.numberPad)
                         .textContentType(.oneTimeCode)
                         .frame(width: 1, height: 1)
                         .opacity(0.1)
                         .blendMode(.screen)
-                        .focused($isKeyboardShowing)
+
+                    OTPTextBoxView(
+                        otpcode: $viewModel.otpText,
+                        isKeyboardShowing: $viewModel.becomeFirstResponder,
+                        count: viewModel.count
+                    )
                 }
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    isKeyboardShowing.toggle()
+                    viewModel.becomeFirstResponder.toggle()
                 }
 
                 VStack(alignment: .leading) {
@@ -101,12 +100,12 @@ struct OTPView: View {
                 }
             }
 
-            ToolbarItem(placement: .keyboard) {
-                Button("Done") {
-                    isKeyboardShowing.toggle()
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
+//            ToolbarItem(placement: .keyboard) {
+//                Button("Done") {
+//                    viewModel.becomeFirstResponder.toggle()
+//                }
+//                .frame(maxWidth: .infinity, alignment: .trailing)
+//            }
         }
         .onAppear {
             viewModel.start()

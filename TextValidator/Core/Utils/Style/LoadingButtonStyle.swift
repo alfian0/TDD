@@ -17,8 +17,7 @@ struct LoadingButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
-            ProgressView()
-                .tint(.white)
+            ActivityIndicatorView(isAnimating: .constant(true), color: .white)
                 .opacity(isLoading ? 1 : 0)
             configuration.label
                 .font(.headline)
@@ -28,7 +27,7 @@ struct LoadingButtonStyle: ButtonStyle {
         .padding(.vertical, 8)
         .padding(.horizontal)
         .background(RoundedRectangle(cornerRadius: 8).fill(.blue))
-        .foregroundStyle(.white)
+        .foregroundColor(.white)
         .opacity(configuration.isPressed ? 0.2 : 1)
         .opacity(isEnabled ? 1 : 0.6)
         .animation(.default, value: isEnabled)

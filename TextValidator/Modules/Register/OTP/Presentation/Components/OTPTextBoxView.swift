@@ -9,21 +9,22 @@ import SwiftUI
 
 struct OTPTextBoxView: View {
     @Binding var otpcode: String
-    @FocusState var isKeyboardShowing: Bool
+    @Binding var isKeyboardShowing: Bool
     let count: Int
 
     var body: some View {
         HStack {
             ForEach(0 ..< count, id: \.self) { index in
-                Text(code(at: index))
-                    .frame(width: 45, height: 45)
-                    .background {
-                        let status = isKeyboardShowing && otpcode.count == index
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(status ? .blue : Color("D5D5D6"), lineWidth: 1)
-                            .animation(.easeInOut(duration: 0.2), value: status)
-                    }
-                    .frame(maxWidth: .infinity)
+                ZStack {
+                    let status = isKeyboardShowing && otpcode.count == index
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(status ? .blue : Color("D5D5D6"), lineWidth: 1)
+                        .animation(.easeInOut(duration: 0.2), value: status)
+
+                    Text(code(at: index))
+                }
+                .frame(width: 45, height: 45)
+                .frame(maxWidth: .infinity)
             }
         }
     }
@@ -40,5 +41,5 @@ struct OTPTextBoxView: View {
 }
 
 #Preview {
-    OTPTextBoxView(otpcode: .constant("12"), isKeyboardShowing: .init(), count: 6)
+    OTPTextBoxView(otpcode: .constant("12"), isKeyboardShowing: .constant(false), count: 6)
 }

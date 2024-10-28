@@ -53,7 +53,7 @@ struct NumpadView: View {
                     .contentShape(.rect)
             }
         }
-        .foregroundStyle(.primary)
+        .foregroundColor(.primary)
     }
 
     private func add(_ value: Int) {

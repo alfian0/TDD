@@ -44,7 +44,7 @@ struct ErrorView: View {
                 Text("Close")
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.automatic)
         }
         .frame(alignment: .center)
         .padding(.horizontal)

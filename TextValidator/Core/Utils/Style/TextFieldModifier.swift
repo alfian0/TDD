@@ -18,9 +18,9 @@ struct TextFieldModifier: ViewModifier {
                     .font(.subheadline)
             }
             content
-            Divider()
-                .frame(minHeight: (errorMessage != nil) ? 1 : 0.1)
-                .background((errorMessage != nil) ? .red : .secondary)
+            Rectangle()
+                .fill((errorMessage != nil) ? .red : .secondary)
+                .frame(height: (errorMessage != nil) ? 1 : 0.5)
                 .animation(.default, value: errorMessage)
             Text(errorMessage ?? "")
                 .font(.caption)
@@ -29,4 +29,9 @@ struct TextFieldModifier: ViewModifier {
                 .animation(.default, value: errorMessage)
         }
     }
+}
+
+#Preview {
+    TextField("", text: .constant("error"))
+        .modifier(TextFieldModifier(label: "Error Sample", errorMessage: "Something went wrong"))
 }
