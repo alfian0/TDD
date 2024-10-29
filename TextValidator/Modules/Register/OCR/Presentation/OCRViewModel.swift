@@ -10,7 +10,6 @@ import SwiftUI
 
 @MainActor
 final class OCRViewModel: ObservableObject {
-    @Published var isTakePicture: Bool = false
     @Published var idCardImage: UIImage? = UIImage(named: "img_id_card_placeholder")
     @Published var name: String = ""
     @Published var nameError: String?
@@ -26,6 +25,7 @@ final class OCRViewModel: ObservableObject {
     private let ageValidationUsecase: AgeValidationUsecase
     private let coordinator: OCRViewCoordinator
     private var cancellables = Set<AnyCancellable>()
+    private let repo: DocumentScannerRepository = ImagePickerRepositoryImpl()
 
     init(
         extractKTPUsecase: ExtractKTPUsecase,
@@ -41,6 +41,17 @@ final class OCRViewModel: ObservableObject {
         self.coordinator = coordinator
 
         setupBindings()
+    }
+
+    func scanDocument() {
+        repo.scanDocument { [weak self] result in
+            switch result {
+            case let .success(image):
+                self?.idCardImage = image.first
+            case let .failure(error):
+                print(error)
+            }
+        }
     }
 
     private func setupBindings() {

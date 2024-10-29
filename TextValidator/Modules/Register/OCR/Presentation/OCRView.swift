@@ -27,6 +27,9 @@ struct OCRView: View {
             if let image = viewModel.idCardImage {
                 Image(uiImage: image)
                     .resizable()
+                    .onTapGesture {
+                        viewModel.scanDocument()
+                    }
             }
 
             VStack {
@@ -54,12 +57,8 @@ struct OCRView: View {
             }
             .padding(.horizontal)
         }
-        .fullScreenCover(isPresented: $viewModel.isTakePicture) {
-            DocumentCameraView(image: $viewModel.idCardImage)
-                .edgesIgnoringSafeArea(.all)
-        }
         .onViewDidLoad {
-            viewModel.isTakePicture = true
+            viewModel.scanDocument()
         }
         .toolbar {
 //            ToolbarItem(placement: .keyboard) {
