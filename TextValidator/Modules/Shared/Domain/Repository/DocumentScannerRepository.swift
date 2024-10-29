@@ -8,5 +8,5 @@
 import UIKit
 
 protocol DocumentScannerRepository {
-    func scanDocument(completion: @escaping (Result<[UIImage], Error>) -> Void)
+    func scanDocument() async throws -> UIImage
 }

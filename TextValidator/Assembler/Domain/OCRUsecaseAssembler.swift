@@ -14,7 +14,10 @@ final class OCRUsecaseAssembler: Assembly {
         }
 
         container.register(ExtractKTPUsecase.self) { r in
-            guard let repository = r.resolve(MachineLearningRepositoryImpl.self) else {
+            guard let ocrRepository = r.resolve(VisionOCRRepositoryImpl.self) else {
+                fatalError()
+            }
+            guard let documentScannerRepository = r.resolve(DocumentScannerRepository.self) else {
                 fatalError()
             }
             guard let extractNIKUsecase = r.resolve(ExtractNIKUsecase.self) else {
@@ -42,7 +45,8 @@ final class OCRUsecaseAssembler: Assembly {
                 fatalError()
             }
             return ExtractKTPUsecase(
-                repository: repository,
+                ocrRepository: ocrRepository,
+                documentScannerRepository: documentScannerRepository,
                 extractNIKUsecase: extractNIKUsecase,
                 extractDOBUsecase: extractDOBUsecase,
                 extractReligionTypeUsecase: extractReligionTypeUsecase,

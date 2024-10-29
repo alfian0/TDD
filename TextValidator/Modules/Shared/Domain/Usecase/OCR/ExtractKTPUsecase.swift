@@ -13,7 +13,8 @@ enum ExtractKTPUsecaseError: Error, LocalizedError {
 }
 
 final class ExtractKTPUsecase {
-    private let repository: MachineLearningRepository
+    private let ocrRepository: OCRRepository
+    private let documentScannerRepository: DocumentScannerRepository
     private let extractNIKUsecase: ExtractNIKUsecase
     private let extractDOBUsecase: ExtractDOBUsecase
     private let extractReligionTypeUsecase: ExtractReligionTypeUsecase
@@ -24,7 +25,8 @@ final class ExtractKTPUsecase {
     private let candidateMatchingUsecase: CandidateMatchingUsecase
 
     init(
-        repository: MachineLearningRepository,
+        ocrRepository: OCRRepository,
+        documentScannerRepository: DocumentScannerRepository,
         extractNIKUsecase: ExtractNIKUsecase,
         extractDOBUsecase: ExtractDOBUsecase,
         extractReligionTypeUsecase: ExtractReligionTypeUsecase,
@@ -34,7 +36,8 @@ final class ExtractKTPUsecase {
         extractNationalityTypeUsecase: ExtractNationalityTypeUsecase,
         candidateMatchingUsecase: CandidateMatchingUsecase
     ) {
-        self.repository = repository
+        self.ocrRepository = ocrRepository
+        self.documentScannerRepository = documentScannerRepository
         self.extractNIKUsecase = extractNIKUsecase
         self.extractDOBUsecase = extractDOBUsecase
         self.extractReligionTypeUsecase = extractReligionTypeUsecase
@@ -45,10 +48,11 @@ final class ExtractKTPUsecase {
         self.candidateMatchingUsecase = candidateMatchingUsecase
     }
 
-    func exec(image: UIImage) async -> Result<IDModel, ExtractKTPUsecaseError> {
+    func exec() async -> Result<IDModel, ExtractKTPUsecaseError> {
         do {
             var idData = IDModel()
-            let data = try await repository.textRecognizer(image: image)
+            let image = try await documentScannerRepository.scanDocument()
+            let data = try await ocrRepository.textRecognizer(image: image)
             var texts = sanitizeTexts(data.map { $0.candidate })
 
             guard candidateMatchingUsecase.exec(texts) else {
@@ -57,6 +61,7 @@ final class ExtractKTPUsecase {
 
             texts = removeKeywords(from: texts)
 
+            idData.image = image
             idData.nama = extractName(from: data)
 
             extractUseCases(texts: texts, into: &idData)

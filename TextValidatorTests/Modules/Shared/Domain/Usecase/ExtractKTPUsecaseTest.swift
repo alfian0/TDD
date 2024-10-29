@@ -73,7 +73,7 @@ final class ExtractKTPUsecaseTest: XCTestCase {
 
     private func makeSUT() -> ExtractKTPUsecase {
         return ExtractKTPUsecase(
-            repository: MachineLearningRepositoryImpl(visionService: VisionService()),
+            repository: VisionOCRRepositoryImpl(visionService: VisionService()),
             extractNIKUsecase: ExtractNIKUsecase(nikUsecase: NIKValidationUsecase()),
             extractDOBUsecase: ExtractDOBUsecase(),
             extractReligionTypeUsecase: ExtractReligionTypeUsecase(),

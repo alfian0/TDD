@@ -25,7 +25,7 @@ final class OCRViewModel: ObservableObject {
     private let ageValidationUsecase: AgeValidationUsecase
     private let coordinator: OCRViewCoordinator
     private var cancellables = Set<AnyCancellable>()
-    private let repo: DocumentScannerRepository = ImagePickerRepositoryImpl()
+    private let repo: DocumentScannerRepository = UIKitDocumentScannerRepositoryImpl()
 
     init(
         extractKTPUsecase: ExtractKTPUsecase,
@@ -44,13 +44,9 @@ final class OCRViewModel: ObservableObject {
     }
 
     func scanDocument() {
-        repo.scanDocument { [weak self] result in
-            switch result {
-            case let .success(image):
-                self?.idCardImage = image.first
-            case let .failure(error):
-                print(error)
-            }
+        Task {
+            let result = await extractKTPUsecase.exec()
+            handleExtractionResult(result)
         }
     }
 
@@ -67,25 +63,12 @@ final class OCRViewModel: ObservableObject {
             self?.canSubmit = nameError == nil && idNumberError == nil && dobError == nil && !self!.name.isEmpty && !self!.idNumber.isEmpty
         }
         .store(in: &cancellables)
-
-        $idCardImage
-            .sink { [weak self] image in
-                guard let self = self, let image = image else { return }
-                self.extractDataFromImage(image)
-            }
-            .store(in: &cancellables)
-    }
-
-    private func extractDataFromImage(_ image: UIImage) {
-        Task {
-            let result = await extractKTPUsecase.exec(image: image)
-            handleExtractionResult(result)
-        }
     }
 
     private func handleExtractionResult(_ result: Result<IDModel, ExtractKTPUsecaseError>) {
         switch result {
         case let .success(model):
+            idCardImage = model.image
             name = model.nama ?? ""
             idNumber = model.nik ?? ""
             dateOfBirth = model.dob ?? .init()
