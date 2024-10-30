@@ -26,4 +26,10 @@ final class VisionRepositoryImplTest: XCTestCase {
         let data = try await sut.textRecognizer(image: image3())
         XCTAssertEqual(data.count, 28)
     }
+
+    func test_CoreMLImageClassifierImpl() async throws {
+        let sut = CoreMLImageClassifierImpl(visionService: VisionService())
+        let result = try await sut.classify(image: image())
+        XCTAssertEqual(result?.identifier, "valid")
+    }
 }

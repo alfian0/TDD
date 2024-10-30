@@ -20,6 +20,13 @@ final class RepositoryAssembler: Assembly {
             VisionDocumentScannerRepositoryImpl()
         }
 
+        container.register(ImageClassifierRepository.self) { r in
+            guard let visionService = r.resolve(VisionService.self) else {
+                fatalError()
+            }
+            return CoreMLImageClassifierImpl(visionService: visionService)
+        }
+
         container.register(CountryCodeRepositoryImpl.self) { _ in
             CountryCodeRepositoryImpl()
         }

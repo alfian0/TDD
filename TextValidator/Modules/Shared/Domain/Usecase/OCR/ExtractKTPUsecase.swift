@@ -15,6 +15,7 @@ enum ExtractKTPUsecaseError: Error, LocalizedError {
 final class ExtractKTPUsecase {
     private let ocrRepository: OCRRepository
     private let documentScannerRepository: DocumentScannerRepository
+    private let imageClassifierRepository: ImageClassifierRepository
     private let extractNIKUsecase: ExtractNIKUsecase
     private let extractDOBUsecase: ExtractDOBUsecase
     private let extractReligionTypeUsecase: ExtractReligionTypeUsecase
@@ -27,6 +28,7 @@ final class ExtractKTPUsecase {
     init(
         ocrRepository: OCRRepository,
         documentScannerRepository: DocumentScannerRepository,
+        imageClassifierRepository: ImageClassifierRepository,
         extractNIKUsecase: ExtractNIKUsecase,
         extractDOBUsecase: ExtractDOBUsecase,
         extractReligionTypeUsecase: ExtractReligionTypeUsecase,
@@ -38,6 +40,7 @@ final class ExtractKTPUsecase {
     ) {
         self.ocrRepository = ocrRepository
         self.documentScannerRepository = documentScannerRepository
+        self.imageClassifierRepository = imageClassifierRepository
         self.extractNIKUsecase = extractNIKUsecase
         self.extractDOBUsecase = extractDOBUsecase
         self.extractReligionTypeUsecase = extractReligionTypeUsecase
@@ -52,6 +55,12 @@ final class ExtractKTPUsecase {
         do {
             var idData = IDModel()
             let image = try await documentScannerRepository.scanDocument()
+            let valid = try await imageClassifierRepository.classify(image: image)
+            
+            guard let valid = valid?.identifier, valid == "valid" else {
+                return .failure(.invalidKTP)
+            }
+            
             let data = try await ocrRepository.textRecognizer(image: image)
             var texts = sanitizeTexts(data.map { $0.candidate })
 

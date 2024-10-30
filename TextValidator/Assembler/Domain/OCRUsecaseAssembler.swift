@@ -20,6 +20,9 @@ final class OCRUsecaseAssembler: Assembly {
             guard let documentScannerRepository = r.resolve(DocumentScannerRepository.self) else {
                 fatalError()
             }
+            guard let imageClassifierRepository = r.resolve(ImageClassifierRepository.self) else {
+                fatalError()
+            }
             guard let extractNIKUsecase = r.resolve(ExtractNIKUsecase.self) else {
                 fatalError()
             }
@@ -47,6 +50,7 @@ final class OCRUsecaseAssembler: Assembly {
             return ExtractKTPUsecase(
                 ocrRepository: ocrRepository,
                 documentScannerRepository: documentScannerRepository,
+                imageClassifierRepository: imageClassifierRepository,
                 extractNIKUsecase: extractNIKUsecase,
                 extractDOBUsecase: extractDOBUsecase,
                 extractReligionTypeUsecase: extractReligionTypeUsecase,
