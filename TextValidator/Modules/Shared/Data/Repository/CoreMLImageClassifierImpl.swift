@@ -15,7 +15,7 @@ class CoreMLImageClassifierImpl: ImageClassifierRepository {
         self.visionService = visionService
     }
 
-    func classify(image: UIImage) async throws -> ClassificationResult? {
+    func classifyKTP(image: UIImage) async throws -> ClassificationResult? {
         let configuration = MLModelConfiguration()
         #if targetEnvironment(simulator)
             configuration.computeUnits = .cpuOnly

@@ -29,7 +29,7 @@ final class VisionRepositoryImplTest: XCTestCase {
 
     func test_CoreMLImageClassifierImpl() async throws {
         let sut = CoreMLImageClassifierImpl(visionService: VisionService())
-        let result = try await sut.classify(image: image())
+        let result = try await sut.classifyKTP(image: image())
         XCTAssertEqual(result?.identifier, "valid")
     }
 }

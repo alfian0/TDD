@@ -55,12 +55,12 @@ final class ExtractKTPUsecase {
         do {
             var idData = IDModel()
             let image = try await documentScannerRepository.scanDocument()
-            let valid = try await imageClassifierRepository.classify(image: image)
-            
+            let valid = try await imageClassifierRepository.classifyKTP(image: image)
+
             guard let valid = valid?.identifier, valid == "valid" else {
                 return .failure(.invalidKTP)
             }
-            
+
             let data = try await ocrRepository.textRecognizer(image: image)
             var texts = sanitizeTexts(data.map { $0.candidate })
 

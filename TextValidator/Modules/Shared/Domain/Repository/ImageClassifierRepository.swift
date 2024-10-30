@@ -8,5 +8,5 @@
 import UIKit
 
 protocol ImageClassifierRepository {
-    func classify(image: UIImage) async throws -> ClassificationResult?
+    func classifyKTP(image: UIImage) async throws -> ClassificationResult?
 }

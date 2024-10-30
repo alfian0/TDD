@@ -67,6 +67,22 @@ final class VisionService {
         return results as? [VNClassificationObservation] ?? []
     }
 
+    func detectRect(in image: UIImage) async throws -> [VNRectangleObservation] {
+        let handler = try createImageRequestHandler(from: image)
+        let request = VNDetectRectanglesRequest()
+        // Configure the request for square detection
+        request.minimumAspectRatio = 1.506
+        request.maximumAspectRatio = 1.664
+        request.minimumSize = 0.5
+        request.maximumObservations = 1
+        #if targetEnvironment(simulator)
+            request.usesCPUOnly = true
+        #endif
+
+        let results = try await performVisionRequest(on: handler, request: request)
+        return results as? [VNRectangleObservation] ?? []
+    }
+
     // Generic method to handle Vision requests
     private func performVisionRequest<T: VNRequest>(on handler: VNImageRequestHandler, request: T) async throws -> [Any] {
         return try await withCheckedThrowingContinuation { continuation in
