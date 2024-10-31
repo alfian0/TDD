@@ -13,14 +13,31 @@ final class OCRUsecaseAssembler: Assembly {
             CandidateMatchingUsecase()
         }
 
+        container.register(ClassifiedKTPUsecase.self) { r in
+            guard let visionService = r.resolve(VisionService.self) else {
+                fatalError()
+            }
+            return ClassifiedKTPUsecase(visionService: visionService)
+        }
+
+        container.register(CropKTPUseCase.self) { r in
+            guard let visionService = r.resolve(VisionService.self) else {
+                fatalError()
+            }
+            return CropKTPUseCase(visionService: visionService)
+        }
+
         container.register(ExtractKTPUsecase.self) { r in
-            guard let ocrRepository = r.resolve(VisionOCRRepositoryImpl.self) else {
+            guard let ocrKTPUsecase = r.resolve(OCRKTPUsecase.self) else {
+                fatalError()
+            }
+            guard let cropKTPUseCase = r.resolve(CropKTPUseCase.self) else {
                 fatalError()
             }
             guard let documentScannerRepository = r.resolve(DocumentScannerRepository.self) else {
                 fatalError()
             }
-            guard let imageClassifierRepository = r.resolve(ImageClassifierRepository.self) else {
+            guard let classifiedKTPUsecase = r.resolve(ClassifiedKTPUsecase.self) else {
                 fatalError()
             }
             guard let extractNIKUsecase = r.resolve(ExtractNIKUsecase.self) else {
@@ -48,9 +65,10 @@ final class OCRUsecaseAssembler: Assembly {
                 fatalError()
             }
             return ExtractKTPUsecase(
-                ocrRepository: ocrRepository,
                 documentScannerRepository: documentScannerRepository,
-                imageClassifierRepository: imageClassifierRepository,
+                ocrKTPUsecase: ocrKTPUsecase,
+                cropKTPUseCase: cropKTPUseCase,
+                classifiedKTPUsecase: classifiedKTPUsecase,
                 extractNIKUsecase: extractNIKUsecase,
                 extractDOBUsecase: extractDOBUsecase,
                 extractReligionTypeUsecase: extractReligionTypeUsecase,

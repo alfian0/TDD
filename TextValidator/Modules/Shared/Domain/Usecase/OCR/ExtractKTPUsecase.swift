@@ -13,9 +13,10 @@ enum ExtractKTPUsecaseError: Error, LocalizedError {
 }
 
 final class ExtractKTPUsecase {
-    private let ocrRepository: OCRRepository
+    private let ocrKTPUsecase: OCRKTPUsecase
+    private let cropKTPUseCase: CropKTPUseCase
     private let documentScannerRepository: DocumentScannerRepository
-    private let imageClassifierRepository: ImageClassifierRepository
+    private let classifiedKTPUsecase: ClassifiedKTPUsecase
     private let extractNIKUsecase: ExtractNIKUsecase
     private let extractDOBUsecase: ExtractDOBUsecase
     private let extractReligionTypeUsecase: ExtractReligionTypeUsecase
@@ -26,9 +27,10 @@ final class ExtractKTPUsecase {
     private let candidateMatchingUsecase: CandidateMatchingUsecase
 
     init(
-        ocrRepository: OCRRepository,
         documentScannerRepository: DocumentScannerRepository,
-        imageClassifierRepository: ImageClassifierRepository,
+        ocrKTPUsecase: OCRKTPUsecase,
+        cropKTPUseCase: CropKTPUseCase,
+        classifiedKTPUsecase: ClassifiedKTPUsecase,
         extractNIKUsecase: ExtractNIKUsecase,
         extractDOBUsecase: ExtractDOBUsecase,
         extractReligionTypeUsecase: ExtractReligionTypeUsecase,
@@ -38,9 +40,10 @@ final class ExtractKTPUsecase {
         extractNationalityTypeUsecase: ExtractNationalityTypeUsecase,
         candidateMatchingUsecase: CandidateMatchingUsecase
     ) {
-        self.ocrRepository = ocrRepository
+        self.ocrKTPUsecase = ocrKTPUsecase
+        self.cropKTPUseCase = cropKTPUseCase
         self.documentScannerRepository = documentScannerRepository
-        self.imageClassifierRepository = imageClassifierRepository
+        self.classifiedKTPUsecase = classifiedKTPUsecase
         self.extractNIKUsecase = extractNIKUsecase
         self.extractDOBUsecase = extractDOBUsecase
         self.extractReligionTypeUsecase = extractReligionTypeUsecase
@@ -55,13 +58,15 @@ final class ExtractKTPUsecase {
         do {
             var idData = IDModel()
             let image = try await documentScannerRepository.scanDocument()
-            let valid = try await imageClassifierRepository.classifyKTP(image: image)
+            let valid = try await classifiedKTPUsecase.exec(image: image)
 
             guard let valid = valid?.identifier, valid == "valid" else {
                 return .failure(.invalidKTP)
             }
 
-            let data = try await ocrRepository.textRecognizer(image: image)
+            let croppedImageIfCan = try await cropKTPUseCase.exec(image: image)
+
+            let data = try await ocrKTPUsecase.textRecognizer(image: croppedImageIfCan)
             var texts = sanitizeTexts(data.map { $0.candidate })
 
             guard candidateMatchingUsecase.exec(texts) else {

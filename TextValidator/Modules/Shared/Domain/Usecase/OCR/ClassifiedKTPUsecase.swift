@@ -1,5 +1,5 @@
 //
-//  CoreMLImageClassifierImpl.swift
+//  ClassifiedKTPUsecase.swift
 //  TextValidator
 //
 //  Created by Alfian on 29/10/24.
@@ -8,14 +8,14 @@
 import CoreML
 import UIKit
 
-class CoreMLImageClassifierImpl: ImageClassifierRepository {
+class ClassifiedKTPUsecase {
     private let visionService: VisionService
 
     init(visionService: VisionService) {
         self.visionService = visionService
     }
 
-    func classifyKTP(image: UIImage) async throws -> ClassificationResult? {
+    func exec(image: UIImage) async throws -> ClassificationResult? {
         let configuration = MLModelConfiguration()
         #if targetEnvironment(simulator)
             configuration.computeUnits = .cpuOnly

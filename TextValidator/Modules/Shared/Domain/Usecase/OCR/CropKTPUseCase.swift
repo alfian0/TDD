@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Vision
 
 final class CropKTPUseCase {
     private let visionService: VisionService
@@ -24,14 +23,14 @@ final class CropKTPUseCase {
             return image
         }
 
-        let croppedImage = cropRectangle(from: image, observation: firstRectangle)
+        let croppedImage = cropRectangle(from: image, boundingBox: firstRectangle.boundingBox)
 
         return croppedImage ?? image
     }
 
     // MARK: - Grayscale and High-Contrast Filter
 
-    func applyGrayscale(to image: UIImage) -> UIImage? {
+    private func applyGrayscale(to image: UIImage) -> UIImage? {
         guard let cgImage = image.cgImage else { return nil }
 
         let width = cgImage.width
@@ -63,10 +62,9 @@ final class CropKTPUseCase {
 
     // MARK: - Crop Rectangle from Image
 
-    func cropRectangle(from image: UIImage, observation: VNRectangleObservation) -> UIImage? {
+    private func cropRectangle(from image: UIImage, boundingBox: CGRect) -> UIImage? {
         guard let cgImage = image.cgImage else { return nil }
 
-        let boundingBox = observation.boundingBox
         let width = CGFloat(cgImage.width)
         let height = CGFloat(cgImage.height)
 

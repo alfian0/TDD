@@ -1,5 +1,5 @@
 //
-//  VisionOCRRepositoryImpl.swift
+//  OCRKTPUsecase.swift
 //  TextValidator
 //
 //  Created by Alfian on 20/10/24.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class VisionOCRRepositoryImpl: OCRRepository {
+final class OCRKTPUsecase {
     private let visionService: VisionService
 
     init(visionService: VisionService) {
