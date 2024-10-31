@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSCameraUsageDescription</key>
-	<string>We want to use Camera</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>We want to use Face ID</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>id</string>
 	<key>CFBundleExecutable</key>
@@ -46,12 +42,23 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>We want to use Camera</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>We want to use Face ID</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIImageName</key>
 		<string></string>
 	</dict>
 	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>

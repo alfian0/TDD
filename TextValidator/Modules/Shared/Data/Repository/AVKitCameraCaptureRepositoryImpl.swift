@@ -44,6 +44,7 @@ class AVKitCameraCaptureRepositoryImpl: NSObject, CameraCaptureRepository {
             return
         }
 
+        photoOutput.connection(with: .video)?.videoOrientation = UIDevice.current.orientation.videoOrientation
         captureSession.addOutput(photoOutput)
         captureSession.commitConfiguration()
     }
