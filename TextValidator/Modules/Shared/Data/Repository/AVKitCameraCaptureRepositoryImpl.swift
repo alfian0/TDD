@@ -67,12 +67,22 @@ extension AVKitCameraCaptureRepositoryImpl: AVCapturePhotoCaptureDelegate {
             return
         }
 
-        guard let imageData = photo.fileDataRepresentation(),
-              let image = UIImage(data: imageData)
-        else {
+        guard let imageData = photo.fileDataRepresentation() else {
             imageContinuation?.resume(throwing: CameraError.captureFailed)
             return
         }
+
+        guard let provider = CGDataProvider(data: imageData as CFData) else {
+            imageContinuation?.resume(throwing: CameraError.captureFailed)
+            return
+        }
+
+        guard let cgImage = CGImage(jpegDataProviderSource: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent) else {
+            imageContinuation?.resume(throwing: CameraError.captureFailed)
+            return
+        }
+
+        let image = UIImage(cgImage: cgImage, scale: 1, orientation: UIDevice.current.orientation.uiImageOrientation)
 
         imageContinuation?.resume(returning: image)
     }
