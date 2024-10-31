@@ -9,20 +9,15 @@ import Swinject
 
 final class RepositoryAssembler: Assembly {
     func assemble(container: Swinject.Container) {
-        container.register(OCRKTPUsecase.self) { r in
-            guard let visionService = r.resolve(VisionService.self) else {
-                fatalError()
-            }
-            return OCRKTPUsecase(visionService: visionService)
-        }
-
         container.register(CameraCaptureRepository.self) { _ in
             VisionCameraCaptureRepositoryImpl()
         }
+        .inObjectScope(.container)
 
         container.register(CountryCodeRepositoryImpl.self) { _ in
             CountryCodeRepositoryImpl()
         }
+        .inObjectScope(.container)
 
         container.register(AuthRepositoryImpl.self) { r in
             guard let firebaseAuthService = r.resolve(FirebaseAuthService.self) else {
@@ -32,5 +27,6 @@ final class RepositoryAssembler: Assembly {
                 firebaseAuthService: firebaseAuthService
             )
         }
+        .inObjectScope(.container)
     }
 }

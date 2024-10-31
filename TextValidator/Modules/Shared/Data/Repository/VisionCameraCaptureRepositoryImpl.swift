@@ -1,5 +1,5 @@
 //
-//  VisionDocumentScannerRepositoryImpl.swift
+//  VisionCameraCaptureRepositoryImpl.swift
 //  TextValidator
 //
 //  Created by Alfian on 29/10/24.

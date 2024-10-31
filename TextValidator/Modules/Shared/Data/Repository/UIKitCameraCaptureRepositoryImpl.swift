@@ -1,5 +1,5 @@
 //
-//  UIKitDocumentScannerRepositoryImpl.swift
+//  UIKitCameraCaptureRepositoryImpl.swift
 //  TextValidator
 //
 //  Created by Alfian on 29/10/24.

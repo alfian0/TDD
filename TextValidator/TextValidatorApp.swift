@@ -28,44 +28,45 @@ struct TextValidatorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            NavigationControllerWrapper(coordinator: coordinator)
-                .edgesIgnoringSafeArea(.all)
-                .onViewDidLoad {
-                    Task {
-                        for await user in FirebaseAuthService().authStateChangeStream() {
-                            if let user = user {
-                                coordinator.push(.home)
-                            } else {
-                                coordinator.start()
-                            }
-                        }
-                    }
-                }
-                .onOpenURL { url in
-
-                    // MARK: FirebaseAuth
-
-                    guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-                        return
-                    }
-                    guard let queryItems = components.queryItems else {
-                        return
-                    }
-                    guard let urlString = queryItems.filter({ $0.name == "ifl" }).first?.value else {
-                        return
-                    }
-                    guard let url = URL(string: urlString) else {
-                        return
-                    }
-                    Task {
-                        do {
-                            let items = try await url.handleDeeplinkType(type: verificationEmailDeeplink)
-                            coordinator.present(.password)
-                        } catch {
-                            print(error)
-                        }
-                    }
-                }
+            CameraView()
+//            NavigationControllerWrapper(coordinator: coordinator)
+//                .edgesIgnoringSafeArea(.all)
+//                .onViewDidLoad {
+//                    Task {
+//                        for await user in FirebaseAuthService().authStateChangeStream() {
+//                            if let user = user {
+//                                coordinator.push(.home)
+//                            } else {
+//                                coordinator.start()
+//                            }
+//                        }
+//                    }
+//                }
+//                .onOpenURL { url in
+//
+//                    // MARK: FirebaseAuth
+//
+//                    guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+//                        return
+//                    }
+//                    guard let queryItems = components.queryItems else {
+//                        return
+//                    }
+//                    guard let urlString = queryItems.filter({ $0.name == "ifl" }).first?.value else {
+//                        return
+//                    }
+//                    guard let url = URL(string: urlString) else {
+//                        return
+//                    }
+//                    Task {
+//                        do {
+//                            let items = try await url.handleDeeplinkType(type: verificationEmailDeeplink)
+//                            coordinator.present(.password)
+//                        } catch {
+//                            print(error)
+//                        }
+//                    }
+//                }
         }
     }
 }

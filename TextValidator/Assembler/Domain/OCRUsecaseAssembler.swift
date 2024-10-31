@@ -31,6 +31,13 @@ final class OCRUsecaseAssembler: Assembly {
             ExtractNameUsecase()
         }
 
+        container.register(OCRKTPUsecase.self) { r in
+            guard let visionService = r.resolve(VisionService.self) else {
+                fatalError()
+            }
+            return OCRKTPUsecase(visionService: visionService)
+        }
+
         container.register(ExtractKTPUsecase.self) { r in
             guard let ocrKTPUsecase = r.resolve(OCRKTPUsecase.self) else {
                 fatalError()
