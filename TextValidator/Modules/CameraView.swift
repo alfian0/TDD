@@ -95,18 +95,35 @@ struct CameraView: View {
         Group {
             Spacer()
 
-            HStack {
-                if let image = capturedImage {
-                    ZStack {
-                        Color.white
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                    }
-                    .frame(width: 80, height: 80)
-                }
+            if isLansscape {
+                VStack {
+                    Spacer()
 
-                Spacer()
+                    if let image = capturedImage {
+                        ZStack {
+                            Color.white
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                        }
+                        .frame(width: 80, height: 80)
+                    }
+                }
+            } else {
+                HStack {
+                    if let image = capturedImage {
+                        ZStack {
+                            Color.white
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                        }
+                        .frame(width: 80, height: 80)
+                    }
+
+                    Spacer()
+                }
+                .padding(.horizontal)
             }
         }
     }
