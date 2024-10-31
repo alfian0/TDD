@@ -73,9 +73,10 @@ final class ExtractKTPUsecaseTest: XCTestCase {
 
     private func makeSUT() -> ExtractKTPUsecase {
         return ExtractKTPUsecase(
-            ocrRepository: OCRKTPUsecase(visionService: VisionService()),
             documentScannerRepository: VisionDocumentScannerRepositoryImpl(),
-            imageClassifierRepository: ClassifiedKTPUsecase(visionService: VisionService()),
+            ocrKTPUsecase: OCRKTPUsecase(visionService: VisionService()),
+            cropKTPUseCase: CropKTPUseCase(visionService: VisionService()),
+            classifiedKTPUsecase: ClassifiedKTPUsecase(visionService: VisionService()),
             extractNIKUsecase: ExtractNIKUsecase(nikUsecase: NIKValidationUsecase()),
             extractDOBUsecase: ExtractDOBUsecase(),
             extractReligionTypeUsecase: ExtractReligionTypeUsecase(),
