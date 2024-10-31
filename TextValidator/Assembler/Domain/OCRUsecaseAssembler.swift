@@ -27,6 +27,10 @@ final class OCRUsecaseAssembler: Assembly {
             return CropKTPUseCase(visionService: visionService)
         }
 
+        container.register(ExtractNameUsecase.self) { _ in
+            ExtractNameUsecase()
+        }
+
         container.register(ExtractKTPUsecase.self) { r in
             guard let ocrKTPUsecase = r.resolve(OCRKTPUsecase.self) else {
                 fatalError()
@@ -41,6 +45,9 @@ final class OCRUsecaseAssembler: Assembly {
                 fatalError()
             }
             guard let extractNIKUsecase = r.resolve(ExtractNIKUsecase.self) else {
+                fatalError()
+            }
+            guard let extractNameUsecase = r.resolve(ExtractNameUsecase.self) else {
                 fatalError()
             }
             guard let extractDOBUsecase = r.resolve(ExtractDOBUsecase.self) else {
@@ -70,6 +77,7 @@ final class OCRUsecaseAssembler: Assembly {
                 cropKTPUseCase: cropKTPUseCase,
                 classifiedKTPUsecase: classifiedKTPUsecase,
                 extractNIKUsecase: extractNIKUsecase,
+                extractNameUsecase: extractNameUsecase,
                 extractDOBUsecase: extractDOBUsecase,
                 extractReligionTypeUsecase: extractReligionTypeUsecase,
                 extractGenderUsecase: extractGenderUsecase,

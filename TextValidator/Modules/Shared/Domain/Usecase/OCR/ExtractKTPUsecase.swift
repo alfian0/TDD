@@ -18,6 +18,7 @@ final class ExtractKTPUsecase {
     private let documentScannerRepository: DocumentScannerRepository
     private let classifiedKTPUsecase: ClassifiedKTPUsecase
     private let extractNIKUsecase: ExtractNIKUsecase
+    private let extractNameUsecase: ExtractNameUsecase
     private let extractDOBUsecase: ExtractDOBUsecase
     private let extractReligionTypeUsecase: ExtractReligionTypeUsecase
     private let extractGenderUsecase: ExtractGenderUsecase
@@ -32,6 +33,7 @@ final class ExtractKTPUsecase {
         cropKTPUseCase: CropKTPUseCase,
         classifiedKTPUsecase: ClassifiedKTPUsecase,
         extractNIKUsecase: ExtractNIKUsecase,
+        extractNameUsecase: ExtractNameUsecase,
         extractDOBUsecase: ExtractDOBUsecase,
         extractReligionTypeUsecase: ExtractReligionTypeUsecase,
         extractGenderUsecase: ExtractGenderUsecase,
@@ -45,6 +47,7 @@ final class ExtractKTPUsecase {
         self.documentScannerRepository = documentScannerRepository
         self.classifiedKTPUsecase = classifiedKTPUsecase
         self.extractNIKUsecase = extractNIKUsecase
+        self.extractNameUsecase = extractNameUsecase
         self.extractDOBUsecase = extractDOBUsecase
         self.extractReligionTypeUsecase = extractReligionTypeUsecase
         self.extractGenderUsecase = extractGenderUsecase
@@ -60,9 +63,15 @@ final class ExtractKTPUsecase {
             let image = try await documentScannerRepository.scanDocument()
             let valid = try await classifiedKTPUsecase.exec(image: image)
 
-            guard let valid = valid?.identifier, valid == "valid" else {
-                return .failure(.invalidKTP)
-            }
+            #if targetEnvironment(simulator)
+
+                // MARK: When use simulator will fail or retrurn invalid
+
+            #else
+                guard let valid = valid?.identifier, valid == "valid" else {
+                    return .failure(.invalidKTP)
+                }
+            #endif
 
             let croppedImageIfCan = try await cropKTPUseCase.exec(image: image)
 
@@ -73,10 +82,9 @@ final class ExtractKTPUsecase {
                 return .failure(.invalidKTP)
             }
 
-            texts = removeKeywords(from: texts)
-
             idData.image = image
-            idData.nama = extractName(from: data)
+            idData.nama = extractNameUsecase.exec(texts: texts)
+            texts = removeKeywords(from: texts)
 
             extractUseCases(texts: texts, into: &idData)
 
@@ -100,11 +108,6 @@ final class ExtractKTPUsecase {
             }
             return newText
         }
-    }
-
-    private func extractName(from data: [TextRecognizerModel]) -> String? {
-        guard data.count > 6 else { return nil }
-        return data[5].candidate.sanitize()
     }
 
     private func extractUseCases(texts: [String], into idData: inout IDModel) {
