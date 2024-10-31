@@ -7,7 +7,7 @@
 
 import UIKit
 
-class UIKitDocumentScannerRepositoryImpl: NSObject, DocumentScannerRepository {
+class UIKitCameraCaptureRepositoryImpl: NSObject, CameraCaptureRepository {
     private var continuation: CheckedContinuation<UIImage, Error>?
 
     @MainActor
@@ -26,7 +26,7 @@ class UIKitDocumentScannerRepositoryImpl: NSObject, DocumentScannerRepository {
     }
 }
 
-extension UIKitDocumentScannerRepositoryImpl: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+extension UIKitCameraCaptureRepositoryImpl: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let topController = UIApplication.topViewController(),
            let image = info[.originalImage] as? UIImage

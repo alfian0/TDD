@@ -8,7 +8,7 @@
 import UIKit
 import VisionKit
 
-class VisionDocumentScannerRepositoryImpl: NSObject, DocumentScannerRepository {
+class VisionCameraCaptureRepositoryImpl: NSObject, CameraCaptureRepository {
     // Store the continuation to resume the async function
     private var continuation: CheckedContinuation<UIImage, Error>?
 
@@ -29,7 +29,7 @@ class VisionDocumentScannerRepositoryImpl: NSObject, DocumentScannerRepository {
     }
 }
 
-extension VisionDocumentScannerRepositoryImpl: VNDocumentCameraViewControllerDelegate {
+extension VisionCameraCaptureRepositoryImpl: VNDocumentCameraViewControllerDelegate {
     func documentCameraViewController(_: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
         if let topController = UIApplication.topViewController() {
             // Dismiss the camera and pass the result

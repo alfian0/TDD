@@ -93,7 +93,7 @@ final class ExtractKTPUsecaseTest: XCTestCase {
     }
 }
 
-final class MockDocumentScanner: DocumentScannerRepository {
+final class MockDocumentScanner: CameraCaptureRepository {
     var result: UIImage?
     var error: NSError?
 

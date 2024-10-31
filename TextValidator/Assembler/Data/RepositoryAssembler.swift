@@ -16,8 +16,8 @@ final class RepositoryAssembler: Assembly {
             return OCRKTPUsecase(visionService: visionService)
         }
 
-        container.register(DocumentScannerRepository.self) { _ in
-            VisionDocumentScannerRepositoryImpl()
+        container.register(CameraCaptureRepository.self) { _ in
+            VisionCameraCaptureRepositoryImpl()
         }
 
         container.register(CountryCodeRepositoryImpl.self) { _ in

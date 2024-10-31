@@ -7,6 +7,6 @@
 
 import UIKit
 
-protocol DocumentScannerRepository {
+protocol CameraCaptureRepository {
     func scanDocument() async throws -> UIImage
 }

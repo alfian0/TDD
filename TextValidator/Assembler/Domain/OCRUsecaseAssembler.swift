@@ -38,7 +38,7 @@ final class OCRUsecaseAssembler: Assembly {
             guard let cropKTPUseCase = r.resolve(CropKTPUseCase.self) else {
                 fatalError()
             }
-            guard let documentScannerRepository = r.resolve(DocumentScannerRepository.self) else {
+            guard let documentScannerRepository = r.resolve(CameraCaptureRepository.self) else {
                 fatalError()
             }
             guard let classifiedKTPUsecase = r.resolve(ClassifiedKTPUsecase.self) else {

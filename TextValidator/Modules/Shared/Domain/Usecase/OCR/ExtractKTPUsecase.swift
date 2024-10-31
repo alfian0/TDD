@@ -15,7 +15,7 @@ enum ExtractKTPUsecaseError: Error, LocalizedError {
 final class ExtractKTPUsecase {
     private let ocrKTPUsecase: OCRKTPUsecase
     private let cropKTPUseCase: CropKTPUseCase
-    private let documentScannerRepository: DocumentScannerRepository
+    private let documentScannerRepository: CameraCaptureRepository
     private let classifiedKTPUsecase: ClassifiedKTPUsecase
     private let extractNIKUsecase: ExtractNIKUsecase
     private let extractNameUsecase: ExtractNameUsecase
@@ -28,7 +28,7 @@ final class ExtractKTPUsecase {
     private let candidateMatchingUsecase: CandidateMatchingUsecase
 
     init(
-        documentScannerRepository: DocumentScannerRepository,
+        documentScannerRepository: CameraCaptureRepository,
         ocrKTPUsecase: OCRKTPUsecase,
         cropKTPUseCase: CropKTPUseCase,
         classifiedKTPUsecase: ClassifiedKTPUsecase,

@@ -25,7 +25,7 @@ final class OCRViewModel: ObservableObject {
     private let ageValidationUsecase: AgeValidationUsecase
     private let coordinator: OCRViewCoordinator
     private var cancellables = Set<AnyCancellable>()
-    private let repo: DocumentScannerRepository = UIKitDocumentScannerRepositoryImpl()
+    private let repo: CameraCaptureRepository = UIKitCameraCaptureRepositoryImpl()
 
     init(
         extractKTPUsecase: ExtractKTPUsecase,
