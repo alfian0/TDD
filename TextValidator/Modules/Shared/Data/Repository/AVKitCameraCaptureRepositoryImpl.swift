@@ -6,43 +6,48 @@
 //
 
 import AVFoundation
-import UIKit
+import SwiftUI
 
 class AVKitCameraCaptureRepositoryImpl: NSObject, CameraCaptureRepository {
-    private var captureSession = AVCaptureSession()
-    private var queue = DispatchQueue(label: "video.capture")
-    private var photoOutput = AVCapturePhotoOutput()
-    private var imageContinuation: CheckedContinuation<UIImage, Error>?
-    private var capturedImage: UIImage?
-
-    override init() {
-        super.init()
-        configure(position: .back)
-    }
-
+    @MainActor
     func getCapturedImage() async throws -> UIImage {
-        guard let capturedImage = capturedImage else {
-            throw CameraError.captureFailed
+        return try await withCheckedThrowingContinuation { continuation in
+            let imagePickerView = CameraView(viewModel: CameraViewModel()) { image in
+                UIApplication.topViewController()?.dismiss(animated: true, completion: {
+                    continuation.resume(returning: image)
+                })
+            }
+            let imagePickerController = UIHostingController(rootView: imagePickerView)
+            imagePickerController.modalPresentationStyle = .fullScreen
+            if let topController = UIApplication.topViewController() {
+                topController.present(imagePickerController, animated: true)
+            }
+        }
+    }
+}
+
+@MainActor
+final class CameraViewModel: NSObject, ObservableObject {
+    @Published var capturedImage: UIImage? = nil
+    @Published var isCapturing = false
+    @Published var captureSession: AVCaptureSession? = nil
+    private var photoOutput = AVCapturePhotoOutput()
+
+    func captureImage() {
+        isCapturing.toggle()
+        let settings = AVCapturePhotoSettings()
+        settings.flashMode = .off
+        photoOutput.capturePhoto(with: settings, delegate: self)
+    }
+
+    func startSession() {
+        captureSession = AVCaptureSession()
+
+        guard let captureSession = captureSession else {
+            return
         }
 
-        return capturedImage
-    }
-
-    func captureImage() async throws -> UIImage {
-        guard captureSession.isRunning else {
-            throw CameraError.sessionNotStarted
-        }
-        let _capturedImage = try await capturePhoto(flashMode: .off)
-        capturedImage = _capturedImage
-        return _capturedImage
-    }
-
-    func getSession() -> AVCaptureSession {
-        return captureSession
-    }
-
-    private func configure(position: AVCaptureDevice.Position) {
-        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position) else {
+        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
             return
         }
 
@@ -65,44 +70,130 @@ class AVKitCameraCaptureRepositoryImpl: NSObject, CameraCaptureRepository {
         photoOutput.connection(with: .video)?.videoOrientation = UIDevice.current.orientation.videoOrientation
         captureSession.addOutput(photoOutput)
         captureSession.commitConfiguration()
+        captureSession.startRunning()
     }
 
-    private func capturePhoto(flashMode: AVCaptureDevice.FlashMode) async throws -> UIImage {
-        return try await withCheckedThrowingContinuation { continuation in
-            imageContinuation = continuation
-            let settings = AVCapturePhotoSettings()
-            settings.flashMode = flashMode
-            photoOutput.capturePhoto(with: settings, delegate: self)
-        }
+    func stopSession() {
+        captureSession?.stopRunning()
+        captureSession = nil
+    }
+
+    func reset() {
+        capturedImage = nil
+        startSession()
     }
 }
 
-// MARK: - AVCapturePhotoCaptureDelegate
-
-extension AVKitCameraCaptureRepositoryImpl: AVCapturePhotoCaptureDelegate {
+extension CameraViewModel: @preconcurrency AVCapturePhotoCaptureDelegate {
     func photoOutput(_: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        if let error = error {
-            imageContinuation?.resume(throwing: error)
+        guard error == nil else {
             return
         }
 
         guard let imageData = photo.fileDataRepresentation() else {
-            imageContinuation?.resume(throwing: CameraError.captureFailed)
             return
         }
 
         guard let provider = CGDataProvider(data: imageData as CFData) else {
-            imageContinuation?.resume(throwing: CameraError.captureFailed)
             return
         }
 
         guard let cgImage = CGImage(jpegDataProviderSource: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent) else {
-            imageContinuation?.resume(throwing: CameraError.captureFailed)
             return
         }
 
         let image = UIImage(cgImage: cgImage, scale: 1, orientation: UIDevice.current.orientation.uiImageOrientation)
 
-        imageContinuation?.resume(returning: image)
+        capturedImage = image
+        isCapturing.toggle()
+        stopSession()
     }
+}
+
+struct CameraView: View {
+    @Environment(\.verticalSizeClass) var verticalSizeClass
+    @StateObject var viewModel: CameraViewModel
+    var isLansscape: Bool { verticalSizeClass == .compact }
+    var completion: (UIImage) -> Void
+
+    var body: some View {
+        ZStack {
+            if let session = viewModel.captureSession {
+                GeometryReader { proxy in
+                    CameraPreview(frame: proxy.frame(in: .global), captureSession: session)
+                }
+                .ignoresSafeArea()
+            }
+
+            if let image = viewModel.capturedImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+            }
+
+            if isLansscape {
+                HStack {
+                    Action
+                }
+            } else {
+                VStack {
+                    Action
+                }
+            }
+        }
+        .onAppear {
+            viewModel.startSession()
+        }
+        .onDisappear {
+            viewModel.stopSession()
+        }
+    }
+
+    private var Action: some View {
+        Group {
+            Spacer()
+
+            if viewModel.capturedImage != nil {
+                if isLansscape {
+                    VStack {
+                        Result
+                    }
+                } else {
+                    HStack {
+                        Result
+                    }
+                }
+            } else {
+                Button {
+                    viewModel.captureImage()
+                } label: {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 70, height: 70)
+                        .opacity(viewModel.isCapturing ? 0.5 : 1.0)
+                }
+                .disabled(viewModel.isCapturing)
+            }
+        }
+    }
+
+    private var Result: some View {
+        Group {
+            Button("Retake") {
+                viewModel.reset()
+            }
+
+            Spacer()
+
+            Button("Use Photo") {
+                guard let image = viewModel.capturedImage else { return }
+                completion(image)
+            }
+        }
+        .padding()
+    }
+}
+
+#Preview {
+    CameraView(viewModel: CameraViewModel(), completion: { _ in })
 }

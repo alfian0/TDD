@@ -9,6 +9,8 @@ import FirebaseCore
 import SwiftUI
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    static var orientationLock = UIInterfaceOrientationMask.all
+
     func application(
         _: UIApplication,
         didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil
@@ -18,6 +20,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_: UIApplication, didReceiveRemoteNotification _: [AnyHashable: Any], fetchCompletionHandler _: @escaping (UIBackgroundFetchResult) -> Void) {}
+
+    func application(_: UIApplication, supportedInterfaceOrientationsFor _: UIWindow?) -> UIInterfaceOrientationMask {
+        return AppDelegate.orientationLock
+    }
 }
 
 @main
@@ -28,7 +34,7 @@ struct TextValidatorApp: App {
 
     var body: some Scene {
         WindowGroup {
-//            CameraView(viewModel: CameraViewModel(repository: AVKitCameraCaptureRepositoryImpl()))
+//            CameraView(viewModel: CameraViewModel())
             NavigationControllerWrapper(coordinator: coordinator)
                 .edgesIgnoringSafeArea(.all)
                 .onViewDidLoad {

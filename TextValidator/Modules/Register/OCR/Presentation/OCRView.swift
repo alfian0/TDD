@@ -28,6 +28,7 @@ struct OCRView: View {
                 if let image = viewModel.idCardImage {
                     Image(uiImage: image)
                         .resizable()
+                        .scaledToFit()
                         .onTapGesture {
                             viewModel.captureKTP()
                         }
