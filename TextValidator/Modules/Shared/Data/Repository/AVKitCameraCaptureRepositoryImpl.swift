@@ -41,6 +41,17 @@ final class CameraViewModel: NSObject, ObservableObject {
     }
 
     func startSession() {
+        let status = AVCaptureDevice.authorizationStatus(for: .video)
+        guard status == .authorized else {
+            if status == .notDetermined {
+                AVCaptureDevice.requestAccess(for: .video) { [weak self] status in
+                    guard status else { return }
+                    self?.startSession()
+                }
+            }
+            return
+        }
+
         captureSession = AVCaptureSession()
 
         guard let captureSession = captureSession else {
@@ -122,69 +133,73 @@ struct CameraView: View {
 
     var body: some View {
         ZStack {
-            if let session = viewModel.captureSession {
-                GeometryReader { proxy in
-                    CameraPreview(frame: proxy.frame(in: .global), captureSession: session)
-                }
-                .ignoresSafeArea()
-            }
-
-            if viewModel.capturedImage == nil {
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.blue, lineWidth: 4)
-                    .aspectRatio(85.6 / 53.98, contentMode: .fit)
-                    .background(Color.clear)
-                    .overlay(
-                        Text("Align KTP here")
-                            .foregroundColor(.white)
-                            .padding(4)
-                            .background(Color.black.opacity(0.6))
-                            .cornerRadius(4)
-                            .padding(8),
-                        alignment: .bottom
-                    )
-                    .padding()
-            }
-
-            if viewModel.capturedImage != nil {
-                HStack(spacing: 16) {
-                    if let image = viewModel.capturedImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                    } else {
-                        Spacer()
+            if AVCaptureDevice.authorizationStatus(for: .video) == .authorized {
+                if let session = viewModel.captureSession {
+                    GeometryReader { proxy in
+                        CameraPreview(frame: proxy.frame(in: .global), captureSession: session)
                     }
+                    .ignoresSafeArea()
+                }
 
-                    VStack(alignment: .trailing) {
-                        Button("Retake") {
-                            viewModel.reset()
+                if viewModel.capturedImage == nil {
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.blue, lineWidth: 4)
+                        .aspectRatio(85.6 / 53.98, contentMode: .fit)
+                        .background(Color.clear)
+                        .overlay(
+                            Text("Align KTP here")
+                                .foregroundColor(.white)
+                                .padding(4)
+                                .background(Color.black.opacity(0.6))
+                                .cornerRadius(4)
+                                .padding(8),
+                            alignment: .bottom
+                        )
+                        .padding()
+                }
+
+                if viewModel.capturedImage != nil {
+                    HStack(spacing: 16) {
+                        if let image = viewModel.capturedImage {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                        } else {
+                            Spacer()
                         }
 
+                        VStack(alignment: .trailing) {
+                            Button("Retake") {
+                                viewModel.reset()
+                            }
+
+                            Spacer()
+
+                            Button("Use Photo") {
+                                guard let image = viewModel.capturedImage else { return }
+                                completion(image)
+                            }
+                        }
+                        .padding(.vertical, 32)
+                    }
+                    .ignoresSafeArea()
+                } else {
+                    HStack {
                         Spacer()
 
-                        Button("Use Photo") {
-                            guard let image = viewModel.capturedImage else { return }
-                            completion(image)
+                        Button {
+                            viewModel.captureImage()
+                        } label: {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 70, height: 70)
+                                .opacity(viewModel.isCapturing ? 0.5 : 1.0)
                         }
+                        .disabled(viewModel.isCapturing)
                     }
-                    .padding(.vertical, 32)
                 }
-                .ignoresSafeArea()
             } else {
-                HStack {
-                    Spacer()
-
-                    Button {
-                        viewModel.captureImage()
-                    } label: {
-                        Circle()
-                            .fill(Color.white)
-                            .frame(width: 70, height: 70)
-                            .opacity(viewModel.isCapturing ? 0.5 : 1.0)
-                    }
-                    .disabled(viewModel.isCapturing)
-                }
+                Text("Change camera access on the setting menu")
             }
         }
         .onAppear {
