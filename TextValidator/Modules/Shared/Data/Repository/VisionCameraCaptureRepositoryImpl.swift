@@ -13,7 +13,7 @@ class VisionCameraCaptureRepositoryImpl: NSObject, CameraCaptureRepository {
     private var continuation: CheckedContinuation<UIImage, Error>?
 
     @MainActor
-    func scanDocument() async throws -> UIImage {
+    func getCapturedImage() async throws -> UIImage {
         // Present the document scanner view controller and wait for completion
         return try await withCheckedThrowingContinuation { continuation in
             let documentCameraViewController = VNDocumentCameraViewController()

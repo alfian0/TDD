@@ -79,6 +79,6 @@ final class CropKTPUseCase {
         // Crop the image using the bounding box
         guard let croppedCGImage = cgImage.cropping(to: rect) else { return nil }
 
-        return UIImage(cgImage: croppedCGImage)
+        return UIImage(cgImage: croppedCGImage, scale: image.scale, orientation: image.imageOrientation)
     }
 }

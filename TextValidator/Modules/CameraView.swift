@@ -8,42 +8,56 @@
 import AVFoundation
 import SwiftUI
 
-struct CameraPreview: UIViewRepresentable {
-    let frame: CGRect
-    let captureSession: AVCaptureSession
+@MainActor
+final class CameraViewModel: ObservableObject {
+    @Published var capturedImage: UIImage? = nil
+    @Published var isCapturing = false
+    private let repository: AVKitCameraCaptureRepositoryImpl
 
-    func makeUIView(context _: Context) -> UIView {
-        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        let view = UIView(frame: frame)
-        view.backgroundColor = .black
-        view.layer.addSublayer(previewLayer)
-        previewLayer.session = captureSession
-        previewLayer.videoGravity = .resizeAspectFill
-        previewLayer.frame = frame
-        previewLayer.connection?.videoOrientation = UIDevice.current.orientation.videoOrientation
-        return view
+    init(repository: AVKitCameraCaptureRepositoryImpl) {
+        self.repository = repository
     }
 
-    func updateUIView(_ view: UIView, context _: Context) {
-        guard let previewLayer = view.layer.sublayers?.first as? AVCaptureVideoPreviewLayer else {
-            return
+    func getSession() -> AVCaptureSession {
+        repository.getSession()
+    }
+
+    func captureImage() {
+        Task {
+            isCapturing = true
+            defer {
+                isCapturing = false
+            }
+            do {
+                capturedImage = try await repository.getCapturedImage()
+            } catch {
+                print(error.localizedDescription)
+            }
         }
-        previewLayer.frame = frame
-        previewLayer.connection?.videoOrientation = UIDevice.current.orientation.videoOrientation
+    }
+
+    func startSession() {
+        Task(priority: .background) {
+            repository.getSession().startRunning()
+        }
+    }
+
+    func stopSession() {
+        Task(priority: .background) {
+            repository.getSession().stopRunning()
+        }
     }
 }
 
 struct CameraView: View {
-    private var cameraRepo = AVKitCameraCaptureRepositoryImpl()
-    @State private var capturedImage: UIImage? = nil
-    @State private var isCapturing = false
     @Environment(\.verticalSizeClass) var verticalSizeClass
+    @StateObject var viewModel: CameraViewModel
     var isLansscape: Bool { verticalSizeClass == .compact }
 
     var body: some View {
         ZStack {
             GeometryReader { proxy in
-                CameraPreview(frame: proxy.frame(in: .global), captureSession: cameraRepo.captureSession)
+                CameraPreview(frame: proxy.frame(in: .global), captureSession: viewModel.getSession())
             }
             .ignoresSafeArea()
 
@@ -51,29 +65,17 @@ struct CameraView: View {
                 HStack {
                     Action
                 }
-
-                HStack {
-                    Result
-                }
             } else {
                 VStack {
                     Action
                 }
-
-                VStack {
-                    Result
-                }
             }
         }
         .onAppear {
-            Task(priority: .background) {
-                cameraRepo.captureSession.startRunning()
-            }
+            viewModel.startSession()
         }
         .onDisappear {
-            Task(priority: .background) {
-                cameraRepo.captureSession.stopRunning()
-            }
+            viewModel.stopSession()
         }
     }
 
@@ -81,67 +83,19 @@ struct CameraView: View {
         Group {
             Spacer()
 
-            Button(action: capturePhoto) {
+            Button {
+                viewModel.captureImage()
+            } label: {
                 Circle()
                     .fill(Color.white)
                     .frame(width: 70, height: 70)
-                    .opacity(isCapturing ? 0.5 : 1.0)
+                    .opacity(viewModel.isCapturing ? 0.5 : 1.0)
             }
-            .disabled(isCapturing)
-        }
-    }
-
-    private var Result: some View {
-        Group {
-            Spacer()
-
-            if isLansscape {
-                VStack {
-                    Spacer()
-
-                    if let image = capturedImage {
-                        ZStack {
-                            Color.white
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                        }
-                        .frame(width: 80, height: 80)
-                    }
-                }
-            } else {
-                HStack {
-                    if let image = capturedImage {
-                        ZStack {
-                            Color.white
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                        }
-                        .frame(width: 80, height: 80)
-                    }
-
-                    Spacer()
-                }
-                .padding(.horizontal)
-            }
-        }
-    }
-
-    private func capturePhoto() {
-        isCapturing = true
-        Task {
-            do {
-                let image = try await cameraRepo.scanDocument()
-                capturedImage = image
-            } catch {
-                print("Failed to capture photo: \(error)")
-            }
-            isCapturing = false
+            .disabled(viewModel.isCapturing)
         }
     }
 }
 
 #Preview {
-    CameraView()
+    CameraView(viewModel: CameraViewModel(repository: AVKitCameraCaptureRepositoryImpl()))
 }

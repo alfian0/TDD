@@ -67,14 +67,29 @@ final class VisionService {
         return results as? [VNClassificationObservation] ?? []
     }
 
-    func detectRect(in image: UIImage) async throws -> [VNRectangleObservation] {
+    // MARK: Example KTP
+
+    // - Width = 8.56 cm
+    // - Height = 5.398 cm
+    // - Aspect Ratio = (Width / Height) = (8.56 cm / 5.398 cm) = 1.585
+    // - Minimum & Maximum Aspect Ration = +- 5%
+    // - Minimum = 1.585 * 0.95 = 1.506
+    // - Maximum = 1.585 * 1.05 = 1.664
+
+    func detectRect(
+        in image: UIImage,
+        minimumAspectRatio: VNAspectRatio = 1.506,
+        maximumAspectRatio: VNAspectRatio = 1.664,
+        minimumSize: Float = 0.5,
+        maximumObservations: Int = 1
+    ) async throws -> [VNRectangleObservation] {
         let handler = try createImageRequestHandler(from: image)
         let request = VNDetectRectanglesRequest()
         // Configure the request for square detection
-        request.minimumAspectRatio = 1.506
-        request.maximumAspectRatio = 1.664
-        request.minimumSize = 0.5
-        request.maximumObservations = 1
+        request.minimumAspectRatio = minimumAspectRatio
+        request.maximumAspectRatio = maximumAspectRatio
+        request.minimumSize = minimumSize
+        request.maximumObservations = maximumObservations
         #if targetEnvironment(simulator)
             request.usesCPUOnly = true
         #endif

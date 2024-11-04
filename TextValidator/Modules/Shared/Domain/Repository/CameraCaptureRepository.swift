@@ -8,5 +8,5 @@
 import UIKit
 
 protocol CameraCaptureRepository {
-    func scanDocument() async throws -> UIImage
+    func getCapturedImage() async throws -> UIImage
 }

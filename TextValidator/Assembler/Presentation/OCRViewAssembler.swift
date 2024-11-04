@@ -15,6 +15,9 @@ final class OCRViewAssembler: @preconcurrency Assembly {
         }
 
         container.register(OCRViewModel.self) { r, c in
+            guard let repository = r.resolve(CameraCaptureRepository.self) else {
+                fatalError()
+            }
             guard let extractKTPUsecase = r.resolve(ExtractKTPUsecase.self) else {
                 fatalError()
             }
@@ -28,6 +31,7 @@ final class OCRViewAssembler: @preconcurrency Assembly {
                 fatalError()
             }
             return OCRViewModel(
+                repository: repository,
                 extractKTPUsecase: extractKTPUsecase,
                 nameValidationUsecase: nameValidationUsecase,
                 nikValidationUsecase: nikValidationUsecase,

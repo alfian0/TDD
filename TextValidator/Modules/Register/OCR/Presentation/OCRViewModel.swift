@@ -10,6 +10,7 @@ import SwiftUI
 
 @MainActor
 final class OCRViewModel: ObservableObject {
+    @Published var isLoading: Bool = false
     @Published var idCardImage: UIImage? = UIImage(named: "img_id_card_placeholder")
     @Published var name: String = ""
     @Published var nameError: String?
@@ -19,21 +20,23 @@ final class OCRViewModel: ObservableObject {
     @Published var dateOfBirthError: String?
     @Published var canSubmit: Bool = false
 
+    private let repository: CameraCaptureRepository
     private let extractKTPUsecase: ExtractKTPUsecase
     private let nameValidationUsecase: NameValidationUsecase
     private let nikValidationUsecase: NIKValidationUsecase
     private let ageValidationUsecase: AgeValidationUsecase
     private let coordinator: OCRViewCoordinator
     private var cancellables = Set<AnyCancellable>()
-    private let repo: CameraCaptureRepository = UIKitCameraCaptureRepositoryImpl()
 
     init(
+        repository: CameraCaptureRepository,
         extractKTPUsecase: ExtractKTPUsecase,
         nameValidationUsecase: NameValidationUsecase,
         nikValidationUsecase: NIKValidationUsecase,
         ageValidationUsecase: AgeValidationUsecase,
         coordinator: OCRViewCoordinator
     ) {
+        self.repository = repository
         self.extractKTPUsecase = extractKTPUsecase
         self.nameValidationUsecase = nameValidationUsecase
         self.nikValidationUsecase = nikValidationUsecase
@@ -43,9 +46,14 @@ final class OCRViewModel: ObservableObject {
         setupBindings()
     }
 
-    func scanDocument() {
+    func captureKTP() {
         Task {
-            let result = await extractKTPUsecase.exec()
+            isLoading = true
+            defer {
+                isLoading = false
+            }
+            let image = try await repository.getCapturedImage()
+            let result = await extractKTPUsecase.exec(image: image)
             handleExtractionResult(result)
         }
     }

@@ -97,7 +97,7 @@ final class MockDocumentScanner: CameraCaptureRepository {
     var result: UIImage?
     var error: NSError?
 
-    func scanDocument() async throws -> UIImage {
+    func getCapturedImage() async throws -> UIImage {
         guard let result = result else {
             throw error ?? NSError(domain: "", code: 404)
         }

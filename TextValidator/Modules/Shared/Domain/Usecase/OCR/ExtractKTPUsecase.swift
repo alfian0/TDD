@@ -57,20 +57,20 @@ final class ExtractKTPUsecase {
         self.candidateMatchingUsecase = candidateMatchingUsecase
     }
 
-    func exec() async -> Result<IDModel, ExtractKTPUsecaseError> {
+    func exec(image: UIImage) async -> Result<IDModel, ExtractKTPUsecaseError> {
         do {
             var idData = IDModel()
-            let image = try await documentScannerRepository.scanDocument()
-            let valid = try await classifiedKTPUsecase.exec(image: image)
+//            let image = try await documentScannerRepository.getCapturedImage()
+//            let valid = try await classifiedKTPUsecase.exec(image: image)
 
             #if targetEnvironment(simulator)
 
                 // MARK: When use simulator will fail or retrurn invalid
 
             #else
-                guard let valid = valid?.identifier, valid == "valid" else {
-                    return .failure(.invalidKTP)
-                }
+//                guard let valid = valid?.identifier, valid == "valid" else {
+//                    return .failure(.invalidKTP)
+//                }
             #endif
 
             let croppedImageIfCan = try await cropKTPUseCase.exec(image: image)
@@ -82,7 +82,7 @@ final class ExtractKTPUsecase {
                 return .failure(.invalidKTP)
             }
 
-            idData.image = image
+            idData.image = croppedImageIfCan
             idData.nama = extractNameUsecase.exec(texts: texts)
             texts = removeKeywords(from: texts)
 

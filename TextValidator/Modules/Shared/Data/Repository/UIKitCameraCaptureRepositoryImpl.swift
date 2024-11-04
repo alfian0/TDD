@@ -11,7 +11,7 @@ class UIKitCameraCaptureRepositoryImpl: NSObject, CameraCaptureRepository {
     private var continuation: CheckedContinuation<UIImage, Error>?
 
     @MainActor
-    func scanDocument() async throws -> UIImage {
+    func getCapturedImage() async throws -> UIImage {
         return try await withCheckedThrowingContinuation { continuation in
             let imagePickerController = UIImagePickerController()
             imagePickerController.sourceType = .camera

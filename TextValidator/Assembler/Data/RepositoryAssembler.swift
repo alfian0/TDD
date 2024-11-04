@@ -10,7 +10,9 @@ import Swinject
 final class RepositoryAssembler: Assembly {
     func assemble(container: Swinject.Container) {
         container.register(CameraCaptureRepository.self) { _ in
-            VisionCameraCaptureRepositoryImpl()
+            UIKitCameraCaptureRepositoryImpl()
+//            VisionCameraCaptureRepositoryImpl()
+//            AVKitCameraCaptureRepositoryImpl()
         }
         .inObjectScope(.container)
 

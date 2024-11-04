@@ -13,10 +13,6 @@ final class ServiceAssembler: Assembly {
             VisionService()
         }
 
-        container.register(UserdefaultsService.self) { _ in
-            UserdefaultsService()
-        }
-
         container.register(BiometricService.self) { _ in
             BiometricService()
         }

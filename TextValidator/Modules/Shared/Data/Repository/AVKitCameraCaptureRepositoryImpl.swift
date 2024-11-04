@@ -9,18 +9,36 @@ import AVFoundation
 import UIKit
 
 class AVKitCameraCaptureRepositoryImpl: NSObject, CameraCaptureRepository {
-    private(set) var captureSession = AVCaptureSession()
+    private var captureSession = AVCaptureSession()
     private var queue = DispatchQueue(label: "video.capture")
     private var photoOutput = AVCapturePhotoOutput()
     private var imageContinuation: CheckedContinuation<UIImage, Error>?
+    private var capturedImage: UIImage?
 
     override init() {
         super.init()
         configure(position: .back)
     }
 
-    func scanDocument() async throws -> UIImage {
-        try await capturePhoto(flashMode: .off)
+    func getCapturedImage() async throws -> UIImage {
+        guard let capturedImage = capturedImage else {
+            throw CameraError.captureFailed
+        }
+
+        return capturedImage
+    }
+
+    func captureImage() async throws -> UIImage {
+        guard captureSession.isRunning else {
+            throw CameraError.sessionNotStarted
+        }
+        let _capturedImage = try await capturePhoto(flashMode: .off)
+        capturedImage = _capturedImage
+        return _capturedImage
+    }
+
+    func getSession() -> AVCaptureSession {
+        return captureSession
     }
 
     private func configure(position: AVCaptureDevice.Position) {

@@ -128,4 +128,5 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
 enum CameraError: Error {
     case unauthorized
     case captureFailed
+    case sessionNotStarted
 }
