@@ -70,6 +70,9 @@ struct OCRView: View {
         .onViewDidLoad {
             viewModel.captureKTP()
         }
+        .onAppear {
+            AppDelegate.orientationLock = .all
+        }
         .toolbar {
 //            ToolbarItem(placement: .keyboard) {
 //                Button("Done") {

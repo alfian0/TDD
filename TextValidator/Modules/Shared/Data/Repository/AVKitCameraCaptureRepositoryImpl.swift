@@ -67,15 +67,19 @@ final class CameraViewModel: NSObject, ObservableObject {
             return
         }
 
-        photoOutput.connection(with: .video)?.videoOrientation = UIDevice.current.orientation.videoOrientation
+        photoOutput.connection(with: .video)?.videoOrientation = .landscapeRight
         captureSession.addOutput(photoOutput)
         captureSession.commitConfiguration()
-        captureSession.startRunning()
+        Task.detached {
+            captureSession.startRunning()
+        }
     }
 
     func stopSession() {
-        captureSession?.stopRunning()
-        captureSession = nil
+        Task(priority: .background) {
+            captureSession?.stopRunning()
+            captureSession = nil
+        }
     }
 
     func reset() {
@@ -102,7 +106,8 @@ extension CameraViewModel: @preconcurrency AVCapturePhotoCaptureDelegate {
             return
         }
 
-        let image = UIImage(cgImage: cgImage, scale: 1, orientation: UIDevice.current.orientation.uiImageOrientation)
+//        let image = UIImage(cgImage: cgImage, scale: 1, orientation: UIDevice.current.orientation.uiImageOrientation)
+        let image = UIImage(cgImage: cgImage)
 
         capturedImage = image
         isCapturing.toggle()
@@ -113,7 +118,6 @@ extension CameraViewModel: @preconcurrency AVCapturePhotoCaptureDelegate {
 struct CameraView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @StateObject var viewModel: CameraViewModel
-    var isLansscape: Bool { verticalSizeClass == .compact }
     var completion: (UIImage) -> Void
 
     var body: some View {
@@ -125,72 +129,75 @@ struct CameraView: View {
                 .ignoresSafeArea()
             }
 
-            if let image = viewModel.capturedImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
+            if viewModel.capturedImage == nil {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.blue, lineWidth: 4)
+                    .aspectRatio(85.6 / 53.98, contentMode: .fit)
+                    .background(Color.clear)
+                    .overlay(
+                        Text("Align KTP here")
+                            .foregroundColor(.white)
+                            .padding(4)
+                            .background(Color.black.opacity(0.6))
+                            .cornerRadius(4)
+                            .padding(8),
+                        alignment: .bottom
+                    )
+                    .padding()
             }
 
-            if isLansscape {
-                HStack {
-                    Action
+            if viewModel.capturedImage != nil {
+                HStack(spacing: 16) {
+                    if let image = viewModel.capturedImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                    } else {
+                        Spacer()
+                    }
+
+                    VStack(alignment: .trailing) {
+                        Button("Retake") {
+                            viewModel.reset()
+                        }
+
+                        Spacer()
+
+                        Button("Use Photo") {
+                            guard let image = viewModel.capturedImage else { return }
+                            completion(image)
+                        }
+                    }
+                    .padding(.vertical, 32)
                 }
+                .ignoresSafeArea()
             } else {
-                VStack {
-                    Action
+                HStack {
+                    Spacer()
+
+                    Button {
+                        viewModel.captureImage()
+                    } label: {
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 70, height: 70)
+                            .opacity(viewModel.isCapturing ? 0.5 : 1.0)
+                    }
+                    .disabled(viewModel.isCapturing)
                 }
             }
         }
         .onAppear {
             viewModel.startSession()
+            // Lock orientation
+            UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+            AppDelegate.orientationLock = .landscapeRight
         }
         .onDisappear {
             viewModel.stopSession()
+            // Release lock orientation
+            AppDelegate.orientationLock = .all
         }
-    }
-
-    private var Action: some View {
-        Group {
-            Spacer()
-
-            if viewModel.capturedImage != nil {
-                if isLansscape {
-                    VStack {
-                        Result
-                    }
-                } else {
-                    HStack {
-                        Result
-                    }
-                }
-            } else {
-                Button {
-                    viewModel.captureImage()
-                } label: {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 70, height: 70)
-                        .opacity(viewModel.isCapturing ? 0.5 : 1.0)
-                }
-                .disabled(viewModel.isCapturing)
-            }
-        }
-    }
-
-    private var Result: some View {
-        Group {
-            Button("Retake") {
-                viewModel.reset()
-            }
-
-            Spacer()
-
-            Button("Use Photo") {
-                guard let image = viewModel.capturedImage else { return }
-                completion(image)
-            }
-        }
-        .padding()
     }
 }
 

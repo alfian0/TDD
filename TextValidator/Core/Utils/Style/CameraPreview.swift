@@ -20,8 +20,9 @@ struct CameraPreview: UIViewRepresentable {
         previewLayer.session = captureSession
         previewLayer.videoGravity = .resizeAspectFill
         previewLayer.frame = frame
-        previewLayer.backgroundColor = UIColor.black.cgColor
-        previewLayer.connection?.videoOrientation = UIDevice.current.orientation.videoOrientation
+        previewLayer.backgroundColor = UIColor.yellow.cgColor
+        previewLayer.connection?.videoOrientation = .landscapeRight
+//        previewLayer.connection?.videoOrientation = UIDevice.current.orientation.videoOrientation
         return view
     }
 
@@ -30,6 +31,7 @@ struct CameraPreview: UIViewRepresentable {
             return
         }
         previewLayer.frame = frame
-        previewLayer.connection?.videoOrientation = UIDevice.current.orientation.videoOrientation
+//        previewLayer.connection?.videoOrientation = UIDevice.current.orientation.videoOrientation
+        previewLayer.connection?.videoOrientation = .landscapeRight
     }
 }
