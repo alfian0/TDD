@@ -21,8 +21,7 @@ struct CameraPreview: UIViewRepresentable {
         previewLayer.videoGravity = .resizeAspectFill
         previewLayer.frame = frame
         previewLayer.backgroundColor = UIColor.yellow.cgColor
-        previewLayer.connection?.videoOrientation = .landscapeRight
-//        previewLayer.connection?.videoOrientation = UIDevice.current.orientation.videoOrientation
+        previewLayer.connection?.videoOrientation = AppDelegate.orientationLock.videoOrientation
         return view
     }
 
@@ -31,7 +30,28 @@ struct CameraPreview: UIViewRepresentable {
             return
         }
         previewLayer.frame = frame
-//        previewLayer.connection?.videoOrientation = UIDevice.current.orientation.videoOrientation
-        previewLayer.connection?.videoOrientation = .landscapeRight
+        previewLayer.connection?.videoOrientation = AppDelegate.orientationLock.videoOrientation
+    }
+}
+
+extension UIInterfaceOrientationMask {
+    var uiImageOrientation: UIImage.Orientation {
+        switch self {
+        case .portrait: .right
+        case .portraitUpsideDown: .left
+        case .landscapeLeft: .up
+        case .landscapeRight: .down
+        default: UIDevice.current.orientation.uiImageOrientation
+        }
+    }
+
+    var videoOrientation: AVCaptureVideoOrientation {
+        switch self {
+        case .portrait: .portrait
+        case .portraitUpsideDown: .portraitUpsideDown
+        case .landscapeLeft: .landscapeRight
+        case .landscapeRight: .landscapeRight
+        default: UIDevice.current.orientation.videoOrientation
+        }
     }
 }

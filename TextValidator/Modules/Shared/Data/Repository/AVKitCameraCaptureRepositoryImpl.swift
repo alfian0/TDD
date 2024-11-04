@@ -34,6 +34,7 @@ final class CameraViewModel: NSObject, ObservableObject {
     private var photoOutput = AVCapturePhotoOutput()
 
     func captureImage() {
+        guard let isRunning = captureSession?.isRunning, isRunning else { return }
         isCapturing.toggle()
         let settings = AVCapturePhotoSettings()
         settings.flashMode = .off
@@ -78,7 +79,7 @@ final class CameraViewModel: NSObject, ObservableObject {
             return
         }
 
-        photoOutput.connection(with: .video)?.videoOrientation = .landscapeRight
+        photoOutput.connection(with: .video)?.videoOrientation = AppDelegate.orientationLock.videoOrientation
         captureSession.addOutput(photoOutput)
         captureSession.commitConfiguration()
         Task.detached {
@@ -117,7 +118,7 @@ extension CameraViewModel: @preconcurrency AVCapturePhotoCaptureDelegate {
             return
         }
 
-//        let image = UIImage(cgImage: cgImage, scale: 1, orientation: UIDevice.current.orientation.uiImageOrientation)
+//        let image = UIImage(cgImage: cgImage, scale: 1, orientation: AppDelegate.orientationLock.uiImageOrientation)
         let image = UIImage(cgImage: cgImage)
 
         capturedImage = image
