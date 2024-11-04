@@ -20,7 +20,6 @@ final class OCRViewModel: ObservableObject {
     @Published var dateOfBirthError: String?
     @Published var canSubmit: Bool = false
 
-    private let repository: CameraCaptureRepository
     private let extractKTPUsecase: ExtractKTPUsecase
     private let nameValidationUsecase: NameValidationUsecase
     private let nikValidationUsecase: NIKValidationUsecase
@@ -29,14 +28,12 @@ final class OCRViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     init(
-        repository: CameraCaptureRepository,
         extractKTPUsecase: ExtractKTPUsecase,
         nameValidationUsecase: NameValidationUsecase,
         nikValidationUsecase: NIKValidationUsecase,
         ageValidationUsecase: AgeValidationUsecase,
         coordinator: OCRViewCoordinator
     ) {
-        self.repository = repository
         self.extractKTPUsecase = extractKTPUsecase
         self.nameValidationUsecase = nameValidationUsecase
         self.nikValidationUsecase = nikValidationUsecase
@@ -52,8 +49,7 @@ final class OCRViewModel: ObservableObject {
             defer {
                 isLoading = false
             }
-            let image = try await repository.getCapturedImage()
-            let result = await extractKTPUsecase.exec(image: image)
+            let result = await extractKTPUsecase.exec()
             handleExtractionResult(result)
         }
     }

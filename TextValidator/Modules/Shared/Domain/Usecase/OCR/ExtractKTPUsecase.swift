@@ -57,10 +57,10 @@ final class ExtractKTPUsecase {
         self.candidateMatchingUsecase = candidateMatchingUsecase
     }
 
-    func exec(image: UIImage) async -> Result<IDModel, ExtractKTPUsecaseError> {
+    func exec() async -> Result<IDModel, ExtractKTPUsecaseError> {
         do {
             var idData = IDModel()
-//            let image = try await documentScannerRepository.getCapturedImage()
+            let image = try await documentScannerRepository.getCapturedImage()
 //            let valid = try await classifiedKTPUsecase.exec(image: image)
 
             #if targetEnvironment(simulator)
